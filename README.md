@@ -25,6 +25,36 @@ The branches intentionally keep different experimental scopes:
 
 This is research software. Back up relevant data and use a test account.
 
+## Build and run
+
+The following commands were verified with Node.js 22 and pnpm 11. Run them from
+the repository root after checking out the branch you want to test.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm exec neu update
+cp dist/neutralino.js neutralino.js
+pnpm build:clients
+```
+
+The built application is created at:
+
+```text
+Yaagl ZZZ DX12.app
+```
+
+To run the development build instead:
+
+```sh
+pnpm start-naposdx12
+```
+
+On first launch, the launcher imports the official GPTK 4.0 beta 2 runtime. Put
+`Game_Porting_Toolkit_4.0_beta_2.dmg` in `~/Downloads` before starting the
+launcher. The commands are the same for `main`, `dev`, and
+`codex/zzz-minimal-rt-shim`; only the checked-out branch changes the runtime
+experiment.
+
 ## Current Supported Game Version:
 ### GI: 5.3.0+ OS/CN **
 ### HSR: 4.3.0 OS/CN
