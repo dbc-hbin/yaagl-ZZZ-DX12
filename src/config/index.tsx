@@ -22,7 +22,7 @@ import {
 } from "@hope-ui/solid";
 import { CURRENT_YAAGL_VERSION, YAAGL_ADVANCED_ENABLE } from "../constants";
 import { Locale } from "../locale";
-import { Wine } from "../wine";
+import { D3DMETAL_LAUNCH_ENVIRONMENT, Wine } from "../wine";
 import { Config } from "./config-def";
 import { createMetalHUDConfig } from "./metal-hud";
 import { createGameInstallDirConfig } from "./game-install-dir";
@@ -31,11 +31,158 @@ import { createLeftCmdConfig } from "./left-cmd";
 import { createWineDistroConfig } from "./wine-distribution";
 import createLocaleConfig from "./ui-locale";
 import createFPSUnlock from "./fps-unlock";
-import { exec2, getKeyOrDefault, resolve, setKey } from "../utils";
-import { createSignal, JSXElement, Show } from "solid-js";
+import {
+  exec2,
+  getKeyOrDefault,
+  mkdirp,
+  readFile,
+  resolve,
+  setKey,
+} from "../utils";
+import { createSignal, JSXElement, onCleanup, onMount, Show } from "solid-js";
 import createReShade from "./reshade";
 import { createProxyEnabledConfig } from "@config/proxy-enabled";
 import { createProxyHostConfig } from "@config/proxy-host";
+import { join } from "path-browserify";
+import {
+  createD3DMetalDxrRuntimeStatus,
+  createD3DMetalMetalFxRuntimeStatus,
+  createD3DMetalMtl4RuntimeStatus,
+  D3DMetalDxrRuntimeStatusDisplay,
+  D3DMetalMetalFxRuntimeStatusDisplay,
+  D3DMetalMtl4RuntimeStatusDisplay,
+  findLatestD3DMetalEvidenceFile,
+} from "../diagnostics/d3dmetal";
+
+const DXR_STATUS_REFRESH_INTERVAL_MS = 5_000;
+
+async function readLatestD3DMetalEvidence() {
+  const logs = resolve("./logs");
+  let entries: Neutralino.filesystem.DirectoryEntry[];
+  try {
+    entries = await Neutralino.filesystem.readDirectory(logs);
+  } catch {
+    return undefined;
+  }
+  const latest = findLatestD3DMetalEvidenceFile(entries);
+  if (!latest) return undefined;
+  try {
+    return JSON.parse(await readFile(join(logs, latest)));
+  } catch {
+    return "unreadable";
+  }
+}
+
+function D3DMetalDxrStatus() {
+  const dxrConfigured = D3DMETAL_LAUNCH_ENVIRONMENT.D3DM_SUPPORT_DXR === "1";
+  const [status, setStatus] = createSignal<D3DMetalDxrRuntimeStatusDisplay>(
+    createD3DMetalDxrRuntimeStatus(dxrConfigured)
+  );
+
+  let mounted = true;
+  let refreshInProgress = false;
+  async function refresh() {
+    if (refreshInProgress) return;
+    refreshInProgress = true;
+    try {
+      const evidence = await readLatestD3DMetalEvidence();
+      if (mounted) {
+        setStatus(createD3DMetalDxrRuntimeStatus(dxrConfigured, evidence));
+      }
+    } finally {
+      refreshInProgress = false;
+    }
+  }
+
+  onMount(() => {
+    void refresh();
+    const interval = window.setInterval(
+      () => void refresh(),
+      DXR_STATUS_REFRESH_INTERVAL_MS
+    );
+    onCleanup(() => {
+      mounted = false;
+      window.clearInterval(interval);
+    });
+  });
+
+  return <Text>DXR: {status().label}</Text>;
+}
+
+function D3DMetalMtl4Status() {
+  const mtl4Configured = D3DMETAL_LAUNCH_ENVIRONMENT.D3DM_MTL4 === "1";
+  const [status, setStatus] = createSignal<D3DMetalMtl4RuntimeStatusDisplay>(
+    createD3DMetalMtl4RuntimeStatus(mtl4Configured)
+  );
+
+  let mounted = true;
+  let refreshInProgress = false;
+  async function refresh() {
+    if (refreshInProgress) return;
+    refreshInProgress = true;
+    try {
+      const evidence = await readLatestD3DMetalEvidence();
+      if (mounted) {
+        setStatus(createD3DMetalMtl4RuntimeStatus(mtl4Configured, evidence));
+      }
+    } finally {
+      refreshInProgress = false;
+    }
+  }
+
+  onMount(() => {
+    void refresh();
+    const interval = window.setInterval(
+      () => void refresh(),
+      DXR_STATUS_REFRESH_INTERVAL_MS
+    );
+    onCleanup(() => {
+      mounted = false;
+      window.clearInterval(interval);
+    });
+  });
+
+  return <Text>Metal 4 backend: {status().label}</Text>;
+}
+
+function D3DMetalMetalFxStatus() {
+  const metalFxConfigured =
+    D3DMETAL_LAUNCH_ENVIRONMENT.D3DM_ENABLE_METALFX === "1";
+  const [status, setStatus] = createSignal<D3DMetalMetalFxRuntimeStatusDisplay>(
+    createD3DMetalMetalFxRuntimeStatus(metalFxConfigured)
+  );
+
+  let mounted = true;
+  let refreshInProgress = false;
+  async function refresh() {
+    if (refreshInProgress) return;
+    refreshInProgress = true;
+    try {
+      const evidence = await readLatestD3DMetalEvidence();
+      if (mounted) {
+        setStatus(
+          createD3DMetalMetalFxRuntimeStatus(metalFxConfigured, evidence)
+        );
+      }
+    } finally {
+      refreshInProgress = false;
+    }
+  }
+
+  onMount(() => {
+    void refresh();
+    const interval = window.setInterval(
+      () => void refresh(),
+      DXR_STATUS_REFRESH_INTERVAL_MS
+    );
+    onCleanup(() => {
+      mounted = false;
+      window.clearInterval(interval);
+    });
+  });
+
+  return <Text>DLSS → MetalFX: {status().label}</Text>;
+}
 
 export async function createConfiguration({
   wine,
@@ -53,6 +200,7 @@ export async function createConfiguration({
   ) => Promise<() => JSXElement>;
   onCheckUpdate: () => void;
 }) {
+  const isZzzDx12 = import.meta.env["YAAGL_CHANNEL_CLIENT"] === "naposdx12";
   const config: Partial<Config> = {};
   const [WD] = await createWineDistroConfig({
     locale,
@@ -217,9 +365,11 @@ export async function createConfiguration({
                       {locale.get("SETTING_OPEN_YAAGL_DIR")}
                     </Button>
                     <Divider />
-                    <Button variant="ghost" size="sm" onClick={onCheckUpdate}>
-                      {locale.get("SETTING_CHECK_UPDATE")}
-                    </Button>
+                    <Show when={!isZzzDx12}>
+                      <Button variant="ghost" size="sm" onClick={onCheckUpdate}>
+                        {locale.get("SETTING_CHECK_UPDATE")}
+                      </Button>
+                    </Show>
                   </VStack>
                 </HStack>
               </TabPanel>
@@ -229,9 +379,35 @@ export async function createConfiguration({
                 </VStack>
               </TabPanel>
               <TabPanel flex={1} pt={0} pb={0} h="100%">
-                <VStack spacing={"$4"} w="40%" alignItems="start">
-                  <WD />
-                </VStack>
+                <Show
+                  when={isZzzDx12}
+                  fallback={
+                    <VStack spacing={"$4"} w="40%" alignItems="start">
+                      <WD />
+                    </VStack>
+                  }
+                >
+                  <VStack spacing={"$4"} w="65%" alignItems="start">
+                    <Heading>ZZZ DX12 runtime</Heading>
+                    <Text>Wine: 11.0-1-crossover-signed-experimental</Text>
+                    <Text>D3DMetal: 4.0b2</Text>
+                    <D3DMetalMtl4Status />
+                    <Text>Direct3D: ZZZ DX12 selector (-use-d3d12)</Text>
+                    <D3DMetalMetalFxStatus />
+                    <D3DMetalDxrStatus />
+                    <Text>Steam stub + timeout fix: enabled</Text>
+                    <Button
+                      size="sm"
+                      onClick={async () => {
+                        const logs = resolve("./logs");
+                        await mkdirp(logs);
+                        await exec2(["open", logs], {}, false, "/dev/null");
+                      }}
+                    >
+                      Open D3DMetal logs
+                    </Button>
+                  </VStack>
+                </Show>
               </TabPanel>
               <Show when={advanceSetting()}>
                 <TabPanel flex={1} pt={0} pb={0} h="100%">
@@ -241,7 +417,9 @@ export async function createConfiguration({
                       {locale.get("SETTING_ADVANCED_ALERT")}
                     </Alert>
                     <FO />
-                    <RS />
+                    <Show when={!isZzzDx12}>
+                      <RS />
+                    </Show>
                   </VStack>
                 </TabPanel>
               </Show>

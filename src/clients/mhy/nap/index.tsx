@@ -46,6 +46,8 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
+import { protectZzzDx12Client } from "../../../game-lock/neutralino-adapter";
+import { ZZZ_SHARED_GAME_DIRECTORY } from "../../../game-lock";
 
 // no need to check supported version
 // const CURRENT_SUPPORTED_VERSION = "3.0.0";
@@ -94,8 +96,10 @@ export async function createNAPChannelClient({
   await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
-    locale,
-    server
+    server,
+    wine.attributes.renderBackend === "d3dmetal"
+      ? ZZZ_SHARED_GAME_DIRECTORY
+      : undefined
   );
 
   const [installed, setInstalled] = createSignal<ChannelClientInstallState>(
@@ -116,7 +120,7 @@ export async function createNAPChannelClient({
     gameVersion ?? "0.0.0"
   );
   const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
-  return {
+  const client: ChannelClient = {
     installState: installed,
     showPredownloadPrompt,
     installDir: _gameInstallDir,
@@ -322,7 +326,7 @@ export async function createNAPChannelClient({
       //   );
       //   return;
       // }
-      if (config.reshade) {
+      if (config.reshade && wine.attributes.renderBackend !== "d3dmetal") {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
       if (wine.attributes.renderBackend == "dxmt") {
@@ -366,35 +370,57 @@ export async function createNAPChannelClient({
       const [SP] = await createSteamPatch({ locale, config });
       const [TF] = await createTimeoutFix({ locale, config });
 
+      if (wine.attributes.renderBackend === "d3dmetal") {
+        config.patchOff = true;
+        config.steamPatch = true;
+        config.timeoutFix = true;
+        config.reshade = false;
+      }
+
       return function () {
         return [
           "Game Version: ",
           gameCurrentVersion(),
-          <PO />,
-          <RES />,
+          wine.attributes.renderBackend === "d3dmetal" ? null : <PO />,
+          wine.attributes.renderBackend === "d3dmetal" ? null : <RES />,
           <BN />,
-          <SP />,
-          <TF />,
+          wine.attributes.renderBackend === "d3dmetal" ? null : <SP />,
+          wine.attributes.renderBackend === "d3dmetal" ? null : <TF />,
         ];
       };
     },
   };
+
+  return wine.attributes.renderBackend === "d3dmetal"
+    ? protectZzzDx12Client(client)
+    : client;
 }
 
-async function checkGameState(locale: Locale, server: Server) {
-  let gameDir = "";
-  try {
-    gameDir = await getKey("game_install_dir");
-  } catch {
-    return {
-      gameInstalled: false,
-    } as const;
+async function checkGameState(server: Server, defaultGameDir?: string) {
+  let gameDir: string;
+  if (defaultGameDir) {
+    gameDir = defaultGameDir;
+  } else {
+    try {
+      gameDir = await getKey("game_install_dir");
+    } catch {
+      return {
+        gameInstalled: false,
+      } as const;
+    }
   }
   try {
+    const gameVersion = await getGameVersion(
+      join(gameDir, server.dataDir),
+      0xc4
+    );
+    if (gameDir === defaultGameDir) {
+      await setKey("game_install_dir", gameDir);
+    }
     return {
       gameInstalled: true,
       gameInstallDir: gameDir,
-      gameVersion: await getGameVersion(join(gameDir, server.dataDir), 0xc4),
+      gameVersion,
     } as const;
   } catch {
     return {

@@ -37,8 +37,25 @@ import {
   Button,
   Text,
 } from "@hope-ui/solid";
+import { assertZzzDx12Platform } from "./platform/zzz-dx12";
+import { ensureGptkRuntime } from "./gptk/neutralino-adapter";
+import { validateD3DMetalWine } from "./wine/d3dmetal";
+import { validateWineRuntime } from "./wine/runtime-manifest";
 
 export async function createApp() {
+  const isZzzDx12 = import.meta.env["YAAGL_CHANNEL_CLIENT"] === "naposdx12";
+  if (isZzzDx12) {
+    const [{ stdOut: macOSVersion }, { stdOut: arm64Capability }] =
+      await Promise.all([
+        exec(["/usr/bin/sw_vers", "-productVersion"]),
+        exec(["/usr/sbin/sysctl", "-n", "hw.optional.arm64"]),
+      ]);
+    assertZzzDx12Platform({
+      macOSVersion: macOSVersion.trim(),
+      appleSilicon: arm64Capability.trim() === "1",
+    });
+  }
+
   await setKey("singleton", null);
 
   const aria2_port = 6868;
@@ -100,8 +117,25 @@ export async function createApp() {
 
   const ignoredVersion = await getKeyOrDefault("ignore_launcher_update", "");
 
-  const wineStatus = await checkWine(github);
+  const gptkRuntime = isZzzDx12 ? await ensureGptkRuntime() : undefined;
+  let wineStatus = await checkWine(github);
   const prefixPath = resolve("./wineprefix"); // CHECK: hardcoded path?
+
+  if (isZzzDx12 && wineStatus.wineReady) {
+    try {
+      await validateWineRuntime(resolve("./wine"), wineStatus.wineDistribution);
+      await validateD3DMetalWine(resolve("./wine"), gptkRuntime?.runtimeRoot);
+    } catch (error) {
+      await log(
+        `D3DMetal Wine validation failed; reinstalling: ${String(error)}`
+      );
+      await setKey("wine_state", "update");
+      wineStatus = {
+        wineReady: false,
+        wineDistribution: wineStatus.wineDistribution,
+      };
+    }
+  }
 
   let MainApp: () => JSXElement;
 
@@ -142,6 +176,7 @@ export async function createApp() {
       wineAbsPrefix: prefixPath,
       wineDistro: wineStatus.wineDistribution,
       locale,
+      gptkRuntime,
     });
   }
 

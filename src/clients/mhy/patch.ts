@@ -21,6 +21,7 @@ import { Config } from "@config";
 import { disableUnityFeature } from "./unity";
 import { Wine } from "@wine";
 import { DXMT_FILES, DXVK_FILES } from "src/downloadable-resource";
+import { installSteamSupport } from "src/wine/steam";
 
 export async function putLocal(url: string, dest: string) {
   return await writeBinary(dest, await (await fetch(url)).arrayBuffer());
@@ -35,6 +36,15 @@ export async function* patchProgram(
   if ((await getKeyOrDefault("patched", "NOTFOUND")) != "NOTFOUND") {
     return;
   }
+
+  // The GPTK launcher keeps every graphics and Steam component inside its
+  // isolated Wine tree/prefix. In particular, never move ZZZ's vulkan-1.dll
+  // or inject DXMT/Reshade files into the shared game directory.
+  if (wine.attributes.renderBackend === "d3dmetal") {
+    await installSteamSupport(wine.prefix);
+    return;
+  }
+
   if (!config.patchOff) {
     for (const file of server.patched) {
       if (file.tag === "workaround3" && config.workaround3) continue;
@@ -66,32 +76,34 @@ export async function* patchProgram(
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
 
-  for (const f of DXMT_FILES) {
-    const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
-    await forceMove(wineLibPath, wineLibPath + ".bak");
-    await cp(`./dxmt/${f}`, wineLibPath);
-  }
+  if (wine.attributes.renderBackend === "dxmt") {
+    for (const f of DXMT_FILES) {
+      const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
+      await forceMove(wineLibPath, wineLibPath + ".bak");
+      await cp(`./dxmt/${f}`, wineLibPath);
+    }
 
-  // winemetal files always go to Wine lib directories
-  await cp(
-    `./dxmt/winemetal.dll`,
-    resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
-  );
-
-  await cp(
-    `./dxmt/winemetal.so`,
-    resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
-  );
-
-  // winemetal.dll also to system32 for both native and builtin
-  await cp(`./dxmt/winemetal.dll`, join(system32Dir, "winemetal.dll"));
-
-  if (server.id.startsWith("hkrpg")) {
+    // winemetal files always go to Wine lib directories
     await cp(
-      `./dxmt/nvngx.dll`,
-      resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
+      `./dxmt/winemetal.dll`,
+      resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
     );
-    await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
+
+    await cp(
+      `./dxmt/winemetal.so`,
+      resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
+    );
+
+    // winemetal.dll also to system32 for both native and builtin
+    await cp(`./dxmt/winemetal.dll`, join(system32Dir, "winemetal.dll"));
+
+    if (server.id.startsWith("hkrpg")) {
+      await cp(
+        `./dxmt/nvngx.dll`,
+        resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
+      );
+      await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
+    }
   }
 
   if (config.reshade) {
@@ -130,6 +142,10 @@ export async function* patchRevertProgram(
   server: Server,
   config: Config
 ): CommonUpdateProgram {
+  if (wine.attributes.renderBackend === "d3dmetal") {
+    return;
+  }
+
   try {
     await getKey("patched");
   } catch {

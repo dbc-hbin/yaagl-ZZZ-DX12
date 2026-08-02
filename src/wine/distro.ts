@@ -3,7 +3,7 @@ import { DEFAULT_WINE_DISTRO_TAG } from "../clients";
 import { Github } from "../github";
 
 export interface WineDistributionAttributes {
-  renderBackend: "dxmt";
+  renderBackend: "dxmt" | "d3dmetal";
   winePath: string; // Path to the wine directory inside the archive
 }
 
@@ -11,6 +11,9 @@ export interface WineDistribution {
   id: string;
   displayName: string;
   remoteUrl: string;
+  archiveSha256?: string;
+  archiveSize?: number;
+  wineVersion?: string;
   attributes: Partial<WineDistributionAttributes>;
 }
 
@@ -77,7 +80,25 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
   },
 ];
 
+const ZZZ_D3DMETAL_WINE: WineDistribution = {
+  id: "11.0-1-crossover-signed-experimental",
+  displayName: "Wine 11.0-1 Crossover + GPTK 4.0b2 D3DMetal",
+  remoteUrl:
+    "https://github.com/yaagl/anime-game-wine/releases/download/wine-crossover-11.0-1-signed/wine-crossover-11.0-1-osx64-signed.tar.xz",
+  archiveSha256:
+    "89fa7e90fb626523a90d5867a03c6be785d017176739c6320a3b86c7838c3a35",
+  archiveSize: 456021524,
+  wineVersion: "wine-11.0",
+  attributes: {
+    renderBackend: "d3dmetal",
+    winePath: "wine",
+  },
+};
+
 export async function getWineDistributions(): Promise<WineDistribution[]> {
+  if (import.meta.env["YAAGL_CHANNEL_CLIENT"] === "naposdx12") {
+    return [ZZZ_D3DMETAL_WINE];
+  }
   return YAAGL_BUILTIN_WINE;
 }
 

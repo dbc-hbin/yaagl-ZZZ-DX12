@@ -8,14 +8,16 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   const icns = new IconIcns();
   const raw = true;
 
-  await execa("cp", ["neutralino.config.json", "neutralino.config.json.bak"]);
-  // build done read neutralino.config.js file
-  const config = await fs.readJSON(
-    path.resolve(process.cwd(), "neutralino.config.json")
+  const neutralinoConfigPath = path.resolve(
+    process.cwd(),
+    "neutralino.config.json"
   );
+  const originalNeutralinoConfig = await fs.readFile(neutralinoConfigPath);
+  const config = await fs.readJSON(neutralinoConfigPath);
   let bundleId;
   let appDistributionName;
   let includeSophon = false;
+  let minimumSystemVersion = "10.15.0";
   switch (process.env["YAAGL_CHANNEL_CLIENT"]) {
     case "hk4ecn":
       bundleId = config.applicationId;
@@ -60,6 +62,13 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       appDistributionName = config.cli.binaryName + " ZZZ OS";
       config.modes.window.icon = "/src/icons/ZZZ_Bang.cr.png";
       break;
+    case "naposdx12":
+      bundleId = config.applicationId + ".nap.os.dx12";
+      appDistributionName = config.cli.binaryName + " ZZZ DX12";
+      minimumSystemVersion = "27.0.0";
+      config.modes.window.icon = "/src/icons/ZZZ_Bang.cr.png";
+      config.modes.window.title = appDistributionName;
+      break;
     case "napcn":
       bundleId = config.applicationId + ".nap.cn";
       appDistributionName = config.cli.binaryName + " ZZZ";
@@ -72,11 +81,28 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
     bundleId += ".test";
     appDistributionName += " Test";
   }
-  await fs.writeJSON(
-    path.resolve(process.cwd(), "neutralino.config.json"),
-    config
-  );
   try {
+    await fs.writeJSON(neutralinoConfigPath, config);
+    if (process.env["YAAGL_CHANNEL_CLIENT"] === "naposdx12") {
+      await Promise.all([
+        execa("bash", [
+          path.resolve(process.cwd(), "scripts", "build-metal-ir-capture.sh"),
+        ]),
+        execa("bash", [
+          path.resolve(
+            process.cwd(),
+            "scripts",
+            "build-capture-fs-helper.sh"
+          ),
+        ]),
+      ]);
+      // The renderer bundle embeds this exact dylib identity. Synchronize it
+      // before TypeScript/Vite so a later native rebuild cannot make the shipped
+      // frontend reject its own sidecar.
+      await execa("node", [
+        path.resolve(process.cwd(), "scripts", "sync-metal-ir-hash.mjs"),
+      ]);
+    }
     await execa("pnpm", ["exec", "tsc"]); // do typecheck first
     await execa("rm", ["-rf", "./.tmp"]);
     await execa("pnpm", ["exec", "vite", "build"]);
@@ -84,11 +110,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
     // run neu build command
     await execa("pnpm", ["exec", "neu", "build"]);
   } finally {
-    await execa("mv", [
-      "-f",
-      "neutralino.config.json.bak",
-      "neutralino.config.json",
-    ]);
+    await fs.writeFile(neutralinoConfigPath, originalNeutralinoConfig);
   }
 
   const appname = config.cli.binaryName;
@@ -171,6 +193,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       resourcesFile
     )
   );
+  const runtimeResourceName = resourcesFile;
 
   // check if file exists
   if (fs.existsSync(path.join(process.cwd(), config.modes.window.icon))) {
@@ -221,7 +244,34 @@ APST_DIR="$HOME/Library/Application Support/${appDistributionName}"
 echo $APST_DIR
 mkdir -p "$APST_DIR"
 CONTENTS_DIR="$(dirname "$SCRIPT_DIR")"
-rsync -rlptu "$CONTENTS_DIR/Resources/." "$APST_DIR"
+RESOURCE_NAME="${runtimeResourceName}"
+STAGE_DIR="$APST_DIR/.yaagl-runtime-stage-$$"
+BACKUP_DIR="$APST_DIR/.yaagl-sidecar-backup-$$"
+mkdir -p "$STAGE_DIR"
+cp -p "$CONTENTS_DIR/Resources/$RESOURCE_NAME" "$STAGE_DIR/$RESOURCE_NAME"
+/usr/bin/ditto "$CONTENTS_DIR/Resources/sidecar" "$STAGE_DIR/sidecar"
+if [ ! -f "$APST_DIR/$RESOURCE_NAME" ] || ! cmp -s "$STAGE_DIR/$RESOURCE_NAME" "$APST_DIR/$RESOURCE_NAME"; then
+  mv -f "$STAGE_DIR/$RESOURCE_NAME" "$APST_DIR/$RESOURCE_NAME"
+else
+  rm -f "$STAGE_DIR/$RESOURCE_NAME"
+fi
+if [ -e "$APST_DIR/sidecar" ]; then
+  mv "$APST_DIR/sidecar" "$BACKUP_DIR"
+fi
+if ! mv "$STAGE_DIR/sidecar" "$APST_DIR/sidecar"; then
+  if [ -e "$BACKUP_DIR" ]; then mv "$BACKUP_DIR" "$APST_DIR/sidecar"; fi
+  exit 78
+fi
+if [ -e "$BACKUP_DIR" ]; then rm -rf "$BACKUP_DIR"; fi
+rmdir "$STAGE_DIR"
+if ! cmp -s "$CONTENTS_DIR/Resources/$RESOURCE_NAME" "$APST_DIR/$RESOURCE_NAME"; then
+  echo "runtime resource verification failed: $RESOURCE_NAME" >&2
+  exit 78
+fi
+if ! /usr/bin/diff -qr "$CONTENTS_DIR/Resources/sidecar" "$APST_DIR/sidecar" >/dev/null; then
+  echo "runtime sidecar verification failed" >&2
+  exit 78
+fi
 cd "$APST_DIR"
 PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$APST_DIR"`
   );
@@ -258,15 +308,39 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
   if (includeSophon) {
     await fs.copy(
       path.resolve(process.cwd(), `sophon_server`, `build`, `server.dist`),
-      path.resolve(sidecarDst, `sophon_server`), {
-      preserveTimestamps: true,
-    });
+      path.resolve(sidecarDst, `sophon_server`),
+      {
+        preserveTimestamps: true,
+      }
+    );
   }
   // Remove potentially existing dev sophon_server from sidecar
   await fs.remove(path.resolve(process.cwd(), `sidecar`, `sophon_server`));
+  // The DX12 diagnostic binaries are rebuilt immediately above. Remove the
+  // destination tree so fs-extra cannot preserve a stale same-name artifact
+  // from an earlier bundle when timestamps or copy metadata happen to match.
+  await fs.remove(sidecarDst);
   await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
     preserveTimestamps: true,
   });
+  if (process.env["YAAGL_CHANNEL_CLIENT"] === "naposdx12") {
+    for (const diagnostic of [
+      "libyaagl-metal-ir-capture.dylib",
+      "yaagl-capture-fs-helper",
+    ]) {
+      const source = path.resolve(
+        process.cwd(),
+        "sidecar",
+        "diagnostics",
+        diagnostic
+      );
+      const destination = path.resolve(sidecarDst, "diagnostics", diagnostic);
+      await fs.copyFile(source, destination);
+      if (!(await fs.readFile(source)).equals(await fs.readFile(destination))) {
+        throw new Error(`DX12 diagnostic bundle copy mismatch: ${diagnostic}`);
+      }
+    }
+  }
   // Remove protonextras for hkrpg
   if (["hkrpgcn", "hkrpgos"].includes(process.env["YAAGL_CHANNEL_CLIENT"])) {
     await fs.remove(path.resolve(sidecarDst, "protonextras"));
@@ -280,12 +354,12 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
         return dirent.isDirectory()
           ? getFiles(res)
           : dirent.isFile()
-            ? dirent.name.split(".").length == 1
-              ? fs.chmod(res, 0o755).then(() => {
+          ? dirent.name.split(".").length == 1
+            ? fs.chmod(res, 0o755).then(() => {
                 console.log("chmod +x " + res);
               })
-              : Promise.resolve()
-            : Promise.resolve();
+            : Promise.resolve()
+          : Promise.resolve();
       })
     );
   })(sidecarDst);
@@ -324,7 +398,7 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
         <key>NSHumanReadableCopyright</key>
         <string>Copyright © 2023 3Shain.</string>
         <key>LSMinimumSystemVersion</key>
-        <string>10.15.0</string>
+        <string>${minimumSystemVersion}</string>
         <key>NSAppTransportSecurity</key>
         <dict>
             <key>NSAllowsArbitraryLoads</key>
@@ -333,4 +407,12 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
     </dict>
     </plist>`
   );
+
+  await execa("codesign", [
+    "--force",
+    "--deep",
+    "--sign",
+    "-",
+    path.resolve(process.cwd(), `${appDistributionName}.app`),
+  ]);
 })();

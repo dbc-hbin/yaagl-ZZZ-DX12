@@ -38,3 +38,6 @@ server_secret.ts
 
 /sidecar/sophon_server
 **/__pycache__
+
+# Local reverse-engineering toolchain (large vendor distribution)
+/tools/ghidra_12.1.2_PUBLIC/

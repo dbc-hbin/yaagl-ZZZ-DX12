@@ -1,6 +1,7 @@
 import {
   exec as unixExec,
   exec2 as unixExec2,
+  startExec2Result,
   getKey,
   log,
   setKey,
@@ -14,12 +15,19 @@ import {
 } from "@utils";
 import { dirname, join } from "path-browserify";
 import { WineDistribution } from "./distro";
+import { createD3DMetalIsolatedCommand } from "./d3dmetal";
 
 export async function createWine(options: {
   prefix: string;
   distro: WineDistribution;
+  wineRoot?: string;
 }) {
-  const loaderBin = await getCorrectWineBinary();
+  const loaderBin = await getCorrectWineBinary(options.wineRoot);
+  function isolatedCommand(executable: string, args: string[]) {
+    return options.distro.attributes.renderBackend === "d3dmetal"
+      ? createD3DMetalIsolatedCommand(executable, args)
+      : [executable, ...args];
+  }
 
   async function cmd(command: string, args: string[]) {
     return await exec("cmd", [command, ...args]);
@@ -32,9 +40,10 @@ export async function createWine(options: {
     log_file: string | undefined = undefined
   ) {
     return await unixExec(
-      program == "copy"
-        ? [loaderBin, "cmd", "/c", program, ...args]
-        : [loaderBin, program, ...args],
+      isolatedCommand(
+        loaderBin,
+        program == "copy" ? ["cmd", "/c", program, ...args] : [program, ...args]
+      ),
       {
         ...getEnvironmentVariables(),
         ...(env ?? {}),
@@ -50,10 +59,22 @@ export async function createWine(options: {
     env?: { [key: string]: string },
     log_file: string | undefined = undefined
   ) {
-    return await unixExec2(
-      program == "copy"
-        ? [loaderBin, "cmd", "/c", program, ...args]
-        : [loaderBin, program, ...args],
+    return await (
+      await startExec2(program, args, env, log_file)
+    ).result;
+  }
+
+  async function startExec2(
+    program: string,
+    args: string[],
+    env?: { [key: string]: string },
+    log_file: string | undefined = undefined
+  ) {
+    return await startExec2Result(
+      isolatedCommand(
+        loaderBin,
+        program == "copy" ? ["cmd", "/c", program, ...args] : [program, ...args]
+      ),
       {
         ...getEnvironmentVariables(),
         ...(env ?? {}),
@@ -64,9 +85,19 @@ export async function createWine(options: {
   }
 
   async function waitUntilServerOff() {
-    return await unixExec2([join(dirname(loaderBin), "wineserver"), "-w"], {
-      ...getEnvironmentVariables(),
-    });
+    return await unixExec2(
+      isolatedCommand(join(dirname(loaderBin), "wineserver"), ["-w"]),
+      {
+        ...getEnvironmentVariables(),
+      }
+    );
+  }
+
+  async function terminatePrefix() {
+    return await unixExec2(
+      isolatedCommand(join(dirname(loaderBin), "wineserver"), ["-k"]),
+      { ...getEnvironmentVariables() }
+    );
   }
 
   function toWinePath(absPath: string) {
@@ -75,7 +106,10 @@ export async function createWine(options: {
 
   function getEnvironmentVariables() {
     return {
-      WINEDEBUG: "fixme-all,err-unwind,+timestamp",
+      WINEDEBUG:
+        options.distro.attributes.renderBackend === "d3dmetal"
+          ? "fixme-all,err-unwind,+timestamp,+loaddll"
+          : "fixme-all,err-unwind,+timestamp",
       WINEPREFIX: options.prefix,
     };
   }
@@ -92,7 +126,7 @@ export async function createWine(options: {
           "to",
           "do",
           "script",
-          `"${build([loaderBin, "cmd"], {
+          `"${build(isolatedCommand(loaderBin, ["cmd"]), {
             ...getEnvironmentVariables(),
             WINEPATH: toWinePath(gameDir),
           })
@@ -156,27 +190,30 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
   return {
     exec,
     exec2,
+    startExec2,
     waitUntilServerOff,
+    terminatePrefix,
     cmd,
     toWinePath,
     prefix: options.prefix,
     openCmdWindow,
     setProps,
     setNVExtension,
+    root: options.wineRoot ?? resolve("./wine"),
     attributes: {
       ...options.distro.attributes,
     },
   };
 }
 
-export async function getCorrectWineBinary() {
+export async function getCorrectWineBinary(wineRoot = resolve("./wine")) {
   try {
     // use wine64 if it is presented
     // in newer version of wine (esp. WoW64 mode), only one binary `bin/wine` exists
-    await stats("./wine/bin/wine64");
-    return resolve("./wine/bin/wine64");
+    await stats(join(wineRoot, "bin", "wine64"));
+    return join(wineRoot, "bin", "wine64");
   } catch {
-    return resolve("./wine/bin/wine");
+    return join(wineRoot, "bin", "wine");
   }
 }
 

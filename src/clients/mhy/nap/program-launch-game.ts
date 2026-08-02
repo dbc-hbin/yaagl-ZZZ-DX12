@@ -12,12 +12,36 @@ import {
   log,
   exec,
   getKeyOrDefault,
+  removeFileIfExists,
 } from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
 import { NAP_CN_BLOCK_URL, NAP_OS_BLOCK_URL } from "../../secret";
 import { gt } from "semver";
+import {
+  createD3DMetalLaunchArguments,
+  D3DMETAL_VERSION,
+  D3DMETAL_LAUNCH_ENVIRONMENT,
+  D3DMETAL_METAL_IR_PROBE_MODE,
+  createD3DMetalMetalIrEnvironment,
+  D3DMETAL_METAL_IR_PROBE_RELATIVE_PATH,
+  D3DMETAL_UNORM_REPLACEMENT_RELATIVE_PATH,
+  validateD3DMetalMetalIrProbe,
+  validateD3DMetalWine,
+} from "../../../wine/d3dmetal";
+import {
+  captureFreshD3DMetalPlayerLog,
+  collectD3DMetalModuleSnapshot,
+  collectD3DMetalSystemLog,
+  createD3DMetalDiagnosticPaths,
+  createZzzPlayerLogPath,
+  D3DMetalLaunchProfile,
+  fingerprintD3DMetalPlayerLog,
+  writePendingD3DMetalRuntimeEvidence,
+  writeD3DMetalLaunchProfile,
+  writeD3DMetalRuntimeEvidence,
+} from "../../../diagnostics/d3dmetal";
 
 export async function* launchGameProgram({
   gameDir,
@@ -38,8 +62,8 @@ export async function* launchGameProgram({
   await fixWebview(wine, server);
   await wine.setProps(config);
 
-  const args = [];
-  if (config.resolutionCustom) {
+  const args: string[] = [];
+  if (wine.attributes.renderBackend !== "d3dmetal" && config.resolutionCustom) {
     args.push("-screen-width", config.resolutionWidth);
     args.push("-screen-height", config.resolutionHeight);
     args.push("-screen-fullscreen", "0");
@@ -55,9 +79,68 @@ cd /d "${wine.toWinePath(gameDir)}"
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
   const yaaglDir = resolve("./");
+  let launchStartedAt: Date | undefined;
+  let d3dMetalDiagnostics:
+    | ReturnType<typeof createD3DMetalDiagnosticPaths>
+    | undefined;
+  let launchError: unknown;
+  let launchExitCode: number | null = null;
+  let validatedD3DMetalVersion: typeof D3DMETAL_VERSION | undefined;
+  let d3dMetalLaunchProfile: D3DMetalLaunchProfile | undefined;
+  let playerLogSource: string | undefined;
+  let playerLogBefore:
+    | Awaited<ReturnType<typeof fingerprintD3DMetalPlayerLog>>
+    | undefined;
+  let moduleSnapshotPromise:
+    | ReturnType<typeof collectD3DMetalModuleSnapshot>
+    | undefined;
+  let metalIrProbeValidation:
+    | Awaited<ReturnType<typeof validateD3DMetalMetalIrProbe>>
+    | undefined;
+  let launchFinished = false;
   try {
     yield ["setStateText", "GAME_RUNNING"];
-    const logfile = resolve(`./logs/game_${Date.now()}.log`);
+    launchStartedAt = new Date();
+    const logfile = resolve(`./logs/game_${launchStartedAt.getTime()}.log`);
+    d3dMetalDiagnostics =
+      wine.attributes.renderBackend === "d3dmetal"
+        ? createD3DMetalDiagnosticPaths(
+            resolve("./logs"),
+            launchStartedAt.getTime()
+          )
+        : undefined;
+    if (d3dMetalDiagnostics) {
+      try {
+        await mkdirp(d3dMetalDiagnostics.metalIrSessionRoot);
+        await exec(["/bin/chmod", "700", d3dMetalDiagnostics.metalIrSessionRoot]);
+        await writePendingD3DMetalRuntimeEvidence({
+          destination: d3dMetalDiagnostics.evidence,
+          createdAt: launchStartedAt.toISOString(),
+        });
+        playerLogSource = createZzzPlayerLogPath(wine.prefix);
+        playerLogBefore = await fingerprintD3DMetalPlayerLog(playerLogSource);
+        const probePath = resolve(`./${D3DMETAL_METAL_IR_PROBE_RELATIVE_PATH}`);
+        const replacementPath = resolve(
+          `./${D3DMETAL_UNORM_REPLACEMENT_RELATIVE_PATH}`
+        );
+        try {
+          metalIrProbeValidation = await validateD3DMetalMetalIrProbe({
+            wineRoot: wine.root,
+            probePath,
+            replacementPath,
+          });
+        } catch (error) {
+          // Functional instrumentation is never launch authority. Preserve
+          // the direct D3DMetal city path when its sidecar cannot validate.
+          await log(`Metal IR functional mode unavailable: ${String(error)}`);
+        }
+        await writeFile(d3dMetalDiagnostics.metalIrProbe, "");
+        await exec(["/bin/chmod", "600", d3dMetalDiagnostics.metalIrProbe]);
+      } catch (error) {
+        await log(`D3DMetal diagnostics unavailable: ${String(error)}`);
+        d3dMetalDiagnostics = undefined;
+      }
+    }
 
     if (config.blockNet) {
       const tmpScriptPath = "/tmp/yaagl_network_block_script.sh";
@@ -93,47 +176,241 @@ cd /d "${wine.toWinePath(gameDir)}"
       );
     }
 
-    await wine.exec2(
-      config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
-      config.steamPatch
+    const launchProgram =
+      wine.attributes.renderBackend === "d3dmetal" || config.steamPatch
+        ? "C:\\windows\\system32\\steam.exe"
+        : "cmd";
+    const launchArguments =
+      wine.attributes.renderBackend === "d3dmetal"
+        ? createD3DMetalLaunchArguments(
+            wine.toWinePath(join(gameDir, gameExecutable))
+          )
+        : config.steamPatch
         ? [wine.toWinePath(join(gameDir, gameExecutable))]
-        : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `],
-      {
-        MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-        WINEDLLOVERRIDES: "",
-        WINE_ENABLE_TIMEOUT_FIX: config.timeoutFix ? "1" : "0",
-        ...(wine.attributes.renderBackend == "dxmt"
-          ? {
-              WINEMSYNC: "1",
-              DXMT_LOG_PATH: yaaglDir,
-              DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
-              GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
-            }
-          : {
-              WINEESYNC: "1",
-            }),
-        ...(config.proxyEnabled
-          ? {
-              HTTP_PROXY: config.proxyHost,
-              HTTPS_PROXY: config.proxyHost,
-            }
-          : {}),
-      },
-      logfile
-    );
-    await wine.waitUntilServerOff();
-    if (config.resolutionCustom) {
-      await revertResolutionRegistry(wine, server);
+        : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `];
+    const launchEnvironment = {
+      MTL_HUD_ENABLED: config.metalHud ? "1" : "",
+      ...(wine.attributes.renderBackend === "d3dmetal"
+        ? {}
+        : {
+            WINE_ENABLE_TIMEOUT_FIX: config.timeoutFix ? "1" : "0",
+          }),
+      ...(wine.attributes.renderBackend === "d3dmetal"
+        ? {
+            ...D3DMETAL_LAUNCH_ENVIRONMENT,
+            ...(d3dMetalDiagnostics && metalIrProbeValidation
+              ? createD3DMetalMetalIrEnvironment({
+                  mode: D3DMETAL_METAL_IR_PROBE_MODE,
+                  capturePath: d3dMetalDiagnostics.metalIrProbe,
+                  captureHash: metalIrProbeValidation.probeHash,
+                  d3dMetalHash: metalIrProbeValidation.d3dMetalHash,
+                  providerHash: metalIrProbeValidation.providerHash,
+                  manifestPath: d3dMetalDiagnostics.metalIrManifest,
+                  probePath: metalIrProbeValidation.probePath,
+                  providerPath: metalIrProbeValidation.providerPath,
+                  d3dMetalPath: metalIrProbeValidation.d3dMetalPath,
+                  dxcompilerPath: metalIrProbeValidation.dxcompilerPath,
+                  replacementPath: metalIrProbeValidation.replacementPath,
+                })
+              : {}),
+          }
+        : {}),
+      ...(wine.attributes.renderBackend == "dxmt"
+        ? {
+            WINEMSYNC: "1",
+            DXMT_LOG_PATH: yaaglDir,
+            DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
+            GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
+          }
+        : wine.attributes.renderBackend === "d3dmetal"
+        ? {}
+        : {
+            WINEESYNC: "1",
+          }),
+      ...(config.proxyEnabled
+        ? {
+            HTTP_PROXY: config.proxyHost,
+            HTTPS_PROXY: config.proxyHost,
+          }
+        : {}),
+    };
+
+    if (d3dMetalDiagnostics) {
+      try {
+        validatedD3DMetalVersion = await validateD3DMetalWine(wine.root);
+        d3dMetalLaunchProfile = {
+          createdAt: launchStartedAt.toISOString(),
+          wineTag: "11.0-1-crossover-signed-experimental",
+          d3dMetalVersion: validatedD3DMetalVersion,
+          launchProgram,
+          gameExecutable: wine.toWinePath(join(gameDir, gameExecutable)),
+          arguments: launchArguments,
+          environment: launchEnvironment,
+          launchExitCode: null,
+          metalIrTerminalStatus: null,
+          ...(metalIrProbeValidation
+            ? {
+                metalIrProbe: {
+                  mode: D3DMETAL_METAL_IR_PROBE_MODE,
+                  capturePath: d3dMetalDiagnostics.metalIrProbe,
+                  captureHash: metalIrProbeValidation.probeHash,
+                  manifestPath: d3dMetalDiagnostics.metalIrManifest,
+                  d3dMetalHash: metalIrProbeValidation.d3dMetalHash,
+                  probeHash: metalIrProbeValidation.probeHash,
+                  probePath: metalIrProbeValidation.probePath,
+                  providerHash: metalIrProbeValidation.providerHash,
+                  providerPath: metalIrProbeValidation.providerPath,
+                  dxcompilerHash: metalIrProbeValidation.dxcompilerHash,
+                  dxcompilerPath: metalIrProbeValidation.dxcompilerPath,
+                  replacementHash: metalIrProbeValidation.replacementHash,
+                  replacementPath: metalIrProbeValidation.replacementPath,
+                },
+              }
+            : {}),
+        };
+        d3dMetalLaunchProfile.metalIrSessionRoot =
+          d3dMetalDiagnostics.metalIrSessionRoot;
+        const launchProfile = d3dMetalLaunchProfile;
+        await writeD3DMetalLaunchProfile(
+          d3dMetalDiagnostics.profile,
+          launchProfile
+        );
+        moduleSnapshotPromise = collectD3DMetalModuleSnapshot({
+          destination: d3dMetalDiagnostics.moduleSnapshot,
+          gameExecutable: launchProfile.gameExecutable,
+          launchFinished: () => launchFinished,
+        });
+      } catch (error) {
+        await log(`D3DMetal launch diagnostics unavailable: ${String(error)}`);
+        d3dMetalDiagnostics = undefined;
+        d3dMetalLaunchProfile = undefined;
+        moduleSnapshotPromise = undefined;
+      }
+    }
+
+    try {
+      const launchResult = await wine.exec2(
+        launchProgram,
+        launchArguments,
+        launchEnvironment,
+        d3dMetalDiagnostics?.wineLog ?? logfile
+      );
+      launchExitCode = launchResult.exitCode;
+      await wine.waitUntilServerOff();
+    } finally {
+      launchFinished = true;
+      if (moduleSnapshotPromise) {
+        try {
+          const snapshot = await moduleSnapshotPromise;
+          await log(
+            `D3DMetal module snapshot captured=${String(
+              snapshot.captured
+            )} complete=${String(snapshot.complete)}`
+          );
+        } catch (error) {
+          await log(
+            `Failed to collect D3DMetal module snapshot: ${String(error)}`
+          );
+        }
+      }
+      if (d3dMetalLaunchProfile) {
+        if (launchExitCode === null && launchError) {
+          launchExitCode = -1;
+        }
+        d3dMetalLaunchProfile.launchExitCode = launchExitCode;
+        d3dMetalLaunchProfile.metalIrTerminalStatus =
+          metalIrProbeValidation ? "incomplete" : "unavailable";
+        try {
+          await writeD3DMetalLaunchProfile(
+            d3dMetalDiagnostics!.profile,
+            d3dMetalLaunchProfile
+          );
+        } catch (error) {
+          await log(
+            `Failed to finalize D3DMetal launch profile: ${String(error)}`
+          );
+        }
+      }
     }
   } catch (e: unknown) {
-    // it seems game crashed?
+    launchError = e;
     await log(String(e));
+  } finally {
+    if (d3dMetalDiagnostics && launchStartedAt) {
+      if (playerLogSource) {
+        try {
+          const captured = await captureFreshD3DMetalPlayerLog({
+            source: playerLogSource,
+            destination: d3dMetalDiagnostics.playerLog,
+            before: playerLogBefore,
+          });
+          if (!captured) {
+            await log("D3DMetal Player.log was missing or stale for this run");
+          }
+        } catch (error) {
+          await log(`Failed to capture D3DMetal Player.log: ${String(error)}`);
+        }
+      }
+      try {
+        await collectD3DMetalSystemLog({
+          destination: d3dMetalDiagnostics.systemLog,
+          since: launchStartedAt,
+        });
+      } catch (error) {
+        await log(`Failed to collect D3DMetal unified log: ${String(error)}`);
+      }
+      try {
+        const evidence = await writeD3DMetalRuntimeEvidence({
+          wineLog: d3dMetalDiagnostics.wineLog,
+          systemLog: d3dMetalDiagnostics.systemLog,
+          playerLog: d3dMetalDiagnostics.playerLog,
+          moduleSnapshot: d3dMetalDiagnostics.moduleSnapshot,
+          metalIrProbe: d3dMetalDiagnostics.metalIrProbe,
+          destination: d3dMetalDiagnostics.evidence,
+          launchProfile: d3dMetalLaunchProfile,
+          validatedD3DMetalVersion,
+          createdAt: launchStartedAt.toISOString(),
+        });
+        await log(
+          `D3DMetal runtime evidence verified=${String(
+            evidence.verified
+          )} dxrVerified=${String(
+            evidence.dxrVerified
+          )} dxrPipelineFailed=${String(
+            evidence.dxrPipelineFailed
+          )} rtPsoFailures=${String(
+            evidence.dxrPipelineDiagnostics.rayTracingPsoFailureCount
+          )} stateObjectFailureStage=${
+            evidence.dxrPipelineDiagnostics.stateObjectFailureStage ?? "unknown"
+          } rejectedSubobject=${
+            evidence.dxrPipelineDiagnostics.rejectedSubobject ?? "unknown"
+          }`
+        );
+      } catch (error) {
+        await log(
+          `Failed to write D3DMetal runtime evidence: ${String(error)}`
+        );
+      }
+    }
+    if (
+      wine.attributes.renderBackend !== "d3dmetal" &&
+      config.resolutionCustom
+    ) {
+      try {
+        await revertResolutionRegistry(wine, server);
+      } catch (error) {
+        await log(`Failed to restore resolution registry: ${String(error)}`);
+      }
+    }
+
+    await removeFileIfExists(resolve("config.bat"));
+    yield ["setStateText", "REVERT_PATCHING"];
+    yield* patchRevertProgram(gameDir, wine, server, config);
   }
 
-  // await removeFile(resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-  await removeFile(resolve("config.bat"));
-  yield ["setStateText", "REVERT_PATCHING"];
-  yield* patchRevertProgram(gameDir, wine, server, config);
+  if (launchError && wine.attributes.renderBackend === "d3dmetal") {
+    throw launchError;
+  }
 }
 
 async function fixWebview(wine: Wine, server: Server) {

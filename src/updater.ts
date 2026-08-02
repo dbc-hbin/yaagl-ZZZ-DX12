@@ -18,6 +18,13 @@ const owner = "3shain";
 const repo = "yet-another-anime-game-launcher";
 
 export async function createUpdater(deps: { github: Github; aria2: Aria2 }) {
+  // This fork has a different graphics runtime contract. Installing an
+  // upstream NAP resource bundle here would silently restore the DXMT path.
+  if (import.meta.env["YAAGL_CHANNEL_CLIENT"] === "naposdx12") {
+    return {
+      latest: true,
+    } as const;
+  }
   if (CURRENT_YAAGL_VERSION === "development") {
     return {
       latest: true,

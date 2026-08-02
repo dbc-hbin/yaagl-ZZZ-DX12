@@ -1,0 +1,4305 @@
+IMAGE_BASE=00000000
+=== CompileAndLink call windows ===
+00087e97  CALL 0x003703a8 -> 003703a8 @rpath/libmetalirconverter.dylib::IRRootSignatureCreateFromABLayout
+00087e9c  MOV R15,RAX
+00087e9f  JMP 0x00087ea4 -> 00087ea4
+00087ea1  XOR R15D,R15D
+00087ea4  MOV RDI,RBX
+00087ea7  MOV RSI,R15
+00087eaa  CALL 0x00370234 -> 00370234 _IRCompilerSetGlobalRootSignature
+00087eaf  LEA RCX,[RSP + 0x8] -> Stack[-0x60]
+00087eb4  MOV qword ptr [RCX],0x0 -> Stack[-0x60]
+00087ebb  MOV RDI,RBX
+00087ebe  MOV RSI,R12
+00087ec1  MOV RDX,R14
+00087ec4  CALL 0x0037037e -> 0037037e @rpath/libmetalirconverter.dylib::IRCompilerAllocCompileAndLink
+00087ec9  MOV R12,RAX
+00087ecc  TEST RAX,RAX
+00087ecf  JZ 0x00087fc7 -> 00087fc7
+00087ed5  MOV RDI,R12
+00087ed8  CALL 0x003702ca -> 003702ca _IRObjectGetMetalIRShaderStage
+00087edd  CMP EAX,EBP
+00087edf  JNZ 0x0008800c -> 0008800c
+00087ee5  MOV EDI,0x180
+00087eea  CALL 0x00370636 -> 00370636 <EXTERNAL>::operator.new
+00087eef  MOV R13,RAX
+00087ef2  MOV qword ptr [RAX],0x0
+00087ef9  LEA RDI,[RAX + 0x8]
+00087efd  LEA RSI,[0x4567a0] -> 004567a0
+00087f04  CALL 0x00001dd0 -> 00001dd0 __ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEC1B9nqe210106ILi0EEEPKc
+00087f09  XORPS XMM0,XMM0
+00087f0c  MOVUPS xmmword ptr [R13 + 0x29],XMM0
+00087f11  MOVUPS xmmword ptr [R13 + 0x20],XMM0
+00087f16  MOVUPS xmmword ptr [R13 + 0x40],XMM0
+00087f1b  MOVUPS xmmword ptr [R13 + 0x50],XMM0
+00087f20  MOVUPS xmmword ptr [R13 + 0x60],XMM0
+0009a0fc  MOV RDI,R13
+0009a0ff  CALL 0x00370222 -> 00370222 _IRCompilerSetDebugRTArguments
+0009a104  MOV RAX,qword ptr [R14 + 0x78]
+0009a108  MOV RDI,qword ptr [RAX]
+0009a10b  MOV ESI,dword ptr [RAX + 0x8]
+0009a10e  CALL 0x0037034e -> 0037034e @rpath/libmetalirconverter.dylib::IRObjectCreateFromDXIL
+0009a113  MOV RBP,RAX
+0009a116  MOV RSI,qword ptr [R14 + 0x80]
+0009a11d  MOV qword ptr [RSP + 0x58],R13 -> Stack[-0xe0]
+0009a122  MOV RDI,R13
+0009a125  MOV RDX,RAX
+0009a128  XOR ECX,ECX
+0009a12a  CALL 0x0037037e -> 0037037e @rpath/libmetalirconverter.dylib::IRCompilerAllocCompileAndLink
+0009a12f  TEST RAX,RAX
+0009a132  JZ 0x0009a23b -> 0009a23b
+0009a138  MOV R12,RAX
+0009a13b  MOV R13,RBX
+0009a13e  ADD R13,0x20
+0009a142  MOV RDI,RAX
+0009a145  CALL 0x003702ca -> 003702ca _IRObjectGetMetalIRShaderStage
+0009a14a  MOV R15D,EAX
+0009a14d  MOV EAX,dword ptr [RSP + 0x44] -> Stack[-0xf4]
+0009a151  MOV dword ptr [RBX + 0x170],EAX
+0009a157  MOV RDI,R12
+0009a15a  MOV ESI,R15D
+0009a15d  MOV RDX,RBX
+0009a160  CALL 0x003702d0 -> 003702d0 _IRObjectGetMetalLibBinary
+0009a165  MOV RDI,R12
+0009a168  MOV ESI,R15D
+0009a16b  MOV RDX,R13
+0009a16e  MOV R15,qword ptr [RSP + 0x60] -> Stack[-0xd8]
+0009a173  CALL 0x003702d6 -> 003702d6 _IRObjectGetReflection
+0009a178  MOV RDI,RBP
+0009cbe2  JNZ 0x0009cbed -> 0009cbed
+0009cbe4  ADD R14,0x589
+0009cbeb  JMP 0x0009cbf4 -> 0009cbf4
+0009cbed  MOV R14,qword ptr [R14 + 0x598] -> 00000598
+0009cbf4  MOV qword ptr [0x004ff210],R14 -> 004ff210
+0009cbfb  LEA RDI,[0x4ff218] -> 004ff218
+0009cc02  CALL 0x0037066c -> 0037066c ___cxa_guard_release
+0009cc07  JMP 0x0009cbae -> 0009cbae
+0009ccb8  JMP 0x0009abba -> 0009abba D3DMCompiler::D3DMCompiler
+0009ccbe  ADD RDI,0x498
+0009ccc5  MOV EDX,EDX
+0009ccc7  JMP 0x00092b5e -> 00092b5e D3DMRootSignatureCache::getCacheEntry
+0009cccc  ADD RDI,0x420
+0009ccd3  JMP 0x00086e58 -> 00086e58 D3DMPipelineStagesCache::CompileComputePipelineStages
+0009ccd8  ADD RDI,0x420
+0009ccdf  JMP 0x00089188 -> 00089188 D3DMPipelineStagesCache::CompileGraphicsPipelineStages
+0009cce4  MOV AL,byte ptr [RDI + 0x54e] -> 0000054e
+0009ccea  RET
+0009ccec  CMP ESI,0x3f5
+0009ccf2  JZ 0x0009cd14 -> 0009cd14
+0009ccf4  CMP ESI,0x3f3
+0009ccfa  JZ 0x0009cd0d -> 0009cd0d
+0009ccfc  MOV AL,0x1
+0009ccfe  CMP ESI,0x3f2
+0009cd04  JNZ 0x0009cd1a -> 0009cd1a
+0009cd06  MOV AL,byte ptr [RDI + 0x55c] -> 0000055c
+0009cd0c  RET
+0009cd0d  MOV AL,byte ptr [RDI + 0x55d] -> 0000055d
+0009cd13  RET
+0009cd14  MOV AL,byte ptr [RDI + 0x55f] -> 0000055f
+0009cd1a  RET
+0009cd1c  PUSH R15
+0009cd1e  PUSH R14
+0009cbeb  JMP 0x0009cbf4 -> 0009cbf4
+0009cbed  MOV R14,qword ptr [R14 + 0x598] -> 00000598
+0009cbf4  MOV qword ptr [0x004ff210],R14 -> 004ff210
+0009cbfb  LEA RDI,[0x4ff218] -> 004ff218
+0009cc02  CALL 0x0037066c -> 0037066c ___cxa_guard_release
+0009cc07  JMP 0x0009cbae -> 0009cbae
+0009ccb8  JMP 0x0009abba -> 0009abba D3DMCompiler::D3DMCompiler
+0009ccbe  ADD RDI,0x498
+0009ccc5  MOV EDX,EDX
+0009ccc7  JMP 0x00092b5e -> 00092b5e D3DMRootSignatureCache::getCacheEntry
+0009cccc  ADD RDI,0x420
+0009ccd3  JMP 0x00086e58 -> 00086e58 D3DMPipelineStagesCache::CompileComputePipelineStages
+0009ccd8  ADD RDI,0x420
+0009ccdf  JMP 0x00089188 -> 00089188 D3DMPipelineStagesCache::CompileGraphicsPipelineStages
+0009cce4  MOV AL,byte ptr [RDI + 0x54e] -> 0000054e
+0009ccea  RET
+0009ccec  CMP ESI,0x3f5
+0009ccf2  JZ 0x0009cd14 -> 0009cd14
+0009ccf4  CMP ESI,0x3f3
+0009ccfa  JZ 0x0009cd0d -> 0009cd0d
+0009ccfc  MOV AL,0x1
+0009ccfe  CMP ESI,0x3f2
+0009cd04  JNZ 0x0009cd1a -> 0009cd1a
+0009cd06  MOV AL,byte ptr [RDI + 0x55c] -> 0000055c
+0009cd0c  RET
+0009cd0d  MOV AL,byte ptr [RDI + 0x55d] -> 0000055d
+0009cd13  RET
+0009cd14  MOV AL,byte ptr [RDI + 0x55f] -> 0000055f
+0009cd1a  RET
+0009cd1c  PUSH R15
+0009cd1e  PUSH R14
+0009cd20  PUSH R12
+0009cd22  PUSH RBX
+=== D3DMStageCache compile function ranges ===
+STAGE_FUNCTION name=D3DMStageCache::CompileCompute entry=0x872e4 end=0x878df prototype=undefined __thiscall CompileCompute(D3DMShaderBytecode * param_1, D3DMRootSignature * param_2)
+STAGE_FUNCTION name=D3DMStageCache::CompileCompute(D3DMShaderBytecode_const&,D3DMRootSignature_const&)::$_0::operator() entry=0x879e8 end=0x87b99 prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileAndLinkStage entry=0x87e4a end=0x88227 prototype=undefined __thiscall CompileAndLinkStage(IRCompiler * param_1, D3DMShaderBytecode * param_2, D3DMRootSignature * param_3, IRShaderStage param_4, vector param_5)
+STAGE_FUNCTION name=D3DMStageCache::CompileGeometry entry=0x8a062 end=0x8a78a prototype=undefined __thiscall CompileGeometry(D3DMShaderBytecode * param_1, D3DMRootSignature * param_2, bool param_3, bool param_4, IRStripCutIndex param_5)
+STAGE_FUNCTION name=D3DMStageCache::CompileFragment entry=0x8a7c2 end=0x8ad32 prototype=undefined __thiscall CompileFragment(D3DMShaderBytecode * param_1, D3DMRootSignature * param_2, bool param_3, bool param_4, uchar param_5, uchar param_6, uint param_7)
+STAGE_FUNCTION name=D3DMStageCache::CompileMesh entry=0x8ad6a end=0x8b365 prototype=undefined __thiscall CompileMesh(D3DMShaderBytecode * param_1, D3DMRootSignature * param_2)
+STAGE_FUNCTION name=D3DMStageCache::CompileAmplification entry=0x8b39e end=0x8b999 prototype=undefined __thiscall CompileAmplification(D3DMShaderBytecode * param_1, D3DMRootSignature * param_2)
+STAGE_FUNCTION name=D3DMStageCache::CompileHull entry=0x8b9d2 end=0x8c07f prototype=undefined __thiscall CompileHull(D3DMShaderBytecode * param_1, D3DMRootSignature * param_2, bool param_3, IRStripCutIndex param_4)
+STAGE_FUNCTION name=D3DMStageCache::CompileDomain entry=0x8c0b8 end=0x8c821 prototype=undefined __thiscall CompileDomain(D3DMShaderBytecode * param_1, D3DMRootSignature * param_2, bool param_3, IRStripCutIndex param_4, IRTessellatorOutputPrimitive param_5, bool param_6)
+STAGE_FUNCTION name=D3DMStageCache::CompileVertex entry=0x8c85a end=0x8ce9e prototype=undefined __thiscall CompileVertex(D3DMShaderBytecode * param_1, D3DMRootSignature * param_2, bool param_3, bool param_4, IRStripCutIndex param_5, bool param_6, bool param_7, int param_8, int param_9)
+STAGE_FUNCTION name=D3DMStageCache::CompileStageIn entry=0x8ced6 end=0x8d5bf prototype=undefined __thiscall CompileStageIn(IRShaderReflection * param_1, D3DMInputLayoutDesc * param_2)
+STAGE_FUNCTION name=D3DMStageCache::CompileStreamOut entry=0x8d5f8 end=0x8dd61 prototype=undefined __thiscall CompileStreamOut(IRShaderReflection * param_1, D3DMStreamOutDesc * param_2)
+STAGE_FUNCTION name=D3DMStageCache::CompileStreamOut(IRShaderReflection_const&,D3DMStreamOutDesc_const&)::$_0::operator() entry=0x8df2c end=0x8e182 prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileStageIn(IRShaderReflection_const&,D3DMInputLayoutDesc_const&)::$_0::operator() entry=0x8e652 end=0x8e8a8 prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileVertex(D3DMShaderBytecode_const&,D3DMRootSignature_const&,bool,bool,IRStripCutIndex,bool,bool,int,int)::$_0::operator() entry=0x8ed4c end=0x8efd5 prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileDomain(D3DMShaderBytecode_const&,D3DMRootSignature_const&,bool,IRStripCutIndex,IRTessellatorOutputPrimitive,bool)::$_0::operator() entry=0x8f66a end=0x8f87f prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileHull(D3DMShaderBytecode_const&,D3DMRootSignature_const&,bool,IRStripCutIndex)::$_0::operator() entry=0x8fd3a end=0x8ff08 prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileAmplification(D3DMShaderBytecode_const&,D3DMRootSignature_const&)::$_0::operator() entry=0x903bc end=0x9056d prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileMesh(D3DMShaderBytecode_const&,D3DMRootSignature_const&)::$_0::operator() entry=0x90a20 end=0x90bd1 prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileFragment(D3DMShaderBytecode_const&,D3DMRootSignature_const&,bool,bool,unsigned_char,unsigned_char,unsigned_int)::$_0::operator() entry=0x910b0 end=0x9130a prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileGeometry(D3DMShaderBytecode_const&,D3DMRootSignature_const&,bool,bool,IRStripCutIndex)::$_0::operator() entry=0x91920 end=0x91b1a prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileRTFunction entry=0x996d8 end=0x999e6 prototype=undefined __thiscall CompileRTFunction(D3DMShaderBytecode * param_1, D3DMRootSignature * param_2, D3DMRootSignature * param_3, vector * param_4, uint param_5, uint param_6, int param_7, bool param_8, ulonglong param_9, ulonglong param_10, ulonglong param_11, ulonglong param_12, bool param_13, RayGenMode param_14)
+STAGE_FUNCTION name=D3DMStageCache::CompileRTFunction(D3DMShaderBytecode_const&,D3DMRootSignature_const&,D3DMRootSignature_const&,std::vector<std::string,std::allocator<std::string>>const&,unsigned_int,unsigned_int,int,bool,unsigned_long_long,unsigned_long_long,unsigned_long_long,unsigned_long_long,bool,StateObjectBuilder::RayGenMode)::$_0::operator() entry=0x99ec4 end=0x9a261 prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileIntersectionWrapperFunction entry=0x9a73a end=0x9a858 prototype=undefined __thiscall CompileIntersectionWrapperFunction(uint param_1, bool param_2, ulonglong param_3, ulonglong param_4, ulonglong param_5)
+STAGE_FUNCTION name=D3DMStageCache::CompileIntersectionWrapperFunction(unsigned_int,bool,unsigned_long_long,unsigned_long_long,unsigned_long_long)::$_0::operator() entry=0x9a85a end=0x9ab56 prototype=undefined __thiscall operator()(uint param_1)
+STAGE_FUNCTION name=D3DMStageCache::CompileNodes entry=0x9cfb6 end=0x9d8d9 prototype=undefined __stdcall CompileNodes(vector * param_1, vector * param_2, vector * param_3, objc_object * param_4)
+STAGE_FUNCTION name=D3DMStageCache::CompileNodes(std::vector<std::unique_ptr<NodeShaderDXILLibrary,std::default_delete<NodeShaderDXILLibrary>>,std::allocator<std::unique_ptr<NodeShaderDXILLibrary,std::default_delete<NodeShaderDXILLibrary>>>>&,std::vector<std::shared_ptr<NodeShaderDescriptor>,std::allocator<std::shared_ptr<NodeShaderDescriptor>>>&,std::vector<std::vector<std::shared_ptr<NodeShaderDescriptor>,std::allocator<std::shared_ptr<NodeShaderDescriptor>>>,std::allocator<std::vector<std::shared_ptr<NodeShaderDescriptor>,std::allocator<std::shared_ptr<NodeShaderDescriptor>>>>>&,objc_object_objcproto9MTLDevice*)::$_0::operator() entry=0x9d940 end=0x9dd73 prototype=undefined __thiscall operator()(uint param_1)
+=== compute compile entry @ +0x86e58 ===
+FUNCTION=D3DMPipelineStagesCache::CompileComputePipelineStages
+ENTRY=00086e58
+BODY_MIN=00086e58
+BODY_MAX=000871f7
+PROTOTYPE=undefined __thiscall CompileComputePipelineStages(D3DMComputePipelineStateDesc * param_1)
+PARAMETERS=2
+PARAM index=0 name=this type=D3DMPipelineStagesCache * storage=RDI:8 (auto)
+PARAM index=1 name=param_1 type=D3DMComputePipelineStateDesc * storage=RSI:8
+CALLERS:
+Entry Point from=unknown
+0056f19a from=unknown
+0010ee43 from=D3DMComputePipelineState::D3DMComputePipelineState
+0009ccd3 from=D3DMCompiler::CompileComputePipelineStages
+ENTRY_WINDOW:
+00086e58  PUSH RBP
+00086e59  PUSH R15
+00086e5b  PUSH R14
+00086e5d  PUSH R13
+00086e5f  PUSH R12
+00086e61  PUSH RBX
+00086e62  SUB RSP,0x68
+00086e66  MOV R14,RSI
+00086e69  MOV R13,RDI
+00086e6c  MOV RDI,RSI
+00086e6f  CALL 0x00084d70 -> 00084d70 PipelineCacheKey::Create
+00086e74  MOV RBX,RAX
+00086e77  TEST RAX,RAX
+00086e7a  JZ 0x00086e98 -> 00086e98
+00086e7c  MOVZX EAX,word ptr [RBX + 0x2]
+00086e80  MOV ECX,dword ptr [RBX + 0x4]
+00086e83  MOVZX R15D,word ptr [RBX]
+00086e87  SHL R15,0x20
+00086e8b  OR R15,RCX
+00086e8e  IMUL R15,RAX
+00086e92  XOR R15,qword ptr [RBX + 0x8]
+00086e96  JMP 0x00086e9b -> 00086e9b
+00086e98  XOR R15D,R15D
+00086e9b  LEA R12,[R13 + 0x40]
+00086e9f  MOV RDI,R12
+DECOMPILE:
+
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* D3DMPipelineStagesCache::CompileComputePipelineStages(D3DMComputePipelineStateDesc const&) */
+
+long __thiscall
+D3DMPipelineStagesCache::CompileComputePipelineStages
+          (D3DMPipelineStagesCache *this,D3DMComputePipelineStateDesc *param_1)
+
+{
+  D3DMPipelineStagesCache *pDVar1;
+  PipelineStagesCacheKeyHashPair *this_00;
+  D3DMPipelineStagesCache *pDVar2;
+  D3DMComputePipelineStateDesc *pDVar3;
+  undefined2 *puVar4;
+  long *plVar5;
+  int iVar6;
+  undefined2 *puVar7;
+  long lVar8;
+  void *pvVar9;
+  long *plVar10;
+  ulong uVar11;
+  ulong uVar12;
+  D3DMComputePipelineStateDesc *pDVar13;
+  D3DMComputePipelineStateDesc *pDVar14;
+  undefined8 *puVar15;
+  D3DMComputePipelineStateDesc *pDVar16;
+  undefined1 extraout_XMM0 [16];
+  undefined1 auVar17 [16];
+  
+  puVar7 = (undefined2 *)PipelineCacheKey::Create(param_1);
+  if (puVar7 == (undefined2 *)0x0) {
+    pDVar16 = (D3DMComputePipelineStateDesc *)0x0;
+  }
+  else {
+    pDVar16 = (D3DMComputePipelineStateDesc *)
+              ((ulong)CONCAT24(*puVar7,*(undefined4 *)(puVar7 + 2)) * (ulong)(ushort)puVar7[1] ^
+              *(ulong *)(puVar7 + 4));
+  }
+  pDVar1 = this + 0x40;
+  _os_unfair_lock_lock_with_options(pDVar1,0x40000);
+  this_00 = (PipelineStagesCacheKeyHashPair *)(this + 0x48);
+  lVar8 = std::
+          __hash_table<std::__hash_value_type<PipelineStagesCacheKeyHashPair,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,std::__unordered_map_hasher<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Hash,PipelineStagesCacheKeyHashPair::Equal,true>,std::__unordered_map_equal<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Equal,PipelineStagesCacheKeyHashPair::Hash,true>,std::allocator<std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>>>
+          ::find<PipelineStagesCacheKeyHashPair>(this_00);
+  if (lVar8 == 0) {
+    _os_unfair_lock_unlock(pDVar1);
+  }
+  else {
+    lVar8 = *(long *)(lVar8 + 0x20);
+    _os_unfair_lock_unlock(pDVar1);
+    if (lVar8 != 0) goto LAB_00086f5e;
+  }
+  lVar8 = *(long *)(this + 0x70);
+  pvVar9 = _malloc(0x58);
+  lVar8 = D3DMStageCache::CompileCompute
+                    ((D3DMStageCache *)(lVar8 + 0x78),(D3DMShaderBytecode *)(param_1 + 0x10),
+                     (D3DMRootSignature *)param_1);
+  *(long *)((long)pvVar9 + 0x38) = lVar8;
+  if (lVar8 != 0) {
+    _os_unfair_lock_lock_with_options(pDVar1,0x40000);
+    pDVar14 = *(D3DMComputePipelineStateDesc **)(this + 0x50);
+    if (pDVar14 != (D3DMComputePipelineStateDesc *)0x0) {
+      pDVar3 = pDVar14 + -1;
+      if (((ulong)pDVar14 & (ulong)pDVar3) == 0) {
+        param_1 = (D3DMComputePipelineStateDesc *)((ulong)pDVar3 & (ulong)pDVar16);
+      }
+      else {
+        param_1 = pDVar16;
+        if (pDVar14 <= pDVar16) {
+          param_1 = (D3DMComputePipelineStateDesc *)((ulong)pDVar16 % (ulong)pDVar14);
+        }
+      }
+      puVar15 = *(undefined8 **)(*(long *)this_00 + (long)param_1 * 8);
+      if (puVar15 != (undefined8 *)0x0) {
+        for (puVar15 = (undefined8 *)*puVar15; puVar15 != (undefined8 *)0x0;
+            puVar15 = (undefined8 *)*puVar15) {
+          pDVar13 = (D3DMComputePipelineStateDesc *)puVar15[1];
+          if (pDVar13 == pDVar16) {
+            if (((D3DMComputePipelineStateDesc *)puVar15[2] == pDVar16) &&
+               ((puVar4 = (undefined2 *)puVar15[3], puVar4 == puVar7 ||
+                ((puVar4[1] == puVar7[1] &&
+                 (iVar6 = _memcmp(puVar4,puVar7,(ulong)(ushort)puVar4[1]), iVar6 == 0)))))) {
+              lVar8 = puVar15[4];
+              _os_unfair_lock_unlock(pDVar1);
+              goto LAB_00086f5e;
+            }
+          }
+          else {
+            if (((ulong)pDVar14 & (ulong)pDVar3) == 0) {
+              pDVar13 = (D3DMComputePipelineStateDesc *)((ulong)pDVar13 & (ulong)pDVar3);
+            }
+            else if (pDVar14 <= pDVar13) {
+              pDVar13 = (D3DMComputePipelineStateDesc *)((ulong)pDVar13 % (ulong)pDVar14);
+            }
+            if (pDVar13 != param_1) break;
+          }
+        }
+      }
+    }
+    plVar10 = operator_new(0x28);
+    *plVar10 = 0;
+    plVar10[1] = (long)pDVar16;
+    plVar10[2] = (long)pDVar16;
+    plVar10[3] = (long)puVar7;
+    plVar10[4] = (long)pvVar9;
+    auVar17._4_12_ = extraout_XMM0._4_12_;
+    pDVar2 = this + 0x58;
+    if ((pDVar14 == (D3DMComputePipelineStateDesc *)0x0) ||
+       ((float)pDVar14 * *(float *)(this + 0x68) < (float)(*(long *)(this + 0x60) + 1))) {
+      uVar11 = 1;
+      if ((D3DMComputePipelineStateDesc *)((long)&MACH_HEADER.magic + 2) < pDVar14) {
+        uVar11 = (ulong)(((ulong)pDVar14 & (ulong)(pDVar14 + -1)) != 0);
+      }
+      uVar11 = uVar11 | (long)pDVar14 * 2;
+      auVar17._0_4_ = (float)(*(long *)(this + 0x60) + 1) / *(float *)(this + 0x68);
+      auVar17 = roundss(auVar17,auVar17,10);
+      uVar12 = (ulong)auVar17._0_4_;
+      uVar12 = (long)(auVar17._0_4_ - _DAT_00374130) & (long)uVar12 >> 0x3f | uVar12;
+      if (uVar12 < uVar11) {
+        uVar12 = uVar11;
+      }
+      std::
+      __hash_table<std::__hash_value_type<PipelineStagesCacheKeyHashPair,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,std::__unordered_map_hasher<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Hash,PipelineStagesCacheKeyHashPair::Equal,true>,std::__unordered_map_equal<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Equal,PipelineStagesCacheKeyHashPair::Hash,true>,std::allocator<std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>>>
+      ::__rehash<true>((__hash_table<std::__hash_value_type<PipelineStagesCacheKeyHashPair,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,std::__unordered_map_hasher<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Hash,PipelineStagesCacheKeyHashPair::Equal,true>,std::__unordered_map_equal<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Equal,PipelineStagesCacheKeyHashPair::Hash,true>,std::allocator<std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>>>
+                        *)this_00,uVar12);
+      pDVar14 = *(D3DMComputePipelineStateDesc **)(this + 0x50);
+      if (((ulong)pDVar14 & (ulong)(pDVar14 + -1)) == 0) {
+        param_1 = (D3DMComputePipelineStateDesc *)((ulong)(pDVar14 + -1) & (ulong)pDVar16);
+      }
+      else {
+        param_1 = pDVar16;
+        if (pDVar14 <= pDVar16) {
+          param_1 = (D3DMComputePipelineStateDesc *)((ulong)pDVar16 % (ulong)pDVar14);
+        }
+      }
+    }
+    lVar8 = *(long *)this_00;
+    plVar5 = *(long **)(lVar8 + (long)param_1 * 8);
+    if (plVar5 == (long *)0x0) {
+      *plVar10 = *(long *)pDVar2;
+      *(long **)pDVar2 = plVar10;
+      *(D3DMPipelineStagesCache **)(lVar8 + (long)param_1 * 8) = pDVar2;
+      if (*plVar10 != 0) {
+        pDVar16 = *(D3DMComputePipelineStateDesc **)(*plVar10 + 8);
+        if (((ulong)pDVar14 & (ulong)(pDVar14 + -1)) == 0) {
+          pDVar16 = (D3DMComputePipelineStateDesc *)((ulong)pDVar16 & (ulong)(pDVar14 + -1));
+        }
+        else if (pDVar14 <= pDVar16) {
+          pDVar16 = (D3DMComputePipelineStateDesc *)((ulong)pDVar16 % (ulong)pDVar14);
+        }
+        *(long **)(lVar8 + (long)pDVar16 * 8) = plVar10;
+      }
+    }
+    else {
+      *plVar10 = *plVar5;
+      *plVar5 = (long)plVar10;
+    }
+    *(long *)(this + 0x60) = *(long *)(this + 0x60) + 1;
+    lVar8 = plVar10[4];
+    _os_unfair_lock_unlock(pDVar1);
+    if (*(long *)this == 0) {
+      return lVar8;
+    }
+    _dispatch_async();
+    return lVar8;
+  }
+  _free(pvVar9);
+  lVar8 = 0;
+LAB_00086f5e:
+  if (puVar7 != (undefined2 *)0x0) {
+    _free(puVar7);
+  }
+  return lVar8;
+}
+
+
+=== shared CompileAndLinkStage @ +0x87e4a ===
+FUNCTION=D3DMStageCache::CompileAndLinkStage
+ENTRY=00087e4a
+BODY_MIN=00087e4a
+BODY_MAX=00088227
+PROTOTYPE=undefined __thiscall CompileAndLinkStage(IRCompiler * param_1, D3DMShaderBytecode * param_2, D3DMRootSignature * param_3, IRShaderStage param_4, vector param_5)
+PARAMETERS=6
+PARAM index=0 name=this type=D3DMStageCache * storage=RDI:8 (auto)
+PARAM index=1 name=param_1 type=IRCompiler * storage=RSI:8
+PARAM index=2 name=param_2 type=D3DMShaderBytecode * storage=RDX:8
+PARAM index=3 name=param_3 type=D3DMRootSignature * storage=RCX:8
+PARAM index=4 name=param_4 type=IRShaderStage storage=<UNASSIGNED>
+PARAM index=5 name=param_5 type=vector storage=<UNASSIGNED>
+CALLERS:
+Entry Point from=unknown
+0056f1a7 from=unknown
+0009dca4 from=D3DMStageCache::CompileNodes(std::vector<std::unique_ptr<NodeShaderDXILLibrary,std::default_delete<NodeShaderDXILLibrary>>,std::allocator<std::unique_ptr<NodeShaderDXILLibrary,std::default_delete<NodeShaderDXILLibrary>>>>&,std::vector<std::shared_ptr<NodeShaderDescriptor>,std::allocator<std::shared_ptr<NodeShaderDescriptor>>>&,std::vector<std::vector<std::shared_ptr<NodeShaderDescriptor>,std::allocator<std::shared_ptr<NodeShaderDescriptor>>>,std::allocator<std::vector<std::shared_ptr<NodeShaderDescriptor>,std::allocator<std::shared_ptr<NodeShaderDescriptor>>>>>&,objc_object_objcproto9MTLDevice*)::$_0::operator()
+00087b0b from=D3DMStageCache::CompileCompute(D3DMShaderBytecode_const&,D3DMRootSignature_const&)::$_0::operator()
+0008ef3d from=D3DMStageCache::CompileVertex(D3DMShaderBytecode_const&,D3DMRootSignature_const&,bool,bool,IRStripCutIndex,bool,bool,int,int)::$_0::operator()
+0008f7e7 from=D3DMStageCache::CompileDomain(D3DMShaderBytecode_const&,D3DMRootSignature_const&,bool,IRStripCutIndex,IRTessellatorOutputPrimitive,bool)::$_0::operator()
+0008fe7a from=D3DMStageCache::CompileHull(D3DMShaderBytecode_const&,D3DMRootSignature_const&,bool,IRStripCutIndex)::$_0::operator()
+000904df from=D3DMStageCache::CompileAmplification(D3DMShaderBytecode_const&,D3DMRootSignature_const&)::$_0::operator()
+00090b43 from=D3DMStageCache::CompileMesh(D3DMShaderBytecode_const&,D3DMRootSignature_const&)::$_0::operator()
+0009127a from=D3DMStageCache::CompileFragment(D3DMShaderBytecode_const&,D3DMRootSignature_const&,bool,bool,unsigned_char,unsigned_char,unsigned_int)::$_0::operator()
+00091a82 from=D3DMStageCache::CompileGeometry(D3DMShaderBytecode_const&,D3DMRootSignature_const&,bool,bool,IRStripCutIndex)::$_0::operator()
+ENTRY_WINDOW:
+00087e4a  PUSH RBP
+00087e4b  PUSH R15
+00087e4d  PUSH R14
+00087e4f  PUSH R13
+00087e51  PUSH R12
+00087e53  PUSH RBX
+00087e54  SUB RSP,0x38
+00087e58  MOV R12,R9
+00087e5b  MOV EBP,R8D
+00087e5e  MOV R15,RCX
+00087e61  MOV RBX,RSI
+00087e64  MOV RAX,qword ptr [0x004ae740] -> 004ae740
+00087e6b  MOV RAX,qword ptr [RAX] -> 0077bf00
+00087e6e  MOV qword ptr [RSP + 0x30],RAX -> Stack[-0x38]
+00087e73  MOV RDI,qword ptr [RDI + 0x38]
+00087e77  MOV RSI,RDX
+00087e7a  CALL 0x000884b4 -> 000884b4 D3DMBytecodeCache::getCachedEntry
+00087e7f  MOV RDI,qword ptr [RAX]
+00087e82  MOV ESI,dword ptr [RAX + 0x8]
+00087e85  CALL 0x0037034e -> 0037034e @rpath/libmetalirconverter.dylib::IRObjectCreateFromDXIL
+00087e8a  MOV R14,RAX
+00087e8d  CMP dword ptr [R15 + 0x8],0x0
+00087e92  JZ 0x00087ea1 -> 00087ea1
+00087e94  MOV RDI,qword ptr [R15]
+00087e97  CALL 0x003703a8 -> 003703a8 @rpath/libmetalirconverter.dylib::IRRootSignatureCreateFromABLayout
+DECOMPILE:
+
+/* D3DMStageCache::CompileAndLinkStage(IRCompiler*, D3DMShaderBytecode const&, D3DMRootSignature
+   const&, IRShaderStage, std::vector<std::string, std::allocator<std::string > >) */
+
+undefined8 * __thiscall
+D3DMStageCache::CompileAndLinkStage
+          (D3DMStageCache *this,IRCompiler *param_1,D3DMShaderBytecode *param_2,undefined8 *param_3,
+          uint param_5,vector *param_6)
+
+{
+  undefined8 uVar1;
+  char cVar2;
+  uint uVar3;
+  undefined4 uVar4;
+  undefined8 *puVar5;
+  IRObject *pIVar6;
+  undefined8 uVar7;
+  long lVar8;
+  char *pcVar9;
+  undefined8 uVar10;
+  IRError *local_60;
+  undefined4 local_58;
+  char *local_54;
+  undefined2 local_4c;
+  undefined4 local_4a;
+  undefined2 local_46;
+  undefined4 local_44;
+  undefined2 uStack_40;
+  undefined2 uStack_3e;
+  undefined2 uStack_3c;
+  long local_38;
+  
+  local_38 = *(long *)PTR____stack_chk_guard_004ae740;
+  puVar5 = (undefined8 *)
+           D3DMBytecodeCache::getCachedEntry(*(D3DMBytecodeCache **)(this + 0x38),param_2);
+  pIVar6 = (IRObject *)IRObjectCreateFromDXIL((char *)*puVar5,(ulong)*(uint *)(puVar5 + 1));
+  if (*(int *)(param_3 + 1) == 0) {
+    uVar7 = 0;
+  }
+  else {
+    uVar7 = IRRootSignatureCreateFromABLayout((ABLayout *)*param_3);
+  }
+  _IRCompilerSetGlobalRootSignature(param_1,uVar7);
+  local_60 = (IRError *)0x0;
+  lVar8 = IRCompilerAllocCompileAndLink(param_1,param_6,pIVar6,&local_60);
+  if (lVar8 == 0) {
+    if (local_60 == (IRError *)0x0) {
+      if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+        _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341);
+      }
+      uVar1 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+      cVar2 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+      if (cVar2 != '\0') {
+        local_54 = (char *)ShaderStageName(param_5);
+        local_58 = 0x8200102;
+        __os_log_error_impl(0,uVar1,0x10,"Failed to compile stage %s",&local_58,0xc);
+      }
+    }
+    else {
+      if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+        _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341);
+      }
+      uVar1 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+      cVar2 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+      if (cVar2 != '\0') {
+        pcVar9 = (char *)ShaderStageName(param_5);
+        uVar4 = _IRErrorGetCode(local_60);
+        uVar10 = _IRErrorGetPayload(local_60);
+        local_58 = 0x8200302;
+        local_4c = 0x400;
+        local_46 = 0x820;
+        local_44 = (undefined4)uVar10;
+        uStack_40 = (undefined2)((ulong)uVar10 >> 0x20);
+        uStack_3e = (undefined2)((ulong)uVar10 >> 0x30);
+        local_54 = pcVar9;
+        local_4a = uVar4;
+        __os_log_error_impl(0,uVar1,0x10,"Failed to compile stage %s - error:%u, %s",&local_58,0x1c)
+        ;
+      }
+      _IRErrorDestroy(local_60);
+    }
+    puVar5 = (undefined8 *)0x0;
+  }
+  else {
+    uVar3 = _IRObjectGetMetalIRShaderStage(lVar8);
+    if (uVar3 == param_5) {
+      puVar5 = operator_new(0x180);
+      *puVar5 = 0;
+      __ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEC1B9nqe210106ILi0EEEPKc
+                (puVar5 + 1,"");
+      *(undefined8 *)((long)puVar5 + 0x29) = 0;
+      *(undefined8 *)((long)puVar5 + 0x31) = 0;
+      puVar5[4] = 0;
+      puVar5[5] = 0;
+      puVar5[8] = 0;
+      puVar5[9] = 0;
+      puVar5[10] = 0;
+      puVar5[0xb] = 0;
+      puVar5[0xc] = 0;
+      puVar5[0xd] = 0;
+      *(undefined1 *)(puVar5 + 0xe) = 0;
+      puVar5[0xf] = 0;
+      puVar5[0x10] = 0;
+      puVar5[0x11] = 0;
+      puVar5[0x12] = 0;
+      puVar5[0x13] = 0;
+      puVar5[0x14] = 0;
+      *(undefined2 *)(puVar5 + 0x15) = 0;
+      puVar5[0x16] = 0;
+      puVar5[0x17] = 0;
+      puVar5[0x18] = 0;
+      puVar5[0x19] = 0;
+      puVar5[0x1a] = 0;
+      puVar5[0x1b] = 0;
+      puVar5[0x1c] = 0;
+      puVar5[0x1d] = 0;
+      puVar5[0x1e] = 0;
+      puVar5[0x1f] = 0;
+      puVar5[0x20] = 0;
+      puVar5[0x21] = 0;
+      puVar5[0x22] = 0;
+      *(undefined1 *)(puVar5 + 0x23) = 0x10;
+      *(undefined4 *)(puVar5 + 0x2d) = 0;
+      puVar5[0x2f] = 0;
+      _IRObjectGetMetalLibBinary(lVar8,param_5,puVar5);
+      _IRObjectGetReflection(lVar8,param_5,puVar5 + 4);
+      _IRObjectDestroy(lVar8);
+    }
+    else {
+      if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+        _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341);
+      }
+      uVar1 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+      cVar2 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+      if (cVar2 != '\0') {
+        local_44 = _IRObjectGetMetalIRShaderStage(lVar8);
+        local_58 = 0x8200402;
+        local_54 = "CompileAndLinkStage";
+        local_4c = 0x400;
+        local_4a = 0x5e2;
+        local_46 = 0x400;
+        uStack_40 = 0x400;
+        uStack_3e = (undefined2)param_5;
+        uStack_3c = (undefined2)(param_5 >> 0x10);
+        __os_log_error_impl(0,uVar1,0x10,
+                            "[%s:%d][ERROR] Shader stage: %u does not match expected stage: %u",
+                            &local_58,0x1e);
+      }
+      uVar3 = _IRObjectGetMetalIRShaderStage(lVar8);
+      puVar5 = (undefined8 *)0x0;
+      ::D3DMPrintError("[%s:%d][ERROR] Shader stage: %u does not match expected stage: %u\n",
+                       "CompileAndLinkStage",0x5e2,(ulong)uVar3,(ulong)param_5);
+    }
+  }
+  _IRObjectDestroy(pIVar6);
+  _IRRootSignatureDestroy(uVar7);
+  _IRCompilerDestroy(param_1);
+  if (*(long *)PTR____stack_chk_guard_004ae740 == local_38) {
+    return puVar5;
+  }
+                    /* WARNING: Subroutine does not return */
+  ___stack_chk_fail();
+}
+
+
+=== graphics compile entry @ +0x89188 ===
+FUNCTION=D3DMPipelineStagesCache::CompileGraphicsPipelineStages
+ENTRY=00089188
+BODY_MIN=00089188
+BODY_MAX=00089ffd
+PROTOTYPE=undefined __thiscall CompileGraphicsPipelineStages(D3DMGraphicsPipelineStateDesc * param_1)
+PARAMETERS=2
+PARAM index=0 name=this type=D3DMPipelineStagesCache * storage=RDI:8 (auto)
+PARAM index=1 name=param_1 type=D3DMGraphicsPipelineStateDesc * storage=RSI:8
+CALLERS:
+Entry Point from=unknown
+0056f1bb from=unknown
+0010f6c9 from=D3DMGraphicsPipelineState::D3DMGraphicsPipelineState
+0009ccdf from=D3DMCompiler::CompileGraphicsPipelineStages
+ENTRY_WINDOW:
+00089188  PUSH RBP
+00089189  PUSH R15
+0008918b  PUSH R14
+0008918d  PUSH R13
+0008918f  PUSH R12
+00089191  PUSH RBX
+00089192  SUB RSP,0xf8
+00089199  MOV R15,RDI
+0008919c  MOV RAX,qword ptr [0x004ae740] -> 004ae740
+000891a3  MOV RAX,qword ptr [RAX] -> 0077bf00
+000891a6  MOV qword ptr [RSP + 0xf0],RAX -> Stack[-0x38]
+000891ae  MOV RAX,qword ptr [RDI + 0x70]
+000891b2  MOVZX EDX,byte ptr [RAX + 0x552] -> 00000552
+000891b9  MOV qword ptr [RSP + 0x40],RSI -> Stack[-0xe8]
+000891be  MOV RDI,RSI
+000891c1  CALL 0x00084538 -> 00084538 PipelineCacheKey::Create
+000891c6  MOV R12,RAX
+000891c9  TEST RAX,RAX
+000891cc  JZ 0x000891f0 -> 000891f0
+000891ce  MOVZX EAX,word ptr [R12 + 0x2]
+000891d4  MOV ECX,dword ptr [R12 + 0x4]
+000891d9  MOVZX EBX,word ptr [R12]
+000891de  SHL RBX,0x20
+000891e2  OR RBX,RCX
+000891e5  IMUL RBX,RAX
+DECOMPILE:
+
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* D3DMPipelineStagesCache::CompileGraphicsPipelineStages(D3DMGraphicsPipelineStateDesc const&) */
+
+long __thiscall
+D3DMPipelineStagesCache::CompileGraphicsPipelineStages
+          (D3DMPipelineStagesCache *this,D3DMGraphicsPipelineStateDesc *param_1)
+
+{
+  D3DMPipelineStagesCache *pDVar1;
+  PipelineStagesCacheKeyHashPair *this_00;
+  ulong uVar2;
+  D3DMPipelineStagesCache *pDVar3;
+  D3DMGraphicsPipelineStateDesc DVar4;
+  byte bVar5;
+  byte bVar6;
+  int iVar7;
+  undefined2 *puVar8;
+  byte bVar9;
+  bool bVar10;
+  char cVar11;
+  char cVar12;
+  uint uVar13;
+  undefined4 uVar14;
+  int iVar15;
+  undefined2 *puVar16;
+  long lVar17;
+  long *plVar18;
+  long *plVar19;
+  ulong uVar20;
+  ulong uVar21;
+  undefined8 uVar22;
+  ulong uVar23;
+  ulong uVar24;
+  D3DMStageCache *this_01;
+  uint uVar25;
+  bool bVar26;
+  byte bVar27;
+  undefined4 uVar28;
+  char *pcVar29;
+  byte bVar30;
+  undefined8 *puVar31;
+  undefined1 auVar32 [16];
+  undefined4 local_58;
+  char *local_54;
+  undefined2 local_4c;
+  undefined4 local_4a;
+  long local_38;
+  
+  local_38 = *(long *)PTR____stack_chk_guard_004ae740;
+  puVar16 = (undefined2 *)
+            PipelineCacheKey::Create
+                      (param_1,SUB81(param_1,0),*(bool *)(*(long *)(this + 0x70) + 0x552));
+  if (puVar16 == (undefined2 *)0x0) {
+    uVar24 = 0;
+  }
+  else {
+    uVar24 = (ulong)CONCAT24(*puVar16,*(undefined4 *)(puVar16 + 2)) * (ulong)(ushort)puVar16[1] ^
+             *(ulong *)(puVar16 + 4);
+  }
+  pDVar1 = this + 0x40;
+  _os_unfair_lock_lock_with_options(pDVar1,0x40000);
+  this_00 = (PipelineStagesCacheKeyHashPair *)(this + 0x48);
+  lVar17 = std::
+           __hash_table<std::__hash_value_type<PipelineStagesCacheKeyHashPair,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,std::__unordered_map_hasher<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Hash,PipelineStagesCacheKeyHashPair::Equal,true>,std::__unordered_map_equal<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Equal,PipelineStagesCacheKeyHashPair::Hash,true>,std::allocator<std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>>>
+           ::find<PipelineStagesCacheKeyHashPair>(this_00);
+  if (lVar17 == 0) {
+    _os_unfair_lock_unlock(pDVar1);
+LAB_0008923a:
+    lVar17 = *(long *)(this + 0x70);
+    plVar18 = operator_new(0x58);
+    this_01 = (D3DMStageCache *)(lVar17 + 0x78);
+    plVar18[8] = 0;
+    plVar18[9] = 0;
+    plVar18[6] = 0;
+    plVar18[7] = 0;
+    plVar18[4] = 0;
+    plVar18[5] = 0;
+    plVar18[2] = 0;
+    plVar18[3] = 0;
+    *plVar18 = 0;
+    plVar18[1] = 0;
+    plVar18[10] = 0;
+    DVar4 = param_1[0x8d8];
+    bVar26 = *(int *)(param_1 + 0x78) != 0 && *(int *)(param_1 + 0x38) != 0;
+    iVar15 = *(int *)(param_1 + 0x7c4);
+    if (*(int *)(param_1 + 0x58) == 0) {
+      bVar9 = 0;
+LAB_000892f6:
+      iVar7 = *(int *)(param_1 + 0x18);
+      if (*(int *)(param_1 + 0xd8) != 0) {
+        bVar10 = (bool)IsDualSourceBlendingEnabled((D3DMRenderTargetBlendDesc *)(param_1 + 0xf2));
+        if (param_1[0x160] == (D3DMGraphicsPipelineStateDesc)0x1) {
+          bVar5 = (&DAT_00524030)[(ulong)*(uint *)(param_1 + 0x900) * 0x58];
+        }
+        else {
+          bVar5 = 0;
+        }
+        uVar13 = *(uint *)(param_1 + 0x8dc);
+        if (uVar13 == 0) {
+          bVar27 = 0;
+          bVar30 = 0;
+        }
+        else {
+          cVar12 = *(char *)(*(long *)(this + 0x70) + 0x552);
+          lVar17 = 0;
+          bVar30 = 0;
+          bVar27 = 0;
+          do {
+            bVar6 = (&DAT_00524030)[(ulong)*(uint *)(param_1 + lVar17 * 4 + 0x8e0) * 0x58];
+            if (cVar12 != '\0') {
+              cVar11 = MTLPixelFormatNeedsFloat2UnormBias
+                                 ((&_dxgi_info)
+                                  [(ulong)*(uint *)(param_1 + lVar17 * 4 + 0x8e0) * 0xb]);
+              bVar27 = bVar27 | cVar11 << ((byte)lVar17 & 0x1f);
+            }
+            bVar30 = bVar30 | ((bVar6 & 0xc0) != 0) << ((byte)lVar17 & 0x1f);
+            lVar17 = lVar17 + 1;
+          } while (((uint)lVar17 & 0xff) < uVar13);
+        }
+        uVar13 = ~(-1 << ((byte)param_1[0x904] & 0x1f));
+        uVar25 = *(uint *)(param_1 + 0x144) & uVar13;
+        if (uVar25 == uVar13) {
+          uVar25 = 0xffffffff;
+        }
+        lVar17 = D3DMStageCache::CompileFragment
+                           (this_01,(D3DMShaderBytecode *)(param_1 + 0xd0),
+                            (D3DMRootSignature *)param_1,bVar10,(bool)(bVar5 & 1),bVar30,bVar27,
+                            uVar25);
+        plVar18[6] = lVar17;
+        if (lVar17 == 0) {
+          if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+            _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341);
+          }
+          uVar22 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+          cVar12 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+          if (cVar12 != '\0') {
+            local_58 = 0x8200202;
+            local_54 = "CompileGraphicsPipelineStages";
+            local_4c = 0x400;
+            local_4a = 0x372;
+            __os_log_error_impl(0,uVar22,0x10,"[%s:%d][ERROR] Failed to compile fragment function",
+                                &local_58,0x12);
+          }
+          pcVar29 = "[%s:%d][ERROR] Failed to compile fragment function\n";
+          uVar22 = 0x372;
+          goto LAB_00089932;
+        }
+      }
+      uVar21 = (ulong)(byte)DVar4;
+      if (*(int *)(param_1 + 0x98) != 0) {
+        lVar17 = D3DMStageCache::CompileMesh
+                           (this_01,(D3DMShaderBytecode *)(param_1 + 0x90),
+                            (D3DMRootSignature *)param_1);
+        *plVar18 = lVar17;
+        if (lVar17 == 0) {
+          if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+            _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341);
+          }
+          uVar22 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+          cVar12 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+          if (cVar12 != '\0') {
+            local_58 = 0x8200202;
+            local_54 = "CompileGraphicsPipelineStages";
+            local_4c = 0x400;
+            local_4a = 0x37e;
+            __os_log_error_impl(0,uVar22,0x10,"[%s:%d][ERROR] Failed to compile mesh function",
+                                &local_58,0x12);
+          }
+          pcVar29 = "[%s:%d][ERROR] Failed to compile mesh function\n";
+          uVar22 = 0x37e;
+          goto LAB_00089932;
+        }
+      }
+      if (*(int *)(param_1 + 0xb8) != 0) {
+        lVar17 = D3DMStageCache::CompileAmplification
+                           (this_01,(D3DMShaderBytecode *)(param_1 + 0xb0),
+                            (D3DMRootSignature *)param_1);
+        plVar18[1] = lVar17;
+        if (lVar17 == 0) {
+          if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+            _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341);
+          }
+          uVar22 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+          cVar12 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+          if (cVar12 != '\0') {
+            local_58 = 0x8200202;
+            local_54 = "CompileGraphicsPipelineStages";
+            local_4c = 0x400;
+            local_4a = 0x388;
+            __os_log_error_impl(0,uVar22,0x10,"[%s:%d][ERROR] Failed to compile object function",
+                                &local_58,0x12);
+          }
+          pcVar29 = "[%s:%d][ERROR] Failed to compile object function\n";
+          uVar22 = 0x388;
+          goto LAB_00089932;
+        }
+      }
+      if ((*(int *)(param_1 + 0x38) == 0) || (*(int *)(param_1 + 0x78) == 0)) {
+LAB_000895ae:
+        if (*(int *)(param_1 + 0x18) != 0) {
+          lVar17 = plVar18[4];
+          uVar14 = 0xffffffff;
+          if (lVar17 == 0) {
+            uVar28 = 0xffffffff;
+          }
+          else {
+            if (*(int *)(lVar17 + 0x168) != 6) {
+                    /* WARNING: Subroutine does not return */
+              std::__throw_bad_variant_access_abi_nqe210106_();
+            }
+            uVar28 = 0xffffffff;
+            if (*(char *)(lVar17 + 0x139) == '\x01') {
+              uVar14 = *(undefined4 *)(lVar17 + 0x13c);
+              uVar28 = *(undefined4 *)(lVar17 + 0x140);
+            }
+          }
+          lVar17 = D3DMStageCache::CompileVertex
+                             (this_01,param_1 + 0x10,param_1,
+                              param_1[0x8d9] == (D3DMGraphicsPipelineStateDesc)0x1,
+                              iVar15 != 0 & (bVar9 ^ 1),uVar21,bVar9,bVar26,uVar28,uVar14);
+          plVar18[5] = lVar17;
+          if (lVar17 == 0) {
+            if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+              _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341
+                            );
+            }
+            uVar22 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+            cVar12 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+            if (cVar12 != '\0') {
+              local_58 = 0x8200202;
+              local_54 = "CompileGraphicsPipelineStages";
+              local_4c = 0x400;
+              local_4a = 0x3be;
+              __os_log_error_impl(0,uVar22,0x10,"[%s:%d][ERROR] Failed to compile vertex function",
+                                  &local_58,0x12);
+            }
+            pcVar29 = "[%s:%d][ERROR] Failed to compile vertex function\n";
+            uVar22 = 0x3be;
+            goto LAB_00089932;
+          }
+        }
+        if (iVar7 != 0) {
+          lVar17 = D3DMStageCache::CompileStageIn
+                             (this_01,(IRShaderReflection *)(plVar18[5] + 0x20),
+                              (D3DMInputLayoutDesc *)(param_1 + 0x170));
+          plVar18[8] = lVar17;
+          if (lVar17 == 0) {
+            if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+              _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341
+                            );
+            }
+            uVar22 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+            cVar12 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+            if (cVar12 != '\0') {
+              local_58 = 0x8200202;
+              local_54 = "CompileGraphicsPipelineStages";
+              local_4c = 0x400;
+              local_4a = 0x3c9;
+              __os_log_error_impl(0,uVar22,0x10,"[%s:%d][ERROR] Failed to compile stage in function"
+                                  ,&local_58,0x12);
+            }
+            pcVar29 = "[%s:%d][ERROR] Failed to compile stage in function\n";
+            uVar22 = 0x3c9;
+            goto LAB_00089932;
+          }
+        }
+        if (iVar15 != 0) {
+          lVar17 = D3DMStageCache::CompileStreamOut
+                             (this_01,(IRShaderReflection *)
+                                      (plVar18[(ulong)(plVar18[4] == 0) + 4] + 0x20),
+                              (D3DMStreamOutDesc *)(param_1 + 0x558));
+          plVar18[9] = lVar17;
+          if (lVar17 == 0) {
+            if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+              _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341
+                            );
+            }
+            uVar22 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+            cVar12 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+            if (cVar12 != '\0') {
+              local_58 = 0x8200202;
+              local_54 = "CompileGraphicsPipelineStages";
+              local_4c = 0x400;
+              local_4a = 0x3d5;
+              __os_log_error_impl(0,uVar22,0x10,
+                                  "[%s:%d][ERROR] Failed to compile stream out function",&local_58,
+                                  0x12);
+            }
+            pcVar29 = "[%s:%d][ERROR] Failed to compile stream out function\n";
+            uVar22 = 0x3d5;
+            goto LAB_00089932;
+          }
+        }
+        _os_unfair_lock_lock_with_options(pDVar1,0x40000);
+        uVar20 = *(ulong *)(this + 0x50);
+        if (uVar20 != 0) {
+          uVar2 = uVar20 - 1;
+          if ((uVar20 & uVar2) == 0) {
+            uVar21 = uVar2 & uVar24;
+          }
+          else {
+            uVar21 = uVar24;
+            if (uVar20 <= uVar24) {
+              uVar21 = uVar24 % uVar20;
+            }
+          }
+          puVar31 = *(undefined8 **)(*(long *)this_00 + uVar21 * 8);
+          if (puVar31 != (undefined8 *)0x0) {
+            for (puVar31 = (undefined8 *)*puVar31; puVar31 != (undefined8 *)0x0;
+                puVar31 = (undefined8 *)*puVar31) {
+              uVar23 = puVar31[1];
+              if (uVar23 == uVar24) {
+                if ((puVar31[2] == uVar24) &&
+                   ((puVar8 = (undefined2 *)puVar31[3], puVar8 == puVar16 ||
+                    ((puVar8[1] == puVar16[1] &&
+                     (iVar15 = _memcmp(puVar8,puVar16,(ulong)(ushort)puVar8[1]), iVar15 == 0)))))) {
+                  lVar17 = puVar31[4];
+                  _os_unfair_lock_unlock(pDVar1);
+                  goto LAB_00089939;
+                }
+              }
+              else {
+                if ((uVar20 & uVar2) == 0) {
+                  uVar23 = uVar23 & uVar2;
+                }
+                else if (uVar20 <= uVar23) {
+                  uVar23 = uVar23 % uVar20;
+                }
+                if (uVar23 != uVar21) break;
+              }
+            }
+          }
+        }
+        plVar19 = operator_new(0x28);
+        *plVar19 = 0;
+        plVar19[1] = uVar24;
+        plVar19[2] = uVar24;
+        plVar19[3] = (long)puVar16;
+        plVar19[4] = (long)plVar18;
+        pDVar3 = this + 0x58;
+        if ((uVar20 == 0) ||
+           ((float)uVar20 * *(float *)(this + 0x68) < (float)(*(long *)(this + 0x60) + 1))) {
+          uVar21 = 1;
+          if (2 < uVar20) {
+            uVar21 = (ulong)((uVar20 & uVar20 - 1) != 0);
+          }
+          uVar21 = uVar21 | uVar20 * 2;
+          auVar32 = ZEXT416((uint)((float)(*(long *)(this + 0x60) + 1) / *(float *)(this + 0x68)));
+          auVar32 = roundss(auVar32,auVar32,10);
+          uVar20 = (ulong)auVar32._0_4_;
+          uVar20 = (long)(auVar32._0_4_ - _DAT_00374130) & (long)uVar20 >> 0x3f | uVar20;
+          if (uVar20 < uVar21) {
+            uVar20 = uVar21;
+          }
+          std::
+          __hash_table<std::__hash_value_type<PipelineStagesCacheKeyHashPair,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,std::__unordered_map_hasher<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Hash,PipelineStagesCacheKeyHashPair::Equal,true>,std::__unordered_map_equal<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Equal,PipelineStagesCacheKeyHashPair::Hash,true>,std::allocator<std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>>>
+          ::__rehash<true>((__hash_table<std::__hash_value_type<PipelineStagesCacheKeyHashPair,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,std::__unordered_map_hasher<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Hash,PipelineStagesCacheKeyHashPair::Equal,true>,std::__unordered_map_equal<PipelineStagesCacheKeyHashPair,std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>,PipelineStagesCacheKeyHashPair::Equal,PipelineStagesCacheKeyHashPair::Hash,true>,std::allocator<std::pair<PipelineStagesCacheKeyHashPair_const,std::unique_ptr<PipelineStagesCacheValue,std::default_delete<PipelineStagesCacheValue>>>>>
+                            *)this_00,uVar20);
+          uVar20 = *(ulong *)(this + 0x50);
+          if ((uVar20 & uVar20 - 1) == 0) {
+            uVar21 = uVar20 - 1 & uVar24;
+          }
+          else {
+            uVar21 = uVar24;
+            if (uVar20 <= uVar24) {
+              uVar21 = uVar24 % uVar20;
+            }
+          }
+        }
+        lVar17 = *(long *)this_00;
+        plVar18 = *(long **)(lVar17 + uVar21 * 8);
+        if (plVar18 == (long *)0x0) {
+          *plVar19 = *(long *)pDVar3;
+          *(long **)pDVar3 = plVar19;
+          *(D3DMPipelineStagesCache **)(lVar17 + uVar21 * 8) = pDVar3;
+          if (*plVar19 != 0) {
+            uVar24 = *(ulong *)(*plVar19 + 8);
+            if ((uVar20 & uVar20 - 1) == 0) {
+              uVar24 = uVar24 & uVar20 - 1;
+            }
+            else if (uVar20 <= uVar24) {
+              uVar24 = uVar24 % uVar20;
+            }
+            *(long **)(lVar17 + uVar24 * 8) = plVar19;
+          }
+        }
+        else {
+          *plVar19 = *plVar18;
+          *plVar18 = (long)plVar19;
+        }
+        *(long *)(this + 0x60) = *(long *)(this + 0x60) + 1;
+        lVar17 = plVar19[4];
+        _os_unfair_lock_unlock(pDVar1);
+        if (*(long *)this != 0) {
+          _dispatch_async();
+        }
+        goto LAB_0008994e;
+      }
+      lVar17 = D3DMStageCache::CompileHull(this_01,param_1 + 0x30,param_1,0,uVar21);
+      plVar18[2] = lVar17;
+      if (lVar17 == 0) {
+        if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+          _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341);
+        }
+        uVar22 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+        cVar12 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+        if (cVar12 != '\0') {
+          local_58 = 0x8200202;
+          local_54 = "CompileGraphicsPipelineStages";
+          local_4c = 0x400;
+          local_4a = 0x393;
+          __os_log_error_impl(0,uVar22,0x10,"[%s:%d][ERROR] Failed to compile hull function",
+                              &local_58,0x12);
+        }
+        pcVar29 = "[%s:%d][ERROR] Failed to compile hull function\n";
+        uVar22 = 0x393;
+      }
+      else {
+        if (*(int *)(lVar17 + 0x168) != 7) {
+                    /* WARNING: Subroutine does not return */
+          std::__throw_bad_variant_access_abi_nqe210106_();
+        }
+        lVar17 = D3DMStageCache::CompileDomain
+                           (this_01,param_1 + 0x70,param_1,0,uVar21,*(undefined1 *)(lVar17 + 0x15e),
+                            *(int *)(param_1 + 0x58) != 0);
+        plVar18[3] = lVar17;
+        if (lVar17 != 0) {
+          if (*(int *)(plVar18[2] + 0x168) != 7) {
+                    /* WARNING: Subroutine does not return */
+            std::__throw_bad_variant_access_abi_nqe210106_();
+          }
+          if (*(int *)(lVar17 + 0x168) != 8) {
+                    /* WARNING: Subroutine does not return */
+            std::__throw_bad_variant_access_abi_nqe210106_();
+          }
+          goto LAB_000895ae;
+        }
+        if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+          _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341);
+        }
+        uVar22 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+        cVar12 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+        if (cVar12 != '\0') {
+          local_58 = 0x8200202;
+          local_54 = "CompileGraphicsPipelineStages";
+          local_4c = 0x400;
+          local_4a = 0x39c;
+          __os_log_error_impl(0,uVar22,0x10,"[%s:%d][ERROR] Failed to compile domain function",
+                              &local_58,0x12);
+        }
+        pcVar29 = "[%s:%d][ERROR] Failed to compile domain function\n";
+        uVar22 = 0x39c;
+      }
+    }
+    else {
+      lVar17 = D3DMStageCache::CompileGeometry
+                         (this_01,param_1 + 0x50,param_1,iVar15 != 0,bVar26,DVar4);
+      plVar18[4] = lVar17;
+      if (lVar17 != 0) {
+        if (*(int *)(lVar17 + 0x168) != 6) {
+                    /* WARNING: Subroutine does not return */
+          std::__throw_bad_variant_access_abi_nqe210106_();
+        }
+        bVar9 = *(byte *)(lVar17 + 0x139) ^ 1;
+        goto LAB_000892f6;
+      }
+      if (__ZZL16D3DMDefaultOSLogvE9onceToken_2340 != -1) {
+        _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_2340,&___block_literal_global_2341);
+      }
+      uVar22 = __ZZL16D3DMDefaultOSLogvE6logObj_2342;
+      cVar12 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_2342,0x10);
+      if (cVar12 != '\0') {
+        local_58 = 0x8200202;
+        local_54 = "CompileGraphicsPipelineStages";
+        local_4c = 0x400;
+        local_4a = 0x34d;
+        __os_log_error_impl(0,uVar22,0x10,"[%s:%d][ERROR] Failed to compile geometry function",
+                            &local_58,0x12);
+      }
+      pcVar29 = "[%s:%d][ERROR] Failed to compile geometry function\n";
+      uVar22 = 0x34d;
+    }
+LAB_00089932:
+    lVar17 = 0;
+    ::D3DMPrintError(pcVar29,"CompileGraphicsPipelineStages",uVar22);
+LAB_00089939:
+    operator_delete(plVar18);
+  }
+  else {
+    lVar17 = *(long *)(lVar17 + 0x20);
+    _os_unfair_lock_unlock(pDVar1);
+    if (lVar17 == 0) goto LAB_0008923a;
+  }
+  if (puVar16 != (undefined2 *)0x0) {
+    _free(puVar16);
+  }
+LAB_0008994e:
+  if (*(long *)PTR____stack_chk_guard_004ae740 == local_38) {
+    return lVar17;
+  }
+                    /* WARNING: Subroutine does not return */
+  ___stack_chk_fail();
+}
+
+
+=== D3DMStageCache CompileRTFunction @ +0x996d8 ===
+FUNCTION=D3DMStageCache::CompileRTFunction
+ENTRY=000996d8
+BODY_MIN=000996d8
+BODY_MAX=000999e6
+PROTOTYPE=undefined __thiscall CompileRTFunction(D3DMShaderBytecode * param_1, D3DMRootSignature * param_2, D3DMRootSignature * param_3, vector * param_4, uint param_5, uint param_6, int param_7, bool param_8, ulonglong param_9, ulonglong param_10, ulonglong param_11, ulonglong param_12, bool param_13, RayGenMode param_14)
+PARAMETERS=15
+PARAM index=0 name=this type=D3DMStageCache * storage=RDI:8 (auto)
+PARAM index=1 name=param_1 type=D3DMShaderBytecode * storage=RSI:8
+PARAM index=2 name=param_2 type=D3DMRootSignature * storage=RDX:8
+PARAM index=3 name=param_3 type=D3DMRootSignature * storage=RCX:8
+PARAM index=4 name=param_4 type=vector * storage=R8:8
+PARAM index=5 name=param_5 type=uint storage=R9D:4
+PARAM index=6 name=param_6 type=uint storage=Stack[0x8]:4
+PARAM index=7 name=param_7 type=int storage=Stack[0x10]:4
+PARAM index=8 name=param_8 type=bool storage=Stack[0x18]:1
+PARAM index=9 name=param_9 type=ulonglong storage=Stack[0x20]:8
+PARAM index=10 name=param_10 type=ulonglong storage=Stack[0x28]:8
+PARAM index=11 name=param_11 type=ulonglong storage=Stack[0x30]:8
+PARAM index=12 name=param_12 type=ulonglong storage=Stack[0x38]:8
+PARAM index=13 name=param_13 type=bool storage=Stack[0x40]:1
+PARAM index=14 name=param_14 type=RayGenMode storage=<UNASSIGNED>
+CALLERS:
+Entry Point from=unknown
+0056f25e from=unknown
+00123f16 from=D3D12StateObject::CreateFunction
+001247e5 from=D3D12StateObject::CreateCombinedAnyHitIntersectionFunction
+0009cf16 from=D3DMCompiler::CompileRTFunction
+ENTRY_WINDOW:
+000996d8  PUSH RBP
+000996d9  PUSH R15
+000996db  PUSH R14
+000996dd  PUSH R13
+000996df  PUSH R12
+000996e1  PUSH RBX
+000996e2  SUB RSP,0x128
+000996e9  MOV qword ptr [RSP + 0x28],RDI -> Stack[-0x130]
+000996ee  MOV AL,byte ptr [RSP + 0x1a0] -> Stack[0x48]
+000996f5  MOVSXD RBX,dword ptr [RSP + 0x168] -> Stack[0x10]
+000996fd  MOV EBP,dword ptr [RSP + 0x160] -> Stack[0x8]
+00099704  MOVUPS XMM0,xmmword ptr [RSP + 0x188] -> Stack[0x30]
+0009970c  MOVUPS XMM1,xmmword ptr [RSP + 0x178] -> Stack[0x20]
+00099714  MOV R11B,byte ptr [RSP + 0x198] -> Stack[0x40]
+0009971c  MOV DIL,byte ptr [RSP + 0x170] -> Stack[0x18]
+00099724  MOV dword ptr [RSP + 0x4],R9D -> Stack[-0x154]
+00099729  MOV byte ptr [RSP + 0x3],DIL -> Stack[-0x155]
+0009972e  MOV byte ptr [RSP + 0x2],R11B -> Stack[-0x156]
+00099733  MOV qword ptr [RSP + 0x8],RDX -> Stack[-0x150]
+00099738  MOV R10D,dword ptr [RDX + 0x8]
+0009973c  MOV dword ptr [RSP + 0x40],R10D -> Stack[-0x118]
+00099741  MOVUPS XMM2,xmmword ptr [RSI + 0x10]
+00099745  MOVAPS xmmword ptr [RSP + 0x30],XMM2 -> Stack[-0x128]
+0009974a  MOV qword ptr [RSP + 0x18],RSI -> Stack[-0x140]
+0009974f  MOV R10D,dword ptr [RSI + 0x8]
+DECOMPILE:
+
+/* D3DMStageCache::CompileRTFunction(D3DMShaderBytecode const&, D3DMRootSignature const&,
+   D3DMRootSignature const&, std::vector<std::string, std::allocator<std::string > > const&,
+   unsigned int, unsigned int, int, bool, unsigned long long, unsigned long long, unsigned long
+   long, unsigned long long, bool, StateObjectBuilder::RayGenMode) */
+
+D3DMStageResult * __thiscall
+D3DMStageCache::CompileRTFunction
+          (D3DMStageCache *this,long param_1,long param_2,long param_3,undefined8 *param_4,
+          undefined4 param_5,undefined4 param_6,int param_7,byte param_8,undefined8 param_9,
+          undefined8 param_10,undefined8 param_11,undefined8 param_12,char param_13,char param_15)
+
+{
+  byte *pbVar1;
+  long lVar2;
+  ValueWrapper *this_00;
+  D3DMStageResult *pDVar3;
+  byte *pbVar4;
+  ulong uVar5;
+  byte *pbVar6;
+  ulong uVar7;
+  undefined1 auVar8 [16];
+  bool local_158;
+  undefined1 local_157;
+  char local_156;
+  byte local_155;
+  undefined4 local_154;
+  long local_150;
+  long local_148;
+  long local_140;
+  undefined8 *local_138;
+  D3DMStageCache *local_130;
+  undefined8 local_128;
+  undefined8 uStack_120;
+  undefined4 local_118;
+  undefined4 local_114;
+  undefined4 local_110;
+  undefined4 local_10c;
+  undefined4 local_108;
+  long local_100;
+  ulong local_f8;
+  undefined8 local_f0;
+  undefined8 uStack_e8;
+  undefined8 local_e0;
+  undefined8 uStack_d8;
+  ulong local_d0;
+  ulong local_c8;
+  D3DMStageCache *local_b8;
+  undefined8 *local_b0;
+  long local_a8;
+  long local_a0;
+  byte *local_98;
+  undefined4 *local_90;
+  undefined4 *local_88;
+  char *local_80;
+  undefined8 *local_78;
+  undefined8 *local_70;
+  undefined8 *local_68;
+  undefined8 *local_60;
+  undefined4 *local_58;
+  undefined1 *local_50;
+  undefined1 *local_48;
+  long local_40;
+  undefined8 *local_38;
+  
+  local_100 = (long)param_7;
+  local_118 = *(undefined4 *)(param_2 + 8);
+  local_128 = *(undefined8 *)(param_1 + 0x10);
+  uStack_120 = *(undefined8 *)(param_1 + 0x18);
+  local_114 = *(undefined4 *)(param_1 + 8);
+  local_110 = *(undefined4 *)(param_3 + 8);
+  local_d0 = (ulong)D3D12Device::IFConfig;
+  local_c8 = (ulong)param_8 + 2;
+  if (param_13 == '\0') {
+    local_c8 = (ulong)param_8;
+  }
+  local_157 = param_15 != '\0';
+  if (param_15 == '\0') {
+    local_158 = true;
+  }
+  else {
+    local_c8 = local_c8 | 4;
+    local_158 = param_15 != '\x02';
+    if (!local_158) goto LAB_000997ca;
+  }
+  local_c8 = local_c8 | 8;
+LAB_000997ca:
+  if (D3D12Device::EnableDSA == '\x01') {
+    local_c8 = local_c8 | 0x10;
+  }
+  pbVar4 = (byte *)*param_4;
+  pbVar1 = (byte *)param_4[1];
+  uVar7 = ((long)pbVar1 - (long)pbVar4 >> 3) * -0x5555555555555555;
+  local_130 = this;
+  local_154 = param_5;
+  local_10c = param_5;
+  local_150 = param_2;
+  local_140 = param_1;
+  local_148 = param_3;
+  local_138 = param_4;
+  local_155 = param_8;
+  local_156 = param_13;
+  local_f0 = param_9;
+  uStack_e8 = param_10;
+  local_e0 = param_11;
+  uStack_d8 = param_12;
+  local_108 = param_6;
+  for (; local_f8 = uVar7, pbVar1 != pbVar4; pbVar4 = pbVar4 + 0x18) {
+    if ((*pbVar4 & 1) == 0) {
+      pbVar6 = pbVar4 + 1;
+      uVar5 = (ulong)(*pbVar4 >> 1);
+    }
+    else {
+      uVar5 = *(ulong *)(pbVar4 + 8);
+      pbVar6 = *(byte **)(pbVar4 + 0x10);
+    }
+    lVar2 = XXH_INLINE_XXH3_64bits(pbVar6,uVar5);
+    uVar7 = (uVar7 ^ (lVar2 * -0x6c158a5880000000 | (ulong)(lVar2 * -0x3d4d51c2d82b14b1) >> 0x21) *
+                     -0x61c8864e7a143579) * -0x61c8864e7a143579 + 0x85ebca77c2b2ae63;
+  }
+  local_b0 = &local_128;
+  local_98 = &local_155;
+  local_90 = &local_154;
+  local_88 = &param_6;
+  local_80 = &local_156;
+  local_78 = &param_9;
+  local_70 = &param_10;
+  local_68 = &param_11;
+  local_60 = &param_12;
+  local_58 = &param_7;
+  local_50 = &local_157;
+  local_b8 = local_130;
+  local_a8 = local_150;
+  local_a0 = local_148;
+  local_40 = local_140;
+  local_38 = local_138;
+  if (*(char *)(*(long *)(local_130 + 0x38) + 0x566) == '\x01') {
+    local_48 = &local_158;
+    auVar8 = Stage<D3DMStageCache::RaytracingStageCacheKey>::lookupOrCreate
+                       ((Stage<D3DMStageCache::RaytracingStageCacheKey> *)(local_130 + 0x318),
+                        (RaytracingStageCacheKey *)&local_128);
+    this_00 = auVar8._0_8_;
+    if ((auVar8._8_8_ & 1) == 0) {
+      pDVar3 = (D3DMStageResult *)
+               Stage<D3DMStageCache::RaytracingStageCacheKey>::ValueWrapper::getValue
+                         ((ValueWrapper *)this_00);
+    }
+    else {
+      pDVar3 = (D3DMStageResult *)
+               CompileRTFunction(D3DMShaderBytecode_const&,D3DMRootSignature_const&,D3DMRootSignature_const&,std::vector<std::string,std::allocator<std::string>>const&,unsigned_int,unsigned_int,int,bool,unsigned_long_long,unsigned_long_long,unsigned_long_long,unsigned_long_long,bool,StateObjectBuilder::RayGenMode)
+               ::$_0::operator()((__0 *)&local_b8,*(uint *)(this_00 + 0x80));
+      Stage<D3DMStageCache::VertexStageCacheKey>::ValueWrapper::setValue(this_00,pDVar3);
+    }
+  }
+  else {
+    local_48 = &local_158;
+    pDVar3 = (D3DMStageResult *)
+             CompileRTFunction(D3DMShaderBytecode_const&,D3DMRootSignature_const&,D3DMRootSignature_const&,std::vector<std::string,std::allocator<std::string>>const&,unsigned_int,unsigned_int,int,bool,unsigned_long_long,unsigned_long_long,unsigned_long_long,unsigned_long_long,bool,StateObjectBuilder::RayGenMode)
+             ::$_0::operator()((__0 *)&local_b8,
+                               (int)((ulong)(*(long *)(local_130 + 0x348) -
+                                            *(long *)(local_130 + 0x340)) >> 3) + 1);
+  }
+  return pDVar3;
+}
+
+
+=== shared compute CompileAndLink caller @ +0x9cccc ===
+FUNCTION=D3DMCompiler::CompileComputePipelineStages
+ENTRY=0009cccc
+BODY_MIN=0009cccc
+BODY_MAX=0009ccd7
+PROTOTYPE=undefined __thiscall CompileComputePipelineStages(D3DMComputePipelineStateDesc * param_1)
+PARAMETERS=2
+PARAM index=0 name=this type=D3DMCompiler * storage=RDI:8 (auto)
+PARAM index=1 name=param_1 type=D3DMComputePipelineStateDesc * storage=RSI:8
+CALLERS:
+Entry Point from=unknown
+0056f28b from=unknown
+ENTRY_WINDOW:
+0009cccc  ADD RDI,0x420
+0009ccd3  JMP 0x00086e58 -> 00086e58 D3DMPipelineStagesCache::CompileComputePipelineStages
+0009ccd8  ADD RDI,0x420
+0009ccdf  JMP 0x00089188 -> 00089188 D3DMPipelineStagesCache::CompileGraphicsPipelineStages
+0009cce4  MOV AL,byte ptr [RDI + 0x54e] -> 0000054e
+0009ccea  RET
+0009ccec  CMP ESI,0x3f5
+0009ccf2  JZ 0x0009cd14 -> 0009cd14
+0009ccf4  CMP ESI,0x3f3
+0009ccfa  JZ 0x0009cd0d -> 0009cd0d
+0009ccfc  MOV AL,0x1
+0009ccfe  CMP ESI,0x3f2
+0009cd04  JNZ 0x0009cd1a -> 0009cd1a
+0009cd06  MOV AL,byte ptr [RDI + 0x55c] -> 0000055c
+0009cd0c  RET
+0009cd0d  MOV AL,byte ptr [RDI + 0x55d] -> 0000055d
+0009cd13  RET
+0009cd14  MOV AL,byte ptr [RDI + 0x55f] -> 0000055f
+0009cd1a  RET
+0009cd1c  PUSH R15
+0009cd1e  PUSH R14
+0009cd20  PUSH R12
+0009cd22  PUSH RBX
+0009cd23  SUB RSP,0x58
+0009cd27  MOV R12,RDX
+DECOMPILE:
+
+/* D3DMCompiler::CompileComputePipelineStages(D3DMComputePipelineStateDesc const&) */
+
+void __thiscall
+D3DMCompiler::CompileComputePipelineStages(D3DMCompiler *this,D3DMComputePipelineStateDesc *param_1)
+
+{
+  D3DMPipelineStagesCache::CompileComputePipelineStages
+            ((D3DMPipelineStagesCache *)(this + 0x420),param_1);
+  return;
+}
+
+
+=== shared graphics CompileAndLink caller @ +0x9ccd8 ===
+FUNCTION=D3DMCompiler::CompileGraphicsPipelineStages
+ENTRY=0009ccd8
+BODY_MIN=0009ccd8
+BODY_MAX=0009cce3
+PROTOTYPE=undefined __thiscall CompileGraphicsPipelineStages(D3DMGraphicsPipelineStateDesc * param_1)
+PARAMETERS=2
+PARAM index=0 name=this type=D3DMCompiler * storage=RDI:8 (auto)
+PARAM index=1 name=param_1 type=D3DMGraphicsPipelineStateDesc * storage=RSI:8
+CALLERS:
+Entry Point from=unknown
+0056f28c from=unknown
+ENTRY_WINDOW:
+0009ccd8  ADD RDI,0x420
+0009ccdf  JMP 0x00089188 -> 00089188 D3DMPipelineStagesCache::CompileGraphicsPipelineStages
+0009cce4  MOV AL,byte ptr [RDI + 0x54e] -> 0000054e
+0009ccea  RET
+0009ccec  CMP ESI,0x3f5
+0009ccf2  JZ 0x0009cd14 -> 0009cd14
+0009ccf4  CMP ESI,0x3f3
+0009ccfa  JZ 0x0009cd0d -> 0009cd0d
+0009ccfc  MOV AL,0x1
+0009ccfe  CMP ESI,0x3f2
+0009cd04  JNZ 0x0009cd1a -> 0009cd1a
+0009cd06  MOV AL,byte ptr [RDI + 0x55c] -> 0000055c
+0009cd0c  RET
+0009cd0d  MOV AL,byte ptr [RDI + 0x55d] -> 0000055d
+0009cd13  RET
+0009cd14  MOV AL,byte ptr [RDI + 0x55f] -> 0000055f
+0009cd1a  RET
+0009cd1c  PUSH R15
+0009cd1e  PUSH R14
+0009cd20  PUSH R12
+0009cd22  PUSH RBX
+0009cd23  SUB RSP,0x58
+0009cd27  MOV R12,RDX
+0009cd2a  MOV RBX,RSI
+0009cd2d  MOV R14,RDI
+=== compute PSO constructor @ +0x10ed2c ===
+FUNCTION=D3DMComputePipelineState::D3DMComputePipelineState
+ENTRY=0010ed2c
+BODY_MIN=0010ed2c
+BODY_MAX=0010ef5b
+PROTOTYPE=undefined __thiscall D3DMComputePipelineState(D3DMDevice * param_1, D3DMComputePipelineStateDesc * param_2)
+PARAMETERS=3
+PARAM index=0 name=this type=D3DMComputePipelineState * storage=RDI:8 (auto)
+PARAM index=1 name=param_1 type=D3DMDevice * storage=RSI:8
+PARAM index=2 name=param_2 type=D3DMComputePipelineStateDesc * storage=RDX:8
+CALLERS:
+Entry Point from=unknown
+00570211 from=unknown
+001ab77c from=D3D11Device::CreatePipeline
+0006a92f from=D3D12ComputePipelineState::D3D12ComputePipelineState
+0010f50c from=D3DMComputePipelineState::D3DMComputePipelineState
+ENTRY_WINDOW:
+0010ed2c  PUSH RBP
+0010ed2d  PUSH R15
+0010ed2f  PUSH R14
+0010ed31  PUSH R12
+0010ed33  PUSH RBX
+0010ed34  SUB RSP,0x30
+0010ed38  MOV R15,RDX
+0010ed3b  MOV R14,RSI
+0010ed3e  MOV RBX,RDI
+0010ed41  LEA RAX,[0x4c2b10] -> 004c2b10
+0010ed48  MOV qword ptr [RDI],RAX -> 004c2b10
+0010ed4b  MOV qword ptr [RDI + 0x8],RSI
+0010ed4f  MOV EAX,0x1
+0010ed54  MOV dword ptr [RDI + 0x10],EAX
+0010ed57  XOR R12D,R12D
+0010ed5a  MOV qword ptr [RDI + 0x18],R12
+0010ed5e  XADD.LOCK dword ptr [0x0050f2a8],EAX -> 0050f2a8
+0010ed66  MOV qword ptr [RDI + 0x20],RAX
+0010ed6a  MOV byte ptr [RDI + 0x28],R12B
+0010ed6e  MOV qword ptr [RDI + 0x30],R12
+0010ed72  MOV byte ptr [RDI + 0x38],R12B
+0010ed76  MOV dword ptr [RDI + 0x3c],R12D
+0010ed7a  MOV byte ptr [RDI + 0x40],R12B
+0010ed7e  MOV RDI,qword ptr [RSI + 0x40]
+0010ed82  MOV RSI,qword ptr [0x004c6798] -> 004c6798 -> 0046adb9
+DECOMPILE:
+
+/* D3DMComputePipelineState::D3DMComputePipelineState(D3DMDevice*, D3DMComputePipelineStateDesc
+   const&) */
+
+void __thiscall
+D3DMComputePipelineState::D3DMComputePipelineState
+          (D3DMComputePipelineState *this,D3DMDevice *param_1,D3DMComputePipelineStateDesc *param_2)
+
+{
+  IRShaderReflection *pIVar1;
+  undefined *puVar2;
+  D3DMComputePipelineState DVar3;
+  ulong uVar4;
+  long lVar5;
+  
+  *(undefined ***)this = &PTR__D3DMPipelineState_004c2b10;
+  *(D3DMDevice **)(this + 8) = param_1;
+  *(undefined4 *)(this + 0x10) = 1;
+  *(undefined8 *)(this + 0x18) = 0;
+  LOCK();
+  uVar4 = (ulong)NextPipelineID;
+  UNLOCK();
+  NextPipelineID = NextPipelineID + 1;
+  *(ulong *)(this + 0x20) = uVar4;
+  this[0x28] = (D3DMComputePipelineState)0x0;
+  *(undefined8 *)(this + 0x30) = 0;
+  this[0x38] = (D3DMComputePipelineState)0x0;
+  *(undefined4 *)(this + 0x3c) = 0;
+  this[0x40] = (D3DMComputePipelineState)0x0;
+  (*(code *)PTR__objc_msgSend_004ae328)
+            (*(undefined8 *)(param_1 + 0x40),PTR_s_setShouldMaximizeConcurrentCompi_004c6798,1);
+  *(undefined ***)this = &PTR__D3DMComputePipelineState_004b8e68;
+  *(undefined8 *)(this + 0x48) = 0;
+  *(undefined8 *)(this + 0x50) = 0;
+  *(undefined8 *)(this + 0x58) = 0;
+  *(undefined8 *)(this + 0x60) = 0;
+  *(undefined4 *)(this + 0x70) = 0;
+  *(undefined8 *)(this + 0x78) = 0;
+  *(undefined8 *)(this + 0x80) = 0;
+  *(undefined8 *)(this + 0x84) = 0;
+  *(undefined8 *)(this + 0x8c) = 0;
+  *(undefined4 *)(this + 0x98) = 0;
+  *(undefined8 *)(this + 0xa0) = 0x80;
+  *(undefined8 *)(this + 0xa8) = 1;
+  *(undefined8 *)(this + 0xb0) = 1;
+  *(ulong *)(this + 0x18) =
+       (((ulong)*(uint *)(param_2 + 8) * -0x6c158a5880000000 |
+        (ulong)*(uint *)(param_2 + 8) * -0x3d4d51c2d82b14b1 >> 0x21) * -0x61c8864e7a143579 ^
+       ((*(long *)(param_2 + 0x28) * -0x6c158a5880000000 |
+        (ulong)(*(long *)(param_2 + 0x28) * -0x3d4d51c2d82b14b1) >> 0x21) * -0x61c8864e7a143579 ^
+       *(ulong *)(param_2 + 0x20)) * -0x61c8864e7a143579 + 0x85ebca77c2b2ae63) * -0x61c8864e7a143579
+       + -0x7a1435883d4d519d;
+  lVar5 = D3DMPipelineStagesCache::CompileComputePipelineStages
+                    ((D3DMPipelineStagesCache *)(*(long *)(param_1 + 0x710) + 0x420),param_2);
+  *(long *)(this + 0x30) = lVar5;
+  if (lVar5 == 0) {
+    *(undefined8 *)(this + 0x48) = *(undefined8 *)(param_1 + 0x5e0);
+    LOCK();
+    this[0x50] = (D3DMComputePipelineState)0x1;
+    UNLOCK();
+    LOCK();
+    this[0x51] = (D3DMComputePipelineState)0x1;
+    puVar2 = PTR__objc_retain_004ae360;
+    UNLOCK();
+    (*(code *)PTR__objc_retain_004ae360)();
+    *(undefined8 *)(this + 0x58) = *(undefined8 *)(param_1 + 0x5e0);
+    LOCK();
+    this[0x60] = (D3DMComputePipelineState)0x1;
+    UNLOCK();
+    LOCK();
+    this[0x61] = (D3DMComputePipelineState)0x1;
+    UNLOCK();
+    (*(code *)puVar2)();
+    this[0x28] = (D3DMComputePipelineState)0x1;
+    *(undefined8 *)(this + 0x68) = 0;
+  }
+  else {
+    lVar5 = *(long *)(lVar5 + 0x38);
+    pIVar1 = (IRShaderReflection *)(lVar5 + 0x20);
+    *(IRShaderReflection **)(this + 0x68) = pIVar1;
+    *(undefined4 *)(this + 0x98) = *(undefined4 *)(lVar5 + 0x110);
+    PopulateBindingSlots((BindingSlots *)(this + 0x70),pIVar1);
+    if (*(int *)(param_1 + 0x58) == 2) {
+      CompilePipeline(this,false);
+    }
+    else {
+      LOCK();
+      this[0x38] = (D3DMComputePipelineState)0x1;
+      UNLOCK();
+      LOCK();
+      *(int *)(this + 0x3c) = *(int *)(this + 0x3c) + 1;
+      UNLOCK();
+      if (GetDispatchQueue()::onceToken != -1) {
+        _dispatch_once(&GetDispatchQueue()::onceToken,&___block_literal_global_6873);
+      }
+      _dispatch_async(PipelineDispatchQueue);
+    }
+    if (*(long *)(*(long *)(this + 0x30) + 0x38) == 0) {
+      DVar3 = (D3DMComputePipelineState)0x0;
+    }
+    else {
+      DVar3 = *(D3DMComputePipelineState *)(*(long *)(*(long *)(this + 0x30) + 0x38) + 0xa8);
+    }
+    this[0x40] = DVar3;
+  }
+  return;
+}
+
+
+=== compute CompilePipeline @ +0x10f062 ===
+FUNCTION=D3DMComputePipelineState::CompilePipeline
+ENTRY=0010f062
+BODY_MIN=0010f062
+BODY_MAX=0010f350
+PROTOTYPE=undefined __thiscall CompilePipeline(bool param_1)
+PARAMETERS=2
+PARAM index=0 name=this type=D3DMComputePipelineState * storage=RDI:8 (auto)
+PARAM index=1 name=param_1 type=bool storage=SIL:1
+CALLERS:
+Entry Point from=unknown
+00570214 from=unknown
+000e2df8 from=D3D12GraphicsCommandListMPL::SetComputePSO
+000e2e28 from=D3D12GraphicsCommandListMPL::SetComputePSO
+0010ee7e from=D3DMComputePipelineState::D3DMComputePipelineState
+0017bc75 from=D3DMCommandEncoder::SetComputePSO
+0010f39b from=____ZN24D3DMComputePipelineStateC2EP10D3DMDeviceRK28D3DMComputePipelineStateDesc_block_invoke
+ENTRY_WINDOW:
+0010f062  PUSH RBP
+0010f063  PUSH R15
+0010f065  PUSH R14
+0010f067  PUSH R13
+0010f069  PUSH R12
+0010f06b  PUSH RBX
+0010f06c  SUB RSP,0x68
+0010f070  MOV RAX,qword ptr [0x004ae740] -> 004ae740
+0010f077  MOV RAX,qword ptr [RAX] -> 0077bf00
+0010f07a  MOV qword ptr [RSP + 0x60],RAX -> Stack[-0x38]
+0010f07f  MOV EAX,ESI
+0010f081  SHL EAX,0x4
+0010f084  LEA RBX,[RDI + RAX*0x1]
+0010f088  ADD RBX,0x48
+0010f08c  MOV CL,0x1
+0010f08e  XOR EAX,EAX
+0010f090  CMPXCHG.LOCK byte ptr [RBX + 0x8],CL
+0010f095  JNZ 0x0010f24a -> 0010f24a
+0010f09b  MOV EBP,ESI
+0010f09d  MOV R15,RDI
+0010f0a0  MOV RDI,qword ptr [0x004c7758] -> 004c7758 -> 00772500
+0010f0a7  CALL 0x00370846 -> 00370846 _objc_opt_new
+0010f0ac  MOV R12,RAX
+0010f0af  MOV RAX,qword ptr [R15 + 0x8]
+0010f0b3  MOV RCX,qword ptr [R15 + 0x30]
+DECOMPILE:
+
+/* D3DMComputePipelineState::CompilePipeline(bool) */
+
+void __thiscall
+D3DMComputePipelineState::CompilePipeline(D3DMComputePipelineState *this,bool param_1)
+
+{
+  long lVar1;
+  undefined *puVar2;
+  D3DMComputePipelineState *pDVar3;
+  char cVar4;
+  uint uVar5;
+  MTLComputePipelineDescriptor *pMVar6;
+  undefined8 uVar7;
+  undefined8 uVar8;
+  undefined8 uVar9;
+  undefined7 in_register_00000031;
+  objc_object *poVar10;
+  MTLFunctionConstantValues *in_R9;
+  bool bVar11;
+  MTLComputePipelineReflection local_81;
+  NSError *local_80;
+  MTLComputePipelineReflection *local_78;
+  D3DMComputePipelineState *local_70;
+  NSError **local_68;
+  MTLComputePipelineReflection **local_60;
+  undefined8 local_58;
+  undefined4 uStack_50;
+  undefined2 uStack_4c;
+  undefined2 uStack_4a;
+  undefined2 uStack_48;
+  undefined2 uStack_46;
+  undefined4 uStack_44;
+  undefined4 uStack_40;
+  long local_38;
+  
+  local_38 = *(long *)PTR____stack_chk_guard_004ae740;
+  uVar5 = (int)CONCAT71(in_register_00000031,param_1) << 4;
+  LOCK();
+  bVar11 = this[(ulong)uVar5 + 0x50] == (D3DMComputePipelineState)0x0;
+  if (bVar11) {
+    this[(ulong)uVar5 + 0x50] = (D3DMComputePipelineState)0x1;
+  }
+  UNLOCK();
+  if (bVar11) {
+    pMVar6 = (MTLComputePipelineDescriptor *)
+             _objc_opt_new(PTR__OBJC_CLASS___MTLComputePipelineDescriptor_004c7758);
+    poVar10 = *(objc_object **)(*(long *)(this + 8) + 0x40);
+    uVar7 = D3DMStageResult::GetAndRetainLibrary
+                      (*(D3DMStageResult **)(*(long *)(this + 0x30) + 0x38),poVar10);
+    uStack_48 = 0;
+    uStack_46 = 0;
+    uStack_44 = 0;
+    local_58._0_4_ = 0;
+    local_58._4_4_ = 0;
+    uStack_50 = 0;
+    uStack_4c = 0;
+    uStack_4a = 0;
+    ExtractDXILFunctions
+              ((D3DMDevice *)&local_70,poVar10,SUB81(uVar7,0),(IRShaderReflection *)0x0,
+               *(vector **)(this + 0x68),in_R9);
+    std::vector<std::string,std::allocator<std::string>>::__destroy_vector::
+    operator()[abi_nqe210106_((__destroy_vector *)&local_58);
+    pDVar3 = local_70;
+    uVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (local_70,PTR_s_objectAtIndexedSubscript__004c6600,0);
+    uVar8 = (*(code *)PTR__objc_retain_004ae360)(uVar8);
+    (*(code *)PTR__objc_msgSend_004ae328)(pMVar6,PTR_s_setComputeFunction__004c6770,uVar8);
+    (*(code *)PTR__objc_release_004ae358)(uVar7);
+    (*(code *)PTR__objc_msgSend_004ae328)
+              (pMVar6,PTR_s_setSupportIndirectCommandBuffers_004c6778,param_1);
+    lVar1 = *(long *)(this + 0x68);
+    if (*(int *)(lVar1 + 0x148) != 4) {
+                    /* WARNING: Subroutine does not return */
+      std::__throw_bad_variant_access_abi_nqe210106_();
+    }
+    if ((*(int *)(lVar1 + 0x104) * *(int *)(lVar1 + 0x100) * *(int *)(lVar1 + 0x108) & 0x1fU) == 0)
+    {
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (pMVar6,PTR_s_setThreadGroupSizeIsMultipleOfTh_004c6c58,1);
+    }
+    local_78 = (MTLComputePipelineReflection *)0x0;
+    local_80 = (NSError *)0x0;
+    uVar7 = CreateComputePipelineStateWithDescriptor
+                      (*(D3DMDevice **)(this + 8),pMVar6,0,&local_78,&local_80);
+    (*(code *)PTR__objc_release_004ae358)(pMVar6);
+    if (local_80 != (NSError *)0x0) {
+      if (__ZZL16D3DMDefaultOSLogvE9onceToken_6875 != -1) {
+        _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_6875,&___block_literal_global_266);
+      }
+      uVar8 = __ZZL16D3DMDefaultOSLogvE6logObj_6876;
+      cVar4 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_6876,0x10);
+      puVar2 = PTR_s_description_004c6c60;
+      if (cVar4 != '\0') {
+        uVar9 = (*(code *)PTR__objc_msgSend_004ae328)(local_80,PTR_s_description_004c6c60);
+        uVar9 = (*(code *)PTR__objc_msgSend_004ae328)(uVar9,PTR_s_UTF8String_004c65f0);
+        local_58._0_4_ = 0x8200302;
+        local_58._4_4_ = 0x45d7a2;
+        uStack_50 = 0;
+        uStack_4c = 0x400;
+        uStack_4a = 0x100;
+        uStack_48 = 0;
+        uStack_46 = 0x820;
+        uStack_44 = (undefined4)uVar9;
+        uStack_40 = (undefined4)((ulong)uVar9 >> 0x20);
+        __os_log_error_impl(0,uVar8,0x10,
+                            "[%s:%d][ERROR] Failed to create compute pipeline state: %s",&local_58,
+                            0x1c);
+      }
+      uVar8 = (*(code *)PTR__objc_msgSend_004ae328)(local_80,puVar2);
+      uVar8 = (*(code *)PTR__objc_msgSend_004ae328)(uVar8,PTR_s_UTF8String_004c65f0);
+      ::D3DMPrintError("[%s:%d][ERROR] Failed to create compute pipeline state: %s\n",
+                       "CompilePipeline",0x100,uVar8);
+      this[0x28] = (D3DMComputePipelineState)0x1;
+    }
+    *(undefined8 *)(this + (ulong)uVar5 + 0x48) = uVar7;
+    LOCK();
+    this[(ulong)uVar5 + 0x51] = (D3DMComputePipelineState)0x1;
+    UNLOCK();
+    std::__cxx_atomic_notify_all(this + (ulong)uVar5 + 0x51);
+    (*(code *)PTR__objc_release_004ae358)(pDVar3);
+  }
+  else if (this[(ulong)uVar5 + 0x51] == (D3DMComputePipelineState)0x0) {
+    local_70 = this + (ulong)uVar5 + 0x51;
+    local_78 = &local_81;
+    local_81 = (MTLComputePipelineReflection)0x0;
+    local_60 = &local_78;
+    local_68 = &local_80;
+    local_80 = (NSError *)CONCAT44(local_80._4_4_,5);
+    uStack_50 = SUB84(local_78,0);
+    uStack_4c = (undefined2)((ulong)local_78 >> 0x20);
+    uStack_4a = (undefined2)((ulong)local_78 >> 0x30);
+    uStack_48 = 5;
+    uStack_46 = 0;
+    local_58 = local_70;
+    std::
+    __libcpp_thread_poll_with_backoff_abi_nqe210106_<std::__atomic_wait_unless[abi:nqe210106]<std::__atomic_base<bool,false>,std::__atomic_wait[abi:nqe210106]<std::__atomic_base<bool,false>const,bool>(std::__atomic_base<bool,false>const&,bool,std::memory_order)::_lambda(bool_const&)_1_>(std::__atomic_base<bool,false>const&,std::memory_order,std::__atomic_wait[abi:nqe210106]<std::__atomic_base<bool,false>const,bool>(std::__atomic_base<bool,false>const&,bool,std::memory_order)::_lambda(bool_const&)_1_&&)::_lambda()_1_,std::__atomic_wait_backoff_impl<std::__atomic_base<bool,false>,std::__atomic_wait[abi:nqe210106]<std::__atomic_base<bool,false>const,bool>(std::__atomic_base<bool,false>const&,bool,std::memory_order)::_lambda(bool_const&)_1_>&>
+              ();
+  }
+  if (*(long *)PTR____stack_chk_guard_004ae740 != local_38) {
+                    /* WARNING: Subroutine does not return */
+    ___stack_chk_fail();
+  }
+  return;
+}
+
+
+=== graphics PSO constructor @ +0x10f512 ===
+FUNCTION=D3DMGraphicsPipelineState::D3DMGraphicsPipelineState
+ENTRY=0010f512
+BODY_MIN=0010f512
+BODY_MAX=0010fb7d
+PROTOTYPE=undefined __thiscall D3DMGraphicsPipelineState(D3DMDevice * param_1, D3DMGraphicsPipelineStateDesc * param_2)
+PARAMETERS=3
+PARAM index=0 name=this type=D3DMGraphicsPipelineState * storage=RDI:8 (auto)
+PARAM index=1 name=param_1 type=D3DMDevice * storage=RSI:8
+PARAM index=2 name=param_2 type=D3DMGraphicsPipelineStateDesc * storage=RDX:8
+CALLERS:
+Entry Point from=unknown
+0057021d from=unknown
+0006a845 from=D3D12GraphicsPipelineState::D3D12GraphicsPipelineState
+00114192 from=D3DMGraphicsPipelineState::D3DMGraphicsPipelineState
+001ab27a from=D3D11Device::CreatePipeline
+ENTRY_WINDOW:
+0010f512  PUSH RBP
+0010f513  PUSH R15
+0010f515  PUSH R14
+0010f517  PUSH R12
+0010f519  PUSH RBX
+0010f51a  SUB RSP,0xf0
+0010f521  MOV R15,RDX
+0010f524  MOV R14,RSI
+0010f527  MOV RBX,RDI
+0010f52a  MOV RAX,qword ptr [0x004ae740] -> 004ae740
+0010f531  MOV RAX,qword ptr [RAX] -> 0077bf00
+0010f534  MOV qword ptr [RSP + 0xe8],RAX -> Stack[-0x30]
+0010f53c  LEA RAX,[0x4c2b10] -> 004c2b10
+0010f543  MOV qword ptr [RDI],RAX -> 004c2b10
+0010f546  MOV qword ptr [RDI + 0x8],RSI
+0010f54a  XOR R12D,R12D
+0010f54d  MOV dword ptr [RDI + 0x10],R12D
+0010f551  MOV qword ptr [RDI + 0x18],R12
+0010f555  MOV EAX,0x1
+0010f55a  XADD.LOCK dword ptr [0x0050f2a8],EAX -> 0050f2a8
+0010f562  MOV qword ptr [RDI + 0x20],RAX
+0010f566  MOV byte ptr [RDI + 0x28],R12B
+0010f56a  MOV qword ptr [RDI + 0x30],R12
+0010f56e  MOV byte ptr [RDI + 0x38],R12B
+0010f572  MOV dword ptr [RDI + 0x3c],R12D
+DECOMPILE:
+
+/* D3DMGraphicsPipelineState::D3DMGraphicsPipelineState(D3DMDevice*, D3DMGraphicsPipelineStateDesc
+   const&) */
+
+void __thiscall
+D3DMGraphicsPipelineState::D3DMGraphicsPipelineState
+          (D3DMGraphicsPipelineState *this,D3DMDevice *param_1,
+          D3DMGraphicsPipelineStateDesc *param_2)
+
+{
+  long *plVar1;
+  int iVar2;
+  char cVar3;
+  byte bVar4;
+  uint uVar5;
+  long lVar6;
+  undefined8 uVar7;
+  PipelineStagesCacheValue *pPVar8;
+  byte bVar9;
+  D3DMGraphicsPipelineState DVar10;
+  byte bVar11;
+  D3DMGraphicsPipelineState *pDVar12;
+  ulong uVar13;
+  undefined *local_118;
+  undefined8 local_110;
+  code *local_108;
+  undefined *local_100;
+  D3DMGraphicsPipelineState *local_f8;
+  D3DMGraphicsPipelineStateDesc *local_f0;
+  undefined *local_e8;
+  undefined8 local_e0;
+  code *local_d8;
+  undefined *local_d0;
+  D3DMGraphicsPipelineState *local_c8;
+  int local_c0;
+  ulong local_b8;
+  XXH_NAMESPACEXXH64_state_s local_b0 [88];
+  int local_58;
+  char *local_54;
+  undefined2 local_4c;
+  undefined4 local_4a;
+  undefined2 local_46;
+  undefined8 local_44;
+  long local_30;
+  
+  local_30 = *(long *)PTR____stack_chk_guard_004ae740;
+  *(undefined ***)this = &PTR__D3DMPipelineState_004c2b10;
+  *(D3DMDevice **)(this + 8) = param_1;
+  *(undefined4 *)(this + 0x10) = 0;
+  *(undefined8 *)(this + 0x18) = 0;
+  LOCK();
+  uVar13 = (ulong)NextPipelineID;
+  UNLOCK();
+  NextPipelineID = NextPipelineID + 1;
+  *(ulong *)(this + 0x20) = uVar13;
+  this[0x28] = (D3DMGraphicsPipelineState)0x0;
+  *(undefined8 *)(this + 0x30) = 0;
+  this[0x38] = (D3DMGraphicsPipelineState)0x0;
+  *(undefined4 *)(this + 0x3c) = 0;
+  this[0x40] = (D3DMGraphicsPipelineState)0x0;
+  (*(code *)PTR__objc_msgSend_004ae328)
+            (*(undefined8 *)(param_1 + 0x40),PTR_s_setShouldMaximizeConcurrentCompi_004c6798,1);
+  *(undefined ***)this = &PTR__D3DMGraphicsPipelineState_004b8e90;
+  *(undefined8 *)(this + 0x44) = 0;
+  *(undefined8 *)(this + 0x4c) = 0;
+  *(undefined8 *)(this + 0x54) = 0;
+  *(undefined8 *)(this + 0x5c) = 0;
+  *(undefined4 *)(this + 100) = 1;
+  this[0x68] = (D3DMGraphicsPipelineState)0x1;
+  *(undefined4 *)(this + 0x69) = 0;
+  this[0x6d] = (D3DMGraphicsPipelineState)0x0;
+  this[0x330] = (D3DMGraphicsPipelineState)0x0;
+  lVar6 = 0x340;
+  do {
+    *(undefined4 *)(this + lVar6 + -8) = 0;
+    *(undefined8 *)(this + lVar6) = 0;
+    *(undefined8 *)(this + lVar6 + 8) = 0;
+    *(undefined8 *)(this + lVar6 + 0xc) = 0;
+    *(undefined8 *)(this + lVar6 + 0xc + 8) = 0;
+    lVar6 = lVar6 + 0x28;
+  } while (lVar6 != 0x480);
+  *(undefined8 *)(this + 0x4f0) = 0;
+  *(undefined8 *)(this + 0x4f8) = 0;
+  *(undefined8 *)(this + 0x4e0) = 0;
+  *(undefined8 *)(this + 0x4e8) = 0;
+  *(undefined8 *)(this + 0x478) = 0;
+  *(undefined8 *)(this + 0x480) = 0;
+  *(undefined8 *)(this + 0x488) = 0;
+  *(undefined8 *)(this + 0x490) = 0;
+  *(undefined8 *)(this + 0x498) = 0;
+  *(undefined8 *)(this + 0x4a0) = 0;
+  *(undefined8 *)(this + 0x4a8) = 0;
+  *(undefined8 *)(this + 0x4b0) = 0;
+  *(undefined8 *)(this + 0x4b8) = 0;
+  *(undefined8 *)(this + 0x4c0) = 0;
+  *(undefined8 *)(this + 0x4c8) = 0;
+  *(undefined8 *)(this + 0x4d0) = 0;
+  *(undefined4 *)(this + 0x4d8) = 0;
+  *(undefined4 *)(this + 0x500) = 0x3f800000;
+  *(undefined8 *)(this + 0x508) = 0;
+  *(undefined8 *)(this + 0x510) = 0;
+  *(undefined8 *)(this + 0x518) = 0;
+  *(undefined8 *)(this + 0x520) = 0;
+  *(undefined8 *)(this + 0x528) = 0;
+  *(undefined8 *)(this + 0x530) = 0;
+  *(undefined4 *)(this + 0x538) = 0x3f4ccccd;
+  this[0x53e] = (D3DMGraphicsPipelineState)0x3d;
+  *(undefined8 *)(this + 0x540) = 0;
+  *(undefined8 *)(this + 0x548) = 0;
+  *(undefined8 *)(this + 0x550) = 0;
+  *(undefined8 *)(this + 0x558) = 0;
+  *(undefined8 *)(this + 0x560) = 0;
+  *(undefined8 *)(this + 0x568) = 0;
+  *(undefined8 *)(this + 0x570) = 0;
+  *(undefined8 *)(this + 0x578) = 0;
+  *(undefined8 *)(this + 0x580) = 0;
+  *(undefined8 *)(this + 0x588) = 0;
+  *(undefined8 *)(this + 0x590) = 0;
+  *(undefined8 *)(this + 0x598) = 0;
+  *(undefined8 *)(this + 0x5a0) = 0;
+  *(undefined8 *)(this + 0x5a8) = 0;
+  *(undefined8 *)(this + 0x5b0) = 0;
+  *(undefined8 *)(this + 0x5b8) = 0;
+  *(undefined4 *)(this + 0x5c0) = 0;
+  uVar7 = ComputeHash(param_2,local_b0);
+  *(undefined8 *)(this + 0x18) = uVar7;
+  cVar3 = D3DMDevice::supportSampleCount(param_1,*(uint *)(param_2 + 0x904));
+  if (cVar3 == '\0') {
+    local_118 = PTR___NSConcreteStackBlock_004ae710;
+    local_110 = 0xc0000000;
+    local_108 = 
+    ____ZN25D3DMGraphicsPipelineStateC2EP10D3DMDeviceRK29D3DMGraphicsPipelineStateDesc_block_invoke;
+    local_100 = &___block_descriptor_48_e5_v8__0l;
+    local_f8 = this;
+    local_f0 = param_2;
+    if (D3DMGraphicsPipelineState(D3DMDevice*,D3DMGraphicsPipelineStateDesc_const&)::onceToken != -1
+       ) {
+      _dispatch_once(&D3DMGraphicsPipelineState(D3DMDevice*,D3DMGraphicsPipelineStateDesc_const&)::
+                      onceToken,&local_118);
+    }
+    this[0x28] = (D3DMGraphicsPipelineState)0x1;
+  }
+  else {
+    pPVar8 = (PipelineStagesCacheValue *)
+             D3DMPipelineStagesCache::CompileGraphicsPipelineStages
+                       ((D3DMPipelineStagesCache *)(*(long *)(param_1 + 0x710) + 0x420),param_2);
+    *(PipelineStagesCacheValue **)(this + 0x30) = pPVar8;
+    if (pPVar8 == (PipelineStagesCacheValue *)0x0) {
+      if (__ZZL16D3DMDefaultOSLogvE9onceToken_6875 != -1) {
+        _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_6875,&___block_literal_global_266);
+      }
+      uVar7 = __ZZL16D3DMDefaultOSLogvE6logObj_6876;
+      cVar3 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_6876,0x10);
+      if (cVar3 != '\0') {
+        local_44 = *(undefined8 *)(this + 0x20);
+        local_58 = 0x8200302;
+        local_54 = "D3DMGraphicsPipelineState";
+        local_4c = 0x400;
+        local_4a = 0x147;
+        local_46 = 0x800;
+        __os_log_error_impl(0,uVar7,0x10,
+                            "[%s:%d][ERROR] Failed to compile a pipeline, marking PSO(%llu) as no-op"
+                            ,&local_58,0x1c);
+      }
+      ::D3DMPrintError("[%s:%d][ERROR] Failed to compile a pipeline, marking PSO(%llu) as no-op\n",
+                       "D3DMGraphicsPipelineState",0x147,*(undefined8 *)(this + 0x20));
+      this[0x28] = (D3DMGraphicsPipelineState)0x1;
+      this[0x326] = (D3DMGraphicsPipelineState)
+                    ((char)*(int *)(param_2 + 0x904) + (*(int *)(param_2 + 0x904) == 0));
+    }
+    else {
+      InitStaticGraphicsState(this,param_2,pPVar8);
+      LoadFunctions(this,*(PipelineStagesCacheValue **)(this + 0x30));
+      if (this[0x28] == (D3DMGraphicsPipelineState)0x0) {
+        CopyReflections(this,*(PipelineStagesCacheValue **)(this + 0x30));
+      }
+      else {
+        if (__ZZL16D3DMDefaultOSLogvE9onceToken_6875 != -1) {
+          _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_6875,&___block_literal_global_266);
+        }
+        uVar7 = __ZZL16D3DMDefaultOSLogvE6logObj_6876;
+        cVar3 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_6876,0x10);
+        if (cVar3 != '\0') {
+          local_44 = *(undefined8 *)(this + 0x20);
+          local_58 = 0x8200302;
+          local_54 = "D3DMGraphicsPipelineState";
+          local_4c = 0x400;
+          local_4a = 0x15b;
+          local_46 = 0x800;
+          __os_log_error_impl(0,uVar7,0x10,
+                              "[%s:%d][ERROR] Failed to compile a pipeline, marking PSO(%llu) as no-op"
+                              ,&local_58,0x1c);
+        }
+        ::D3DMPrintError("[%s:%d][ERROR] Failed to compile a pipeline, marking PSO(%llu) as no-op\n"
+                         ,"D3DMGraphicsPipelineState",0x15b,*(undefined8 *)(this + 0x20));
+      }
+    }
+    uVar5 = 1;
+    if ((((this[0x32a] == (D3DMGraphicsPipelineState)0x0) &&
+         (this[0x32b] == (D3DMGraphicsPipelineState)0x0)) &&
+        (this[0x328] == (D3DMGraphicsPipelineState)0x0)) &&
+       (this[0x32e] == (D3DMGraphicsPipelineState)0x0)) {
+      bVar4 = D3DMDevice::IsForceMeshShadersEnabled();
+      uVar5 = (uint)bVar4;
+    }
+    *(uint *)(this + 0x44) = uVar5;
+    if (this[0x28] == (D3DMGraphicsPipelineState)0x0) {
+      *(ulong *)(this + 0x50) = (ulong)(param_2[0x149] != (D3DMGraphicsPipelineStateDesc)0x3);
+      lVar6 = 0;
+      if (param_2[0x14a] != (D3DMGraphicsPipelineStateDesc)0x1) {
+        lVar6 = (ulong)(param_2[0x14a] == (D3DMGraphicsPipelineStateDesc)0x3) + 1;
+      }
+      *(long *)(this + 0x48) = lVar6;
+      *(undefined4 *)(this + 0x58) = *(undefined4 *)(param_2 + 0x150);
+      *(undefined8 *)(this + 0x5c) = *(undefined8 *)(param_2 + 0x154);
+      *(undefined4 *)(this + 0x68) = *(undefined4 *)(param_2 + 0x14b);
+      *(undefined4 *)(this + 100) = *(undefined4 *)(param_2 + 0x15c);
+      this[0x6d] = this[0x32b];
+      this[0x6c] = this[0x328];
+      local_58 = (*(uint *)(param_2 + 0x900) & 0xffff) << 2;
+      GetDepthStencilState(this,(DynamicDepthStencilState *)&local_58);
+      if (this[0x2c5] == (D3DMGraphicsPipelineState)0x0) {
+        uVar13 = 0;
+      }
+      else {
+        pDVar12 = this + 0x2c6;
+        lVar6 = 0;
+        uVar13 = 0;
+        do {
+          uVar13 = uVar13 | (ulong)*(ushort *)pDVar12 << ((byte)lVar6 & 0x3f);
+          lVar6 = lVar6 + 8;
+          pDVar12 = pDVar12 + 0xc;
+        } while ((ulong)(byte)this[0x2c5] * 8 != lVar6);
+      }
+      iVar2 = (*(uint *)(param_2 + 0x900) & 0xffff) * 2;
+      if (*(int *)(param_1 + 0x58) == 2) {
+        GetRenderPipelineState(this,iVar2,uVar13);
+      }
+      else {
+        LOCK();
+        this[0x38] = (D3DMGraphicsPipelineState)0x1;
+        UNLOCK();
+        LOCK();
+        *(int *)(this + 0x3c) = *(int *)(this + 0x3c) + 1;
+        UNLOCK();
+        if (GetDispatchQueue()::onceToken != -1) {
+          _dispatch_once(&GetDispatchQueue()::onceToken,&___block_literal_global_6873);
+        }
+        local_e8 = PTR___NSConcreteStackBlock_004ae710;
+        local_e0 = 0xc0000000;
+        local_d8 = 
+        ____ZN25D3DMGraphicsPipelineStateC2EP10D3DMDeviceRK29D3DMGraphicsPipelineStateDesc_block_invoke_77
+        ;
+        local_d0 = &___block_descriptor_56_e5_v8__0l;
+        local_c8 = this;
+        local_c0 = iVar2;
+        local_b8 = uVar13;
+        _dispatch_async(PipelineDispatchQueue);
+      }
+      D3DMDevice::PrecompileDynamicStateVariants();
+      plVar1 = *(long **)(this + 0x30);
+      bVar4 = 0;
+      if (plVar1[5] == 0) {
+        DVar10 = (D3DMGraphicsPipelineState)0x0;
+      }
+      else {
+        DVar10 = *(D3DMGraphicsPipelineState *)(plVar1[5] + 0xa8);
+      }
+      this[0x40] = DVar10;
+      if (*plVar1 != 0) {
+        bVar4 = *(byte *)(*plVar1 + 0xa8);
+      }
+      this[0x40] = (D3DMGraphicsPipelineState)((byte)DVar10 | bVar4);
+      bVar9 = 0;
+      bVar11 = 0;
+      if (plVar1[1] != 0) {
+        bVar11 = *(byte *)(plVar1[1] + 0xa8);
+      }
+      DVar10 = (D3DMGraphicsPipelineState)(bVar11 | (byte)DVar10 | bVar4);
+      this[0x40] = DVar10;
+      if (plVar1[2] != 0) {
+        bVar9 = *(byte *)(plVar1[2] + 0xa8);
+      }
+      DVar10 = (D3DMGraphicsPipelineState)(bVar9 | (byte)DVar10);
+      this[0x40] = DVar10;
+      bVar11 = 0;
+      bVar4 = 0;
+      if (plVar1[3] != 0) {
+        bVar4 = *(byte *)(plVar1[3] + 0xa8);
+      }
+      DVar10 = (D3DMGraphicsPipelineState)(bVar4 | (byte)DVar10);
+      this[0x40] = DVar10;
+      if (plVar1[4] != 0) {
+        bVar11 = *(byte *)(plVar1[4] + 0xa8);
+      }
+      DVar10 = (D3DMGraphicsPipelineState)(bVar11 | (byte)DVar10);
+      this[0x40] = DVar10;
+      if (plVar1[6] == 0) {
+        bVar4 = 0;
+      }
+      else {
+        bVar4 = *(byte *)(plVar1[6] + 0xa8);
+      }
+      this[0x40] = (D3DMGraphicsPipelineState)(bVar4 | (byte)DVar10);
+    }
+  }
+  if (*(long *)PTR____stack_chk_guard_004ae740 != local_30) {
+                    /* WARNING: Subroutine does not return */
+    ___stack_chk_fail();
+  }
+  return;
+}
+
+
+=== graphics LoadFunctions @ +0x110746 ===
+FUNCTION=D3DMGraphicsPipelineState::LoadFunctions
+ENTRY=00110746
+BODY_MIN=00110746
+BODY_MAX=001117ef
+PROTOTYPE=undefined __thiscall LoadFunctions(PipelineStagesCacheValue * param_1)
+PARAMETERS=2
+PARAM index=0 name=this type=D3DMGraphicsPipelineState * storage=RDI:8 (auto)
+PARAM index=1 name=param_1 type=PipelineStagesCacheValue * storage=RSI:8
+CALLERS:
+Entry Point from=unknown
+00570222 from=unknown
+0010f6f0 from=D3DMGraphicsPipelineState::D3DMGraphicsPipelineState
+ENTRY_WINDOW:
+00110746  PUSH RBP
+00110747  PUSH R15
+00110749  PUSH R14
+0011074b  PUSH R13
+0011074d  PUSH R12
+0011074f  PUSH RBX
+00110750  SUB RSP,0x3a8
+00110757  MOV R14,RSI
+0011075a  MOV R13,RDI
+0011075d  MOV RAX,qword ptr [0x004ae740] -> 004ae740
+00110764  MOV RAX,qword ptr [RAX] -> 0077bf00
+00110767  MOV qword ptr [RSP + 0x3a0],RAX -> Stack[-0x38]
+0011076f  CALL 0x00370828 -> 00370828 _objc_autoreleasePoolPush
+00110774  MOV qword ptr [RSP + 0x70],RAX -> Stack[-0x368]
+00110779  MOV RAX,qword ptr [R13 + 0x8]
+0011077d  MOV RAX,qword ptr [RAX + 0x40]
+00110781  MOV qword ptr [RSP + 0x20],RAX -> Stack[-0x3b8]
+00110786  MOV RDI,qword ptr [R14 + 0x30]
+0011078a  TEST RDI,RDI
+0011078d  MOV qword ptr [RSP + 0x8],R14 -> Stack[-0x3d0]
+00110792  JZ 0x00110875 -> 00110875
+00110798  MOV RSI,qword ptr [RSP + 0x20] -> Stack[-0x3b8]
+0011079d  CALL 0x00083926 -> 00083926 D3DMStageResult::GetAndRetainLibrary
+001107a2  MOV RBX,RAX
+001107a5  MOV R8,qword ptr [R14 + 0x30]
+DECOMPILE:
+
+/* WARNING: Type propagation algorithm not settling */
+/* D3DMGraphicsPipelineState::LoadFunctions(PipelineStagesCacheValue const&) */
+
+void __thiscall
+D3DMGraphicsPipelineState::LoadFunctions
+          (D3DMGraphicsPipelineState *this,PipelineStagesCacheValue *param_1)
+
+{
+  D3DMGraphicsPipelineState DVar1;
+  D3DMGraphicsPipelineState DVar2;
+  D3DMStageResult *this_00;
+  undefined *puVar3;
+  undefined *puVar4;
+  undefined *puVar5;
+  char cVar6;
+  undefined8 uVar7;
+  undefined8 uVar8;
+  long lVar9;
+  undefined8 uVar10;
+  undefined *puVar11;
+  long lVar12;
+  undefined8 uVar13;
+  long lVar14;
+  objc_object *poVar15;
+  MTLFunctionConstantValues *in_R9;
+  undefined *puVar16;
+  long lVar17;
+  undefined8 local_3c8;
+  undefined8 local_3c0;
+  objc_object *local_3b8;
+  undefined8 local_3b0;
+  D3DMGraphicsPipelineState *local_3a8;
+  long local_3a0;
+  long local_398;
+  undefined *local_390;
+  undefined *local_388;
+  undefined8 local_380;
+  long local_378;
+  undefined8 local_370;
+  undefined8 local_368;
+  long local_360 [3];
+  long *local_348;
+  undefined8 uStack_340;
+  undefined8 local_338;
+  undefined8 uStack_330;
+  undefined8 local_328;
+  undefined8 uStack_320;
+  undefined8 local_318;
+  long lStack_310;
+  long *local_308;
+  undefined8 uStack_300;
+  undefined8 local_2f8;
+  undefined8 uStack_2f0;
+  undefined8 local_2e8;
+  undefined8 uStack_2e0;
+  undefined8 local_2d8;
+  long lStack_2d0;
+  long *local_2c8;
+  undefined8 uStack_2c0;
+  undefined8 local_2b8;
+  undefined8 uStack_2b0;
+  undefined8 local_2a8;
+  undefined8 uStack_2a0;
+  undefined8 local_298;
+  long lStack_290;
+  long *local_288;
+  undefined8 uStack_280;
+  undefined8 local_278;
+  undefined8 uStack_270;
+  undefined8 local_268;
+  undefined8 uStack_260;
+  undefined1 local_1d8 [256];
+  undefined1 local_d8 [128];
+  undefined4 local_58;
+  undefined4 uStack_54;
+  undefined4 uStack_50;
+  undefined2 uStack_4c;
+  undefined2 uStack_4a;
+  undefined2 uStack_48;
+  undefined6 uStack_46;
+  long local_38;
+  
+  local_38 = *(long *)PTR____stack_chk_guard_004ae740;
+  local_368 = _objc_autoreleasePoolPush();
+  poVar15 = *(objc_object **)(*(long *)(this + 8) + 0x40);
+  local_3b8 = poVar15;
+  if (*(D3DMStageResult **)(param_1 + 0x30) != (D3DMStageResult *)0x0) {
+    uVar7 = D3DMStageResult::GetAndRetainLibrary(*(D3DMStageResult **)(param_1 + 0x30),poVar15);
+    uStack_48 = 0;
+    uStack_46 = 0;
+    local_58 = 0;
+    uStack_54 = 0;
+    uStack_50 = 0;
+    uStack_4c = 0;
+    uStack_4a = 0;
+    ExtractDXILFunctions
+              ((D3DMDevice *)&local_3c8,poVar15,SUB81(uVar7,0),(IRShaderReflection *)0x0,
+               (vector *)(*(long *)(param_1 + 0x30) + 0x20),in_R9);
+    std::vector<std::string,std::allocator<std::string>>::__destroy_vector::
+    operator()[abi_nqe210106_((__destroy_vector *)&local_58);
+    uVar10 = local_3c8;
+    uVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (local_3c8,PTR_s_objectAtIndexedSubscript__004c6600,0);
+    lVar9 = (*(code *)PTR__objc_retain_004ae360)(uVar8);
+    *(long *)(this + 0x598) = lVar9;
+    if (lVar9 == 0) {
+      this[0x28] = (D3DMGraphicsPipelineState)0x1;
+    }
+    else if (*(char *)(*(long *)(this + 8) + 0xac9) == '\x01') {
+      uVar8 = (*(code *)PTR__objc_msgSend_004ae328)(lVar9,PTR_s_name_004c6c00);
+      uVar8 = (*(code *)PTR__objc_retain_004ae360)(uVar8);
+      *(undefined8 *)(this + 0x5a8) = uVar8;
+      uVar8 = (*(code *)PTR__objc_retain_004ae360)(uVar7);
+      *(undefined8 *)(this + 0x5a0) = uVar8;
+    }
+    (*(code *)PTR__objc_release_004ae358)(uVar7);
+    (*(code *)PTR__objc_release_004ae358)(uVar10);
+    if (lVar9 == 0) goto LAB_00111733;
+  }
+  if ((*(D3DMStageResult **)(param_1 + 0x10) != (D3DMStageResult *)0x0) &&
+     (*(long *)(param_1 + 0x18) != 0)) {
+    local_380 = D3DMStageResult::GetAndRetainLibrary
+                          (*(D3DMStageResult **)(param_1 + 0x10),local_3b8);
+    uVar10 = D3DMStageResult::GetAndRetainLibrary(*(D3DMStageResult **)(param_1 + 0x18),local_3b8);
+    uVar7 = _objc_alloc_init(PTR__OBJC_CLASS___MTLFunctionConstantValues_004c77a0);
+    lVar9 = *(long *)(param_1 + 0x28);
+    if (*(int *)(lVar9 + 0x168) != 1) {
+                    /* WARNING: Subroutine does not return */
+      std::__throw_bad_variant_access_abi_nqe210106_();
+    }
+    uVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (PTR__OBJC_CLASS___NSString_004c7748,PTR_s_stringWithUTF8String__004c6610,
+                       "vertex_shader_output_size_fc");
+    poVar15 = (objc_object *)PTR_s_setConstantValue_type_withName__004c6c68;
+    (*(code *)PTR__objc_msgSend_004ae328)
+              (uVar7,PTR_s_setConstantValue_type_withName__004c6c68,lVar9 + 0x128,0x1d,uVar8);
+    uVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (PTR__OBJC_CLASS___NSString_004c7748,PTR_s_stringWithUTF8String__004c6610,
+                       "max_tessellation_factor_fc");
+    (*(code *)PTR__objc_msgSend_004ae328)(uVar7,poVar15,this + 0x2b9,3,uVar8);
+    local_58 = 0;
+    uStack_54 = 0;
+    uStack_50 = 0;
+    uStack_4c = 0;
+    uStack_4a = 0;
+    uStack_48 = 0;
+    uStack_46 = 0;
+    ExtractDXILFunctions
+              ((D3DMDevice *)&local_3c8,poVar15,SUB81(local_380,0),(IRShaderReflection *)0x0,
+               (vector *)(*(long *)(param_1 + 0x10) + 0x20),in_R9);
+    std::vector<std::string,std::allocator<std::string>>::__destroy_vector::
+    operator()[abi_nqe210106_((__destroy_vector *)&local_58);
+    puVar3 = PTR_s_count_004c6650;
+    local_3b0 = local_3c8;
+    lVar9 = (*(code *)PTR__objc_msgSend_004ae328)(local_3c8,PTR_s_count_004c6650);
+    poVar15 = (objc_object *)PTR_s_objectAtIndexedSubscript__004c6600;
+    if (lVar9 == 0) {
+      (*(code *)PTR__objc_release_004ae358)(local_380);
+      (*(code *)PTR__objc_release_004ae358)(uVar10);
+      (*(code *)PTR__objc_release_004ae358)(uVar7);
+      this[0x28] = (D3DMGraphicsPipelineState)0x1;
+      (*(code *)PTR__objc_release_004ae358)(local_3b0);
+      goto LAB_00111733;
+    }
+    uVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (local_3b0,PTR_s_objectAtIndexedSubscript__004c6600,0);
+    uVar8 = (*(code *)PTR__objc_retain_004ae360)(uVar8);
+    *(undefined8 *)(this + 0x580) = uVar8;
+    uVar8 = (*(code *)PTR__objc_msgSend_004ae328)(local_3b0,poVar15,1);
+    uVar8 = (*(code *)PTR__objc_retain_004ae360)(uVar8);
+    *(undefined8 *)(this + 0x590) = uVar8;
+    (*(code *)PTR__objc_release_004ae358)(uVar7);
+    lVar9 = *(long *)(param_1 + 0x10);
+    if (*(int *)(lVar9 + 0x168) != 7) {
+                    /* WARNING: Subroutine does not return */
+      std::__throw_bad_variant_access_abi_nqe210106_();
+    }
+    local_398 = CONCAT71((int7)((ulong)lVar9 >> 8),*(undefined1 *)(lVar9 + 0x15e));
+    uStack_48 = 0;
+    uStack_46 = 0;
+    local_58 = 0;
+    uStack_54 = 0;
+    uStack_50 = 0;
+    uStack_4c = 0;
+    uStack_4a = 0;
+    ExtractDXILFunctions
+              ((D3DMDevice *)local_360,poVar15,SUB81(uVar10,0),(IRShaderReflection *)0x0,
+               (vector *)(*(long *)(param_1 + 0x18) + 0x20),in_R9);
+    std::vector<std::string,std::allocator<std::string>>::__destroy_vector::
+    operator()[abi_nqe210106_((__destroy_vector *)&local_58);
+    local_3a0 = local_360[0];
+    lVar9 = (*(code *)PTR__objc_msgSend_004ae328)(local_360[0],puVar3);
+    if (lVar9 == 0) {
+      (*(code *)PTR__objc_release_004ae358)(local_380);
+      (*(code *)PTR__objc_release_004ae358)(uVar10);
+      this[0x28] = (D3DMGraphicsPipelineState)0x1;
+    }
+    else {
+      local_268 = 0;
+      uStack_260 = 0;
+      local_278 = 0;
+      uStack_270 = 0;
+      local_288 = (long *)0x0;
+      uStack_280 = 0;
+      local_298 = 0;
+      lStack_290 = 0;
+      local_3a8 = this;
+      local_378 = lVar9;
+      local_370 = uVar10;
+      puVar11 = (undefined *)
+                (*(code *)PTR__objc_msgSend_004ae328)
+                          (local_3a0,PTR_s_countByEnumeratingWithState_obje_004c6b28,&local_298,
+                           local_d8);
+      puVar3 = PTR__objc_msgSend_004ae328;
+      if (puVar11 != (undefined *)0x0) {
+        local_390 = (undefined *)*local_288;
+        local_3c0 = CONCAT44(local_3c0._4_4_,(int)local_398 + -3);
+        do {
+          puVar5 = PTR_s_isEqualToString__004c6c70;
+          puVar4 = PTR_s_name_004c6c00;
+          puVar16 = (undefined *)0x0;
+          local_388 = puVar11;
+          do {
+            if ((undefined *)*local_288 != local_390) {
+              _objc_enumerationMutation(local_3a0);
+            }
+            uVar10 = *(undefined8 *)(lStack_290 + (long)puVar16 * 8);
+            uVar7 = (*(code *)puVar3)(uVar10,puVar4);
+            uVar8 = (*(code *)puVar3)(PTR__OBJC_CLASS___NSString_004c7748,
+                                      PTR_s_stringWithUTF8String__004c6610,
+                                      "irconverter_dxil_domain_shader");
+            cVar6 = (*(code *)puVar3)(uVar7,puVar5,uVar8);
+            if (cVar6 == '\0') {
+              uVar7 = (*(code *)puVar3)(uVar10,puVar4);
+              uVar8 = (*(code *)puVar3)(PTR__OBJC_CLASS___NSString_004c7748,
+                                        PTR_s_stringWithUTF8String__004c6610,
+                                        "irconverter_domain_shader_point_passthrough");
+              cVar6 = (*(code *)puVar3)(uVar7,puVar5,uVar8);
+              if (cVar6 == '\0' || (char)local_398 != '\x01') {
+                uVar7 = (*(code *)puVar3)(uVar10,puVar4);
+                uVar8 = (*(code *)puVar3)(PTR__OBJC_CLASS___NSString_004c7748,
+                                          PTR_s_stringWithUTF8String__004c6610,
+                                          "irconverter_domain_shader_line_passthrough");
+                cVar6 = (*(code *)puVar3)(uVar7,puVar5,uVar8);
+                if (cVar6 == '\0' || (char)local_398 != '\x02') {
+                  uVar7 = (*(code *)puVar3)(uVar10,puVar4);
+                  uVar8 = (*(code *)puVar3)(PTR__OBJC_CLASS___NSString_004c7748,
+                                            PTR_s_stringWithUTF8String__004c6610,
+                                            "irconverter_domain_shader_triangle_passthrough");
+                  cVar6 = (*(code *)puVar3)(uVar7,puVar5,uVar8);
+                  if ((cVar6 == '\0') || (1 < (byte)local_3c0)) goto LAB_00110c7e;
+                  uVar10 = (*(code *)PTR__objc_retain_004ae360)(uVar10);
+                }
+                else {
+                  uVar10 = (*(code *)PTR__objc_retain_004ae360)(uVar10);
+                }
+              }
+              else {
+                uVar10 = (*(code *)PTR__objc_retain_004ae360)(uVar10);
+              }
+              *(undefined8 *)(local_3a8 + 0x5b0) = uVar10;
+            }
+            else {
+              uVar10 = (*(code *)PTR__objc_retain_004ae360)(uVar10);
+              *(undefined8 *)(local_3a8 + 0x588) = uVar10;
+            }
+LAB_00110c7e:
+            puVar16 = puVar16 + 1;
+          } while (local_388 != puVar16);
+          puVar11 = (undefined *)
+                    (*(code *)puVar3)(local_3a0,PTR_s_countByEnumeratingWithState_obje_004c6b28,
+                                      &local_298,local_d8);
+        } while (puVar11 != (undefined *)0x0);
+      }
+      (*(code *)PTR__objc_release_004ae358)(local_380);
+      lVar9 = local_378;
+      this = local_3a8;
+      (*(code *)PTR__objc_release_004ae358)(local_370);
+    }
+    (*(code *)PTR__objc_release_004ae358)(local_3a0);
+    (*(code *)PTR__objc_release_004ae358)(local_3b0);
+    if (lVar9 == 0) goto LAB_00111733;
+  }
+  if (*(D3DMStageResult **)param_1 != (D3DMStageResult *)0x0) {
+    poVar15 = local_3b8;
+    uVar7 = D3DMStageResult::GetAndRetainLibrary(*(D3DMStageResult **)param_1,local_3b8);
+    uStack_48 = 0;
+    uStack_46 = 0;
+    local_58 = 0;
+    uStack_54 = 0;
+    uStack_50 = 0;
+    uStack_4c = 0;
+    uStack_4a = 0;
+    ExtractDXILFunctions
+              ((D3DMDevice *)&local_3c8,poVar15,SUB81(uVar7,0),(IRShaderReflection *)0x0,
+               (vector *)(*(long *)param_1 + 0x20),in_R9);
+    std::vector<std::string,std::allocator<std::string>>::__destroy_vector::
+    operator()[abi_nqe210106_((__destroy_vector *)&local_58);
+    uVar10 = local_3c8;
+    uVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (local_3c8,PTR_s_objectAtIndexedSubscript__004c6600,0);
+    lVar9 = (*(code *)PTR__objc_retain_004ae360)(uVar8);
+    *(long *)(this + 0x5b0) = lVar9;
+    if (lVar9 == 0) {
+      (*(code *)PTR__objc_release_004ae358)(uVar7);
+      this[0x28] = (D3DMGraphicsPipelineState)0x1;
+    }
+    else {
+      (*(code *)PTR__objc_release_004ae358)(uVar7);
+    }
+    (*(code *)PTR__objc_release_004ae358)(uVar10);
+    if (lVar9 == 0) goto LAB_00111733;
+  }
+  if (*(D3DMStageResult **)(param_1 + 8) != (D3DMStageResult *)0x0) {
+    poVar15 = local_3b8;
+    uVar7 = D3DMStageResult::GetAndRetainLibrary(*(D3DMStageResult **)(param_1 + 8),local_3b8);
+    uStack_48 = 0;
+    uStack_46 = 0;
+    local_58 = 0;
+    uStack_54 = 0;
+    uStack_50 = 0;
+    uStack_4c = 0;
+    uStack_4a = 0;
+    ExtractDXILFunctions
+              ((D3DMDevice *)&local_3c8,poVar15,SUB81(uVar7,0),(IRShaderReflection *)0x0,
+               (vector *)(*(long *)(param_1 + 8) + 0x20),in_R9);
+    std::vector<std::string,std::allocator<std::string>>::__destroy_vector::
+    operator()[abi_nqe210106_((__destroy_vector *)&local_58);
+    uVar10 = local_3c8;
+    uVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (local_3c8,PTR_s_objectAtIndexedSubscript__004c6600,0);
+    lVar9 = (*(code *)PTR__objc_retain_004ae360)(uVar8);
+    *(long *)(this + 0x5b8) = lVar9;
+    if (lVar9 == 0) {
+      (*(code *)PTR__objc_release_004ae358)(uVar7);
+      this[0x28] = (D3DMGraphicsPipelineState)0x1;
+    }
+    else {
+      (*(code *)PTR__objc_release_004ae358)(uVar7);
+    }
+    (*(code *)PTR__objc_release_004ae358)(uVar10);
+    if (lVar9 == 0) goto LAB_00111733;
+  }
+  if (*(D3DMStageResult **)(param_1 + 0x28) != (D3DMStageResult *)0x0) {
+    DVar1 = this[0x328];
+    DVar2 = this[0x32b];
+    poVar15 = local_3b8;
+    uVar10 = D3DMStageResult::GetAndRetainLibrary(*(D3DMStageResult **)(param_1 + 0x28),local_3b8);
+    uStack_48 = 0;
+    uStack_46 = 0;
+    local_58 = 0;
+    uStack_54 = 0;
+    uStack_50 = 0;
+    uStack_4c = 0;
+    uStack_4a = 0;
+    ExtractDXILFunctions
+              ((D3DMDevice *)&local_3c8,poVar15,SUB81(uVar10,0),(IRShaderReflection *)0x0,
+               (vector *)(*(long *)(param_1 + 0x28) + 0x20),in_R9);
+    std::vector<std::string,std::allocator<std::string>>::__destroy_vector::
+    operator()[abi_nqe210106_((__destroy_vector *)&local_58);
+    local_3c0 = local_3c8;
+    lVar9 = (*(code *)PTR__objc_msgSend_004ae328)(local_3c8,PTR_s_count_004c6650);
+    if (lVar9 == 0) {
+      (*(code *)PTR__objc_release_004ae358)(uVar10);
+LAB_001112ce:
+      this[0x28] = (D3DMGraphicsPipelineState)0x1;
+      (*(code *)PTR__objc_release_004ae358)(local_3c0);
+      goto LAB_00111733;
+    }
+    local_3b0 = uVar10;
+    if (DVar1 == (D3DMGraphicsPipelineState)0x0) {
+      if (DVar2 != (D3DMGraphicsPipelineState)0x0) {
+        if (*(int *)(*(long *)(param_1 + 0x20) + 0x168) != 6) {
+                    /* WARNING: Subroutine does not return */
+          std::__throw_bad_variant_access_abi_nqe210106_();
+        }
+        if (*(char *)(*(long *)(param_1 + 0x20) + 0x139) != '\x01') goto LAB_00110f90;
+      }
+      if ((this[0x32e] != (D3DMGraphicsPipelineState)0x0) ||
+         (cVar6 = D3DMDevice::IsForceMeshShadersEnabled(), cVar6 != '\0')) goto LAB_00110f90;
+      local_328 = 0;
+      uStack_320 = 0;
+      local_338 = 0;
+      uStack_330 = 0;
+      local_348 = (long *)0x0;
+      uStack_340 = 0;
+      local_360[1] = 0;
+      local_360[2] = 0;
+      lVar9 = (*(code *)PTR__objc_msgSend_004ae328)
+                        (local_3c0,PTR_s_countByEnumeratingWithState_obje_004c6b28);
+      if (lVar9 != 0) {
+        lVar17 = *local_348;
+        do {
+          puVar3 = PTR_s_functionType_004c6c78;
+          lVar14 = 0;
+          do {
+            if (*local_348 != lVar17) {
+              _objc_enumerationMutation(local_3c0);
+            }
+            uVar10 = *(undefined8 *)(local_360[2] + lVar14 * 8);
+            lVar12 = (*(code *)PTR__objc_msgSend_004ae328)(uVar10,puVar3);
+            if (lVar12 == 1) {
+              uVar7 = (*(code *)PTR__objc_retain_004ae360)(uVar10);
+              *(undefined8 *)(this + 0x540) = uVar7;
+              if (*(char *)(*(long *)(this + 8) + 0xac9) == '\x01') {
+                uVar10 = (*(code *)PTR__objc_msgSend_004ae328)(uVar10,PTR_s_name_004c6c00);
+                uVar10 = (*(code *)PTR__objc_retain_004ae360)(uVar10);
+                *(undefined8 *)(this + 0x550) = uVar10;
+                uVar10 = (*(code *)PTR__objc_retain_004ae360)(local_3b0);
+                *(undefined8 *)(this + 0x548) = uVar10;
+              }
+              goto LAB_00111420;
+            }
+            lVar14 = lVar14 + 1;
+          } while (lVar9 != lVar14);
+          lVar9 = (*(code *)PTR__objc_msgSend_004ae328)
+                            (local_3c0,PTR_s_countByEnumeratingWithState_obje_004c6b28,local_360 + 1
+                            );
+        } while (lVar9 != 0);
+      }
+    }
+    else {
+LAB_00110f90:
+      local_2a8 = 0;
+      uStack_2a0 = 0;
+      local_2b8 = 0;
+      uStack_2b0 = 0;
+      local_2c8 = (long *)0x0;
+      uStack_2c0 = 0;
+      local_2d8 = 0;
+      lStack_2d0 = 0;
+      lVar9 = (*(code *)PTR__objc_msgSend_004ae328)
+                        (local_3c0,PTR_s_countByEnumeratingWithState_obje_004c6b28);
+      puVar3 = PTR__objc_msgSend_004ae328;
+      if (lVar9 != 0) {
+        lVar17 = *local_2c8;
+        local_3a8 = this;
+        do {
+          puVar11 = PTR_s_functionType_004c6c78;
+          lVar14 = 0;
+          do {
+            if (*local_2c8 != lVar17) {
+              _objc_enumerationMutation(local_3c0);
+            }
+            uVar10 = *(undefined8 *)(lStack_2d0 + lVar14 * 8);
+            lVar12 = (*(code *)puVar3)(uVar10,puVar11);
+            if (lVar12 == 8) {
+              uVar10 = (*(code *)PTR__objc_retain_004ae360)(uVar10);
+              *(undefined8 *)(local_3a8 + 0x5b8) = uVar10;
+              this = local_3a8;
+              goto LAB_0011108b;
+            }
+            lVar14 = lVar14 + 1;
+          } while (lVar9 != lVar14);
+          lVar9 = (*(code *)puVar3)(local_3c0,PTR_s_countByEnumeratingWithState_obje_004c6b28,
+                                    &local_2d8);
+          this = local_3a8;
+        } while (lVar9 != 0);
+      }
+LAB_0011108b:
+      if (*(long *)(this + 0x5b8) == 0) {
+        if (__ZZL16D3DMDefaultOSLogvE9onceToken_6875 != -1) {
+          _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_6875,&___block_literal_global_266);
+        }
+        uVar10 = __ZZL16D3DMDefaultOSLogvE6logObj_6876;
+        cVar6 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_6876,0x10);
+        if (cVar6 != '\0') {
+          local_58 = 0x8200202;
+          uStack_54 = 0x45dbd5;
+          uStack_50 = 0;
+          uStack_4c = 0x400;
+          uStack_4a = 0x43e;
+          uStack_48 = 0;
+          __os_log_error_impl(0,uVar10,0x10,
+                              "[%s:%d][ERROR] Failed to create an object function from vertex shader."
+                              ,&local_58,0x12);
+        }
+        ::D3DMPrintError("[%s:%d][ERROR] Failed to create an object function from vertex shader.\n",
+                         "LoadFunctions",0x43e);
+        goto LAB_001112ce;
+      }
+      cVar6 = D3DMDevice::IsForceMeshShadersEnabled();
+      if ((cVar6 != '\0') ||
+         ((this[0x32e] == (D3DMGraphicsPipelineState)0x1 &&
+          (this[0x329] == (D3DMGraphicsPipelineState)0x0)))) {
+        local_2e8 = 0;
+        uStack_2e0 = 0;
+        local_2f8 = 0;
+        uStack_2f0 = 0;
+        local_308 = (long *)0x0;
+        uStack_300 = 0;
+        local_318 = 0;
+        lStack_310 = 0;
+        lVar9 = (*(code *)PTR__objc_msgSend_004ae328)
+                          (local_3c0,PTR_s_countByEnumeratingWithState_obje_004c6b28,&local_318,
+                           local_1d8);
+        puVar3 = PTR__objc_msgSend_004ae328;
+        if (lVar9 != 0) {
+          local_3a0 = *local_308;
+          do {
+            puVar11 = PTR_s_isEqual__004c6c80;
+            local_388 = PTR_s_name_004c6c00;
+            local_390 = PTR_s_stringWithUTF8String__004c6610;
+            lVar17 = 0;
+            local_398 = lVar9;
+            do {
+              if (*local_308 != local_3a0) {
+                _objc_enumerationMutation(local_3c0);
+              }
+              uVar10 = *(undefined8 *)(lStack_310 + lVar17 * 8);
+              lVar9 = *(long *)(this + 0x28e);
+              if (lVar9 == 1) {
+                uVar7 = (*(code *)puVar3)(uVar10,local_388);
+                uVar8 = (*(code *)puVar3)(PTR__OBJC_CLASS___NSString_004c7748,local_390,
+                                          "irconverter_vertex_shader_ms_passthrough_point");
+                cVar6 = (*(code *)puVar3)(uVar7,puVar11,uVar8);
+                if (cVar6 != '\0') {
+                  uVar7 = (*(code *)PTR__objc_retain_004ae360)(uVar10);
+                  *(undefined8 *)(this + 0x558) = uVar7;
+                }
+                lVar9 = *(long *)(this + 0x28e);
+              }
+              if (lVar9 == 2) {
+                uVar7 = (*(code *)puVar3)(uVar10,local_388);
+                uVar8 = (*(code *)puVar3)(PTR__OBJC_CLASS___NSString_004c7748,local_390,
+                                          "irconverter_vertex_shader_ms_passthrough_line");
+                cVar6 = (*(code *)puVar3)(uVar7,puVar11,uVar8);
+                if (cVar6 != '\0') {
+                  uVar7 = (*(code *)PTR__objc_retain_004ae360)(uVar10);
+                  *(undefined8 *)(this + 0x558) = uVar7;
+                }
+              }
+              if (*(long *)(this + 0x28e) == 3) {
+                uVar7 = (*(code *)puVar3)(uVar10,local_388);
+                uVar8 = (*(code *)puVar3)(PTR__OBJC_CLASS___NSString_004c7748,local_390,
+                                          "irconverter_vertex_shader_ms_passthrough_triangle");
+                cVar6 = (*(code *)puVar3)(uVar7,puVar11,uVar8);
+                if (cVar6 != '\0') {
+                  uVar10 = (*(code *)PTR__objc_retain_004ae360)(uVar10);
+                  *(undefined8 *)(this + 0x558) = uVar10;
+                }
+              }
+              lVar17 = lVar17 + 1;
+            } while (local_398 != lVar17);
+            lVar9 = (*(code *)puVar3)(local_3c0,PTR_s_countByEnumeratingWithState_obje_004c6b28,
+                                      &local_318,local_1d8);
+          } while (lVar9 != 0);
+        }
+      }
+    }
+LAB_00111420:
+    (*(code *)PTR__objc_release_004ae358)(local_3b0);
+    (*(code *)PTR__objc_release_004ae358)(local_3c0);
+  }
+  this_00 = *(D3DMStageResult **)(param_1 + 0x20);
+  if (this_00 != (D3DMStageResult *)0x0) {
+    if (*(int *)(this_00 + 0x168) != 6) {
+                    /* WARNING: Subroutine does not return */
+      std::__throw_bad_variant_access_abi_nqe210106_();
+    }
+    if (this_00[0x139] == (D3DMStageResult)0x0) {
+      poVar15 = local_3b8;
+      uVar10 = D3DMStageResult::GetAndRetainLibrary(this_00,local_3b8);
+      lVar9 = *(long *)(param_1 + 0x20);
+      if (*(char *)(lVar9 + 0x70) == '\x01') {
+        uVar7 = _objc_alloc_init(PTR__OBJC_CLASS___MTLFunctionConstantValues_004c77a0);
+        lVar9 = *(long *)(param_1 + 0x28);
+        if (*(int *)(lVar9 + 0x168) != 1) {
+                    /* WARNING: Subroutine does not return */
+          std::__throw_bad_variant_access_abi_nqe210106_();
+        }
+        uVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                          (PTR__OBJC_CLASS___NSString_004c7748,PTR_s_stringWithUTF8String__004c6610,
+                           "vertex_shader_output_size_fc");
+        poVar15 = (objc_object *)PTR_s_setConstantValue_type_withName__004c6c68;
+        (*(code *)PTR__objc_msgSend_004ae328)
+                  (uVar7,PTR_s_setConstantValue_type_withName__004c6c68,lVar9 + 0x128,0x1d,uVar8);
+        lVar9 = *(long *)(param_1 + 0x20);
+      }
+      else {
+        uVar7 = 0;
+      }
+      local_58 = 0;
+      uStack_54 = 0;
+      uStack_50 = 0;
+      uStack_4c = 0;
+      uStack_4a = 0;
+      uStack_48 = 0;
+      uStack_46 = 0;
+      ExtractDXILFunctions
+                ((D3DMDevice *)&local_3c8,poVar15,SUB81(uVar10,0),(IRShaderReflection *)0x0,
+                 (vector *)(lVar9 + 0x20),in_R9);
+      std::vector<std::string,std::allocator<std::string>>::__destroy_vector::
+      operator()[abi_nqe210106_((__destroy_vector *)&local_58);
+      uVar8 = local_3c8;
+      uVar13 = (*(code *)PTR__objc_msgSend_004ae328)
+                         (local_3c8,PTR_s_objectAtIndexedSubscript__004c6600,0);
+      lVar9 = (*(code *)PTR__objc_retain_004ae360)(uVar13);
+      *(long *)(this + 0x5b0) = lVar9;
+      if (lVar9 == 0) {
+        (*(code *)PTR__objc_release_004ae358)(uVar7);
+        (*(code *)PTR__objc_release_004ae358)(uVar10);
+        this[0x28] = (D3DMGraphicsPipelineState)0x1;
+      }
+      else {
+        (*(code *)PTR__objc_release_004ae358)(uVar7);
+        (*(code *)PTR__objc_release_004ae358)(uVar10);
+      }
+      (*(code *)PTR__objc_release_004ae358)(uVar8);
+      if (lVar9 == 0) goto LAB_00111733;
+    }
+  }
+  if (*(D3DMStageResult **)(param_1 + 0x40) != (D3DMStageResult *)0x0) {
+    poVar15 = local_3b8;
+    uVar7 = D3DMStageResult::GetAndRetainLibrary(*(D3DMStageResult **)(param_1 + 0x40),local_3b8);
+    uStack_48 = 0;
+    uStack_46 = 0;
+    local_58 = 0;
+    uStack_54 = 0;
+    uStack_50 = 0;
+    uStack_4c = 0;
+    uStack_4a = 0;
+    ExtractDXILFunctions
+              ((D3DMDevice *)&local_3c8,poVar15,SUB81(uVar7,0),(IRShaderReflection *)0x0,
+               (vector *)0x0,in_R9);
+    std::vector<std::string,std::allocator<std::string>>::__destroy_vector::
+    operator()[abi_nqe210106_((__destroy_vector *)&local_58);
+    uVar10 = local_3c8;
+    uVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (local_3c8,PTR_s_objectAtIndexedSubscript__004c6600,0);
+    lVar9 = (*(code *)PTR__objc_retain_004ae360)(uVar8);
+    *(long *)(this + 0x560) = lVar9;
+    if (lVar9 == 0) {
+      (*(code *)PTR__objc_release_004ae358)(uVar7);
+      this[0x28] = (D3DMGraphicsPipelineState)0x1;
+    }
+    else {
+      if (*(char *)(*(long *)(this + 8) + 0xac9) == '\x01') {
+        uVar8 = (*(code *)PTR__objc_retain_004ae360)(uVar7);
+        *(undefined8 *)(this + 0x570) = uVar8;
+        uVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                          (*(undefined8 *)(this + 0x560),PTR_s_name_004c6c00);
+        uVar8 = (*(code *)PTR__objc_retain_004ae360)(uVar8);
+        *(undefined8 *)(this + 0x568) = uVar8;
+      }
+      (*(code *)PTR__objc_release_004ae358)(uVar7);
+    }
+    (*(code *)PTR__objc_release_004ae358)(uVar10);
+    if (lVar9 == 0) goto LAB_00111733;
+  }
+  if (*(D3DMStageResult **)(param_1 + 0x48) != (D3DMStageResult *)0x0) {
+    poVar15 = local_3b8;
+    uVar10 = D3DMStageResult::GetAndRetainLibrary(*(D3DMStageResult **)(param_1 + 0x48),local_3b8);
+    uStack_48 = 0;
+    uStack_46 = 0;
+    local_58 = 0;
+    uStack_54 = 0;
+    uStack_50 = 0;
+    uStack_4c = 0;
+    uStack_4a = 0;
+    ExtractDXILFunctions
+              ((D3DMDevice *)&local_3c8,poVar15,SUB81(uVar10,0),(IRShaderReflection *)0x0,
+               (vector *)0x0,in_R9);
+    std::vector<std::string,std::allocator<std::string>>::__destroy_vector::
+    operator()[abi_nqe210106_((__destroy_vector *)&local_58);
+    uVar7 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (local_3c8,PTR_s_objectAtIndexedSubscript__004c6600,0);
+    lVar9 = (*(code *)PTR__objc_retain_004ae360)(uVar7);
+    *(long *)(this + 0x578) = lVar9;
+    if (lVar9 == 0) {
+      (*(code *)PTR__objc_release_004ae358)(uVar10);
+      this[0x28] = (D3DMGraphicsPipelineState)0x1;
+    }
+    else {
+      (*(code *)PTR__objc_release_004ae358)(uVar10);
+    }
+    (*(code *)PTR__objc_release_004ae358)(local_3c8);
+  }
+LAB_00111733:
+  _objc_autoreleasePoolPop(local_368);
+  if (*(long *)PTR____stack_chk_guard_004ae740 != local_38) {
+                    /* WARNING: Subroutine does not return */
+    ___stack_chk_fail();
+  }
+  return;
+}
+
+
+=== graphics GetRenderPipelineState @ +0x11215c ===
+FUNCTION=D3DMGraphicsPipelineState::GetRenderPipelineState
+ENTRY=0011215c
+BODY_MIN=0011215c
+BODY_MAX=001137c8
+PROTOTYPE=undefined __stdcall GetRenderPipelineState(DynamicGraphicsState param_1)
+PARAMETERS=1
+PARAM index=0 name=param_1 type=DynamicGraphicsState storage=<UNASSIGNED>
+CALLERS:
+Entry Point from=unknown
+00570229 from=unknown
+0010f921 from=D3DMGraphicsPipelineState::D3DMGraphicsPipelineState
+000e1778 from=D3D12GraphicsCommandListMPL::SetRenderPSO
+000ed6dd from=D3D12GraphicsCommandListMTL::ExecuteIndirect
+00114249 from=D3DMGraphicsPipelineState::GetMetalPipelineState
+001137f4 from=____ZN25D3DMGraphicsPipelineStateC2EP10D3DMDeviceRK29D3DMGraphicsPipelineStateDesc_block_invoke.77
+ENTRY_WINDOW:
+0011215c  PUSH RBP
+0011215d  PUSH R15
+0011215f  PUSH R14
+00112161  PUSH R13
+00112163  PUSH R12
+00112165  PUSH RBX
+00112166  SUB RSP,0x178
+0011216d  MOV RBX,RDX
+00112170  MOV R12D,ESI
+00112173  MOV R13,RDI
+00112176  MOV RAX,qword ptr [0x004ae740] -> 004ae740
+0011217d  MOV RAX,qword ptr [RAX] -> 0077bf00
+00112180  MOV qword ptr [RSP + 0x170],RAX -> Stack[-0x38]
+00112188  MOV R14D,0x9e3779b9
+0011218e  MOV qword ptr [RSP + 0x48],0x0 -> Stack[-0x160]
+00112197  ADD RDI,0x5c0
+0011219e  MOV qword ptr [RSP + 0x28],RDI -> Stack[-0x180]
+001121a3  MOV ESI,0x40000
+001121a8  CALL 0x00370870 -> 00370870 _os_unfair_lock_lock_with_options
+001121ad  MOV R15,qword ptr [R13 + 0x4e8] -> 000004e8
+001121b4  TEST R15,R15
+001121b7  MOV qword ptr [RSP + 0x30],RBX -> Stack[-0x178]
+001121bc  MOV qword ptr [RSP + 0x20],R12 -> Stack[-0x188]
+001121c1  JZ 0x00112215 -> 00112215
+001121c3  CMP qword ptr [R13 + 0x4f8],0x0 -> 000004f8
+DECOMPILE:
+
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* D3DMGraphicsPipelineState::GetRenderPipelineState(D3DMGraphicsPipelineState::DynamicGraphicsState)
+    */
+
+long D3DMGraphicsPipelineState::GetRenderPipelineState(long param_1,uint param_2,long *param_3)
+
+{
+  void *pvVar1;
+  byte *pbVar2;
+  float fVar3;
+  undefined *puVar4;
+  undefined *puVar5;
+  char cVar6;
+  byte bVar7;
+  int iVar8;
+  uint uVar9;
+  uint uVar10;
+  void *pvVar11;
+  undefined8 uVar12;
+  undefined8 uVar13;
+  ulong uVar14;
+  ulong uVar15;
+  MTLRenderPipelineColorAttachmentDescriptorArray *pMVar16;
+  uint uVar17;
+  long *plVar18;
+  long lVar19;
+  char *pcVar20;
+  long *plVar21;
+  long *plVar22;
+  long *plVar23;
+  undefined8 extraout_RDX;
+  char *pcVar24;
+  char *pcVar25;
+  long lVar26;
+  undefined8 *puVar27;
+  D3DMDevice *pDVar28;
+  undefined8 *puVar29;
+  char *pcVar30;
+  char *pcVar31;
+  undefined *puVar32;
+  undefined4 *puVar33;
+  undefined1 *puVar34;
+  long *plVar35;
+  undefined1 auVar36 [16];
+  MTLMeshRenderPipelineDescriptor *local_188;
+  undefined1 local_169;
+  long *local_168;
+  NSError *local_160;
+  undefined8 local_158;
+  undefined8 local_150;
+  undefined *local_148;
+  undefined *local_140;
+  undefined *local_138;
+  undefined *local_130;
+  undefined *local_128;
+  undefined *local_120;
+  undefined *local_118;
+  undefined *local_110;
+  undefined *local_108;
+  undefined *local_100;
+  undefined8 local_f8;
+  MTLRenderPipelineReflection *local_f0;
+  undefined4 *local_e8;
+  undefined1 **local_e0;
+  undefined4 local_d4;
+  undefined1 *local_d0;
+  undefined8 local_c8;
+  undefined4 uStack_c0;
+  undefined2 uStack_bc;
+  undefined2 uStack_ba;
+  undefined2 uStack_b8;
+  undefined2 local_b6;
+  undefined8 local_b4;
+  undefined2 local_ac;
+  byte *local_aa;
+  undefined2 local_a2;
+  byte *local_a0;
+  undefined2 local_98;
+  byte *local_96;
+  undefined2 local_8e;
+  byte *local_8c;
+  undefined2 local_84;
+  byte *local_82;
+  undefined2 local_7a;
+  undefined8 local_78;
+  undefined8 local_68;
+  undefined8 local_60;
+  long local_58;
+  undefined8 local_50;
+  undefined8 local_48;
+  undefined8 local_40;
+  long local_38;
+  
+  uVar14 = (ulong)param_2;
+  local_38 = *(long *)PTR____stack_chk_guard_004ae740;
+  local_160 = (NSError *)0x0;
+  lVar26 = param_1 + 0x5c0;
+  _os_unfair_lock_lock_with_options(lVar26,0x40000);
+  plVar35 = *(long **)(param_1 + 0x4e8);
+  if (plVar35 == (long *)0x0) {
+    plVar18 = (long *)((long)param_3 + (ulong)(param_2 >> 2) + uVar14 * 0x40 + 0x9e3779b9 ^ uVar14);
+    plVar23 = param_3;
+  }
+  else {
+    if (*(long *)(param_1 + 0x4f8) == 0) {
+LAB_001122b7:
+      plVar18 = (long *)((long)param_3 + (ulong)(param_2 >> 2) + uVar14 * 0x40 + 0x9e3779b9 ^ uVar14
+                        );
+    }
+    else {
+      plVar18 = (long *)((long)param_3 + (ulong)(param_2 >> 2) + uVar14 * 0x40 + 0x9e3779b9 ^ uVar14
+                        );
+      uVar15 = (long)plVar35 - 1;
+      if (((ulong)plVar35 & uVar15) == 0) {
+        plVar21 = (long *)((ulong)plVar18 & uVar15);
+      }
+      else {
+        plVar21 = plVar18;
+        if (plVar35 <= plVar18) {
+          plVar21 = (long *)((ulong)plVar18 % (ulong)plVar35);
+        }
+      }
+      plVar23 = *(long **)(*(long *)(param_1 + 0x4e0) + (long)plVar21 * 8);
+      if ((plVar23 == (long *)0x0) || (plVar23 = (long *)*plVar23, plVar23 == (long *)0x0))
+      goto LAB_001122b7;
+      do {
+        plVar22 = (long *)plVar23[1];
+        if (plVar22 == plVar18) {
+          if ((*(uint *)(plVar23 + 2) == param_2) && ((long *)plVar23[3] == param_3)) {
+            _os_unfair_lock_unlock(lVar26);
+            if ((char)plVar23[5] == '\0') {
+              local_f0 = (MTLRenderPipelineReflection *)(plVar23 + 5);
+              local_d0 = &local_169;
+              local_169 = 0;
+              local_e0 = &local_d0;
+              local_e8 = &local_d4;
+              local_d4 = 5;
+              uStack_c0 = SUB84(local_d0,0);
+              uStack_bc = (undefined2)((ulong)local_d0 >> 0x20);
+              uStack_ba = (undefined2)((ulong)local_d0 >> 0x30);
+              uStack_b8 = 5;
+              local_b6 = 0;
+              local_c8 = local_f0;
+              std::
+              __libcpp_thread_poll_with_backoff_abi_nqe210106_<std::__atomic_wait_unless[abi:nqe210106]<std::__atomic_base<bool,false>,std::__atomic_wait[abi:nqe210106]<std::__atomic_base<bool,false>const,bool>(std::__atomic_base<bool,false>const&,bool,std::memory_order)::_lambda(bool_const&)_1_>(std::__atomic_base<bool,false>const&,std::memory_order,std::__atomic_wait[abi:nqe210106]<std::__atomic_base<bool,false>const,bool>(std::__atomic_base<bool,false>const&,bool,std::memory_order)::_lambda(bool_const&)_1_&&)::_lambda()_1_,std::__atomic_wait_backoff_impl<std::__atomic_base<bool,false>,std::__atomic_wait[abi:nqe210106]<std::__atomic_base<bool,false>const,bool>(std::__atomic_base<bool,false>const&,bool,std::memory_order)::_lambda(bool_const&)_1_>&>
+                        ();
+            }
+            lVar26 = plVar23[4];
+            goto LAB_00113536;
+          }
+        }
+        else {
+          if (((ulong)plVar35 & uVar15) == 0) {
+            plVar22 = (long *)((ulong)plVar22 & uVar15);
+          }
+          else if (plVar35 <= plVar22) {
+            plVar22 = (long *)((ulong)plVar22 % (ulong)plVar35);
+          }
+          if (plVar22 != plVar21) break;
+        }
+        plVar23 = (long *)*plVar23;
+      } while (plVar23 != (long *)0x0);
+      plVar18 = (long *)((long)param_3 + uVar14 * 0x40 + (ulong)(param_2 >> 2) + 0x9e3779b9 ^ uVar14
+                        );
+      if (plVar35 == (long *)0x0) goto LAB_0011235f;
+    }
+    uVar14 = (long)plVar35 - 1;
+    if (((ulong)plVar35 & uVar14) == 0) {
+      plVar23 = (long *)((ulong)plVar18 & uVar14);
+    }
+    else {
+      plVar23 = plVar18;
+      if (plVar35 <= plVar18) {
+        plVar23 = (long *)((ulong)plVar18 % (ulong)plVar35);
+      }
+    }
+    puVar27 = *(undefined8 **)(*(long *)(param_1 + 0x4e0) + (long)plVar23 * 8);
+    if (puVar27 != (undefined8 *)0x0) {
+      for (local_168 = (long *)*puVar27; local_168 != (long *)0x0; local_168 = (long *)*local_168) {
+        plVar21 = (long *)local_168[1];
+        if (plVar21 == plVar18) {
+          if ((*(uint *)(local_168 + 2) == param_2) && ((long *)local_168[3] == param_3))
+          goto LAB_0011262f;
+        }
+        else {
+          if (((ulong)plVar35 & uVar14) == 0) {
+            plVar21 = (long *)((ulong)plVar21 & uVar14);
+          }
+          else if (plVar35 <= plVar21) {
+            plVar21 = (long *)((ulong)plVar21 % (ulong)plVar35);
+          }
+          if (plVar21 != plVar23) break;
+        }
+      }
+    }
+  }
+LAB_0011235f:
+  local_168 = operator_new(0x30);
+  *local_168 = 0;
+  local_168[1] = (long)plVar18;
+  *(uint *)(local_168 + 2) = param_2;
+  local_168[3] = (long)param_3;
+  local_168[4] = 0;
+  local_168[5] = 0;
+  fVar3 = (float)(*(long *)(param_1 + 0x4f8) + 1);
+  if ((plVar35 == (long *)0x0) || ((float)plVar35 * *(float *)(param_1 + 0x500) < fVar3)) {
+    uVar14 = 1;
+    if ((long *)((long)&MACH_HEADER.magic + 2) < plVar35) {
+      uVar14 = (ulong)(((ulong)plVar35 & (long)plVar35 - 1U) != 0);
+    }
+    plVar21 = (long *)(uVar14 | (long)plVar35 * 2);
+    auVar36 = ZEXT416((uint)(fVar3 / *(float *)(param_1 + 0x500)));
+    auVar36 = roundss(auVar36,auVar36,10);
+    uVar14 = (ulong)auVar36._0_4_;
+    plVar23 = (long *)((long)(auVar36._0_4_ - _DAT_00374130) & (long)uVar14 >> 0x3f | uVar14);
+    if (plVar23 < plVar21) {
+      plVar23 = plVar21;
+    }
+    plVar21 = (long *)((long)&MACH_HEADER.magic + 2);
+    if ((plVar23 != (long *)((long)&MACH_HEADER.magic + 1)) &&
+       (plVar21 = plVar23, ((ulong)plVar23 & (long)plVar23 - 1U) != 0)) {
+      plVar21 = (long *)std::__next_prime((ulong)plVar23);
+      plVar35 = *(long **)(param_1 + 0x4e8);
+    }
+    if (plVar35 < plVar21) {
+LAB_00112482:
+      if ((ulong)plVar21 >> 0x3d != 0) {
+                    /* WARNING: Subroutine does not return */
+        std::__throw_bad_array_new_length_abi_nqe210106_();
+      }
+      pvVar11 = operator_new((long)plVar21 * 8);
+      pvVar1 = *(void **)(param_1 + 0x4e0);
+      *(void **)(param_1 + 0x4e0) = pvVar11;
+      if (pvVar1 != (void *)0x0) {
+        operator_delete(pvVar1);
+        pvVar11 = *(void **)(param_1 + 0x4e0);
+      }
+      *(long **)(param_1 + 0x4e8) = plVar21;
+      ___bzero(pvVar11,(long)plVar21 * 8);
+      puVar27 = *(undefined8 **)(param_1 + 0x4f0);
+      plVar35 = plVar21;
+      if (puVar27 != (undefined8 *)0x0) {
+        plVar23 = (long *)puVar27[1];
+        uVar14 = (long)plVar21 - 1;
+        if (((ulong)plVar21 & uVar14) == 0) {
+          plVar23 = (long *)((ulong)plVar23 & uVar14);
+        }
+        else if (plVar21 <= plVar23) {
+          plVar23 = (long *)((ulong)plVar23 % (ulong)plVar21);
+        }
+        *(long *)((long)pvVar11 + (long)plVar23 * 8) = param_1 + 0x4f0;
+        puVar29 = (undefined8 *)*puVar27;
+        while (puVar29 != (undefined8 *)0x0) {
+          plVar22 = (long *)puVar29[1];
+          if (((ulong)plVar21 & uVar14) == 0) {
+            plVar22 = (long *)((ulong)plVar22 & uVar14);
+          }
+          else if (plVar21 <= plVar22) {
+            plVar22 = (long *)((ulong)plVar22 % (ulong)plVar21);
+          }
+          if (plVar22 != plVar23) {
+            if (*(long *)((long)pvVar11 + (long)plVar22 * 8) == 0) {
+              *(undefined8 **)((long)pvVar11 + (long)plVar22 * 8) = puVar27;
+              plVar23 = plVar22;
+            }
+            else {
+              *puVar27 = *puVar29;
+              *puVar29 = **(undefined8 **)((long)pvVar11 + (long)plVar22 * 8);
+              **(undefined8 **)((long)pvVar11 + (long)plVar22 * 8) = puVar29;
+              puVar29 = puVar27;
+            }
+          }
+          puVar27 = puVar29;
+          puVar29 = (undefined8 *)*puVar27;
+        }
+      }
+    }
+    else if (plVar21 < plVar35) {
+      auVar36 = ZEXT416((uint)((float)*(ulong *)(param_1 + 0x4f8) / *(float *)(param_1 + 0x500)));
+      auVar36 = roundss(auVar36,auVar36,10);
+      uVar14 = (ulong)auVar36._0_4_;
+      plVar23 = (long *)((long)(auVar36._0_4_ - _DAT_00374130) & (long)uVar14 >> 0x3f | uVar14);
+      if ((plVar35 < (long *)((long)&MACH_HEADER.magic + 3)) ||
+         (((long)plVar35 - 1U & (ulong)plVar35) != 0)) {
+        plVar23 = (long *)std::__next_prime((ulong)plVar23);
+      }
+      else if ((long *)((long)&MACH_HEADER.magic + 1) < plVar23) {
+        lVar19 = 0x3f;
+        if ((long)plVar23 - 1U != 0) {
+          for (; (long)plVar23 - 1U >> lVar19 == 0; lVar19 = lVar19 + -1) {
+          }
+        }
+        plVar23 = (long *)(1L << (-((byte)lVar19 ^ 0x3f) & 0x3f));
+      }
+      if (plVar23 < plVar21) {
+        plVar23 = plVar21;
+      }
+      if (plVar23 < plVar35) {
+        plVar21 = plVar23;
+        if (plVar23 != (long *)0x0) goto LAB_00112482;
+        pvVar1 = *(void **)(param_1 + 0x4e0);
+        *(undefined8 *)(param_1 + 0x4e0) = 0;
+        if (pvVar1 != (void *)0x0) {
+          operator_delete(pvVar1);
+        }
+        *(undefined8 *)(param_1 + 0x4e8) = 0;
+        plVar35 = (long *)0x0;
+      }
+      else {
+        plVar35 = *(long **)(param_1 + 0x4e8);
+      }
+    }
+    if (((ulong)plVar35 & (long)plVar35 - 1U) == 0) {
+      plVar23 = (long *)((ulong)plVar18 & (long)plVar35 - 1U);
+    }
+    else {
+      plVar23 = plVar18;
+      if (plVar35 <= plVar18) {
+        plVar23 = (long *)((ulong)plVar18 % (ulong)plVar35);
+      }
+    }
+  }
+  lVar19 = *(long *)(param_1 + 0x4e0);
+  plVar18 = *(long **)(lVar19 + (long)plVar23 * 8);
+  if (plVar18 == (long *)0x0) {
+    *local_168 = *(long *)(param_1 + 0x4f0);
+    *(long **)(param_1 + 0x4f0) = local_168;
+    *(long *)(lVar19 + (long)plVar23 * 8) = param_1 + 0x4f0;
+    if (*local_168 != 0) {
+      plVar23 = *(long **)(*local_168 + 8);
+      if (((ulong)plVar35 & (long)plVar35 - 1U) == 0) {
+        plVar23 = (long *)((ulong)plVar23 & (long)plVar35 - 1U);
+      }
+      else if (plVar35 <= plVar23) {
+        plVar23 = (long *)((ulong)plVar23 % (ulong)plVar35);
+      }
+      *(long **)(lVar19 + (long)plVar23 * 8) = local_168;
+    }
+  }
+  else {
+    *local_168 = *plVar18;
+    *plVar18 = (long)local_168;
+  }
+  *(long *)(param_1 + 0x4f8) = *(long *)(param_1 + 0x4f8) + 1;
+LAB_0011262f:
+  _os_unfair_lock_unlock(lVar26);
+  local_f0 = (MTLRenderPipelineReflection *)0x0;
+  lVar26 = *(long *)(&DAT_00524000 + (ulong)(param_2 >> 1) * 0x58);
+  if (*(int *)(param_1 + 0x44) == 1) {
+    local_188 = (MTLMeshRenderPipelineDescriptor *)
+                _objc_opt_new(PTR__OBJC_CLASS___MTLMeshRenderPipelineDescriptor_004c77f8);
+    lVar19 = 0x5b0;
+    if (((*(char *)(param_1 + 0x32b) == '\0') && (*(char *)(param_1 + 0x32a) == '\0')) &&
+       (*(char *)(param_1 + 0x328) == '\0')) {
+      cVar6 = D3DMDevice::IsForceMeshShadersEnabled();
+      lVar19 = 0x558;
+      if ((cVar6 != '\0') || (*(char *)(param_1 + 0x32e) == '\x01')) goto LAB_001126af;
+    }
+    else {
+LAB_001126af:
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (local_188,PTR_s_setMeshFunction__004c6c88,*(undefined8 *)(param_1 + lVar19));
+    }
+    puVar32 = PTR__objc_msgSend_004ae328;
+    (*(code *)PTR__objc_msgSend_004ae328)
+              (local_188,PTR_s_setObjectFunction__004c6c90,*(undefined8 *)(param_1 + 0x5b8));
+    (*(code *)puVar32)(local_188,PTR_s_setFragmentFunction__004c6748,
+                       *(undefined8 *)(param_1 + 0x598));
+    (*(code *)puVar32)(local_188,PTR_s_setAlphaToCoverageEnabled__004c6c98,
+                       (int)*(char *)(param_1 + 0x32c));
+    (*(code *)puVar32)(local_188,PTR_s_setRasterSampleCount__004c6ca0,
+                       *(undefined1 *)(param_1 + 0x326));
+    (*(code *)puVar32)(local_188,PTR_s_setRasterizationEnabled__004c6740,
+                       (int)*(char *)(param_1 + 0x327));
+    (*(code *)puVar32)(local_188,PTR_s_setDepthAttachmentPixelFormat__004c6758,lVar26);
+    lVar19 = 0;
+    if ((lVar26 - 0xfdU < 9) && ((0x181UL >> (lVar26 - 0xfdU & 0x3f) & 1) != 0)) {
+      lVar19 = lVar26;
+    }
+    (*(code *)puVar32)(local_188,PTR_s_setStencilAttachmentPixelFormat__004c6760,lVar19);
+    (*(code *)puVar32)(local_188,PTR_s_setSupportIndirectCommandBuffers_004c6778,param_2 & 1);
+    if (D3DMDevice::SupportMeshShaders == '\x01') {
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (local_188,PTR_s_setPayloadMemoryLength__004c6ca8,*(undefined4 *)(param_1 + 0x2c1));
+    }
+    if (*(char *)(param_1 + 0x328) == '\x01') {
+      lVar26 = *(long *)(param_1 + 0x480);
+      if ((*(int *)(lVar26 + 0x148) != 7) ||
+         (lVar19 = *(long *)(param_1 + 0x488), *(int *)(lVar19 + 0x148) != 8)) {
+LAB_001137b8:
+                    /* WARNING: Subroutine does not return */
+        std::__throw_bad_variant_access_abi_nqe210106_();
+      }
+      local_48 = *(undefined8 *)(param_1 + 0x580);
+      local_40 = *(undefined8 *)(param_1 + 0x560);
+      uVar12 = (*(code *)PTR__objc_msgSend_004ae328)
+                         (PTR__OBJC_CLASS___NSArray_004c77c0,PTR_s_arrayWithObjects_count__004c6a08,
+                          &local_48,2);
+      uVar13 = (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_objectLinkedFunctions_004c6cb0)
+      ;
+      puVar4 = PTR_s_setPrivateFunctions__004c6cb8;
+      (*(code *)PTR__objc_msgSend_004ae328)(uVar13,PTR_s_setPrivateFunctions__004c6cb8,uVar12);
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (local_188,PTR_s_setMaxTotalThreadsPerObjectThrea_004c6cc0,
+                 *(int *)(lVar26 + 0x104) * *(int *)(lVar26 + 0x100));
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (local_188,PTR_s_setMaxTotalThreadgroupsPerMeshGr_004c6cc8,0x400);
+      uVar12 = _objc_opt_new(PTR__OBJC_CLASS___NSMutableArray_004c7800);
+      puVar32 = PTR_s_addObject__004c6b98;
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (uVar12,PTR_s_addObject__004c6b98,*(undefined8 *)(param_1 + 0x590));
+      if (*(char *)(param_1 + 0x32b) == '\x01') {
+        (*(code *)PTR__objc_msgSend_004ae328)(uVar12,puVar32,*(undefined8 *)(param_1 + 0x588));
+        if (*(int *)(*(long *)(param_1 + 0x490) + 0x148) != 6) {
+                    /* WARNING: Subroutine does not return */
+          std::__throw_bad_variant_access_abi_nqe210106_();
+        }
+        puVar33 = (undefined4 *)(*(long *)(param_1 + 0x490) + 0x128);
+      }
+      else {
+        puVar33 = (undefined4 *)(lVar19 + 0x114);
+      }
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (local_188,PTR_s_setMaxTotalThreadsPerMeshThreadg_004c6cd0,*puVar33);
+      if (*(long *)(param_1 + 0x578) != 0) {
+        (*(code *)PTR__objc_msgSend_004ae328)(uVar12,puVar32);
+      }
+      uVar13 = (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_meshLinkedFunctions_004c6cd8);
+      (*(code *)PTR__objc_msgSend_004ae328)(uVar13,puVar4,uVar12);
+      (*(code *)PTR__objc_release_004ae358)(uVar12);
+    }
+    else if (((*(char *)(param_1 + 0x32b) != '\0') ||
+             (cVar6 = D3DMDevice::IsForceMeshShadersEnabled(), cVar6 != '\0')) ||
+            (*(char *)(param_1 + 0x32e) == '\x01')) {
+      if (*(char *)(param_1 + 0x32b) == '\x01') {
+        lVar26 = *(long *)(param_1 + 0x490);
+        if ((*(int *)(lVar26 + 0x148) != 6) ||
+           (lVar19 = *(long *)(param_1 + 0x478), *(int *)(lVar19 + 0x148) != 1)) goto LAB_001137b8;
+        if (*(char *)(lVar26 + 0x124) == '\0') {
+          iVar8 = 0x1ff;
+        }
+        else {
+          uVar14 = (*(code *)PTR__objc_msgSend_004ae328)
+                             (local_188,PTR_s_maxTotalThreadsPerObjectThreadgr_004c6ce0);
+          iVar8 = (int)(uVar14 / *(ulong *)(&DAT_0042a648 +
+                                           (ulong)(byte)(*(char *)(lVar26 + 0x124) - 1) * 8)) + -1;
+        }
+        uVar10 = 0;
+        (*(code *)puVar32)(local_188,PTR_s_setMaxTotalThreadgroupsPerMeshGr_004c6cc8,
+                           (ulong)(iVar8 + *(uint *)(lVar26 + 0x128)) /
+                           (ulong)*(uint *)(lVar26 + 0x128));
+        (*(code *)puVar32)(local_188,PTR_s_setMaxTotalThreadsPerMeshThreadg_004c6cd0,
+                           *(undefined4 *)(lVar26 + 0x128));
+        bVar7 = *(char *)(lVar26 + 0x124) - 1;
+        if (bVar7 < 7) {
+          uVar10 = *(uint *)(&DAT_0042a680 + (ulong)bVar7 * 4);
+        }
+        uVar9 = *(uint *)(lVar19 + 0x108);
+        if (uVar9 == 0) {
+          iVar8 = 0x200;
+        }
+        else {
+          uVar9 = ((*(byte *)(param_1 + 0x32f) ^ 1) << 9 | 0x3d6c) / uVar9;
+          uVar17 = 0x200;
+          if (uVar9 < 0x200) {
+            uVar17 = uVar9;
+          }
+          iVar8 = uVar17 - uVar17 % uVar10;
+        }
+        (*(code *)PTR__objc_msgSend_004ae328)
+                  (local_188,PTR_s_setMaxTotalThreadsPerObjectThrea_004c6cc0,iVar8);
+      }
+      puVar32 = PTR_s_arrayWithObjects_count__004c6a08;
+      local_50 = *(undefined8 *)(param_1 + 0x560);
+      uVar12 = (*(code *)PTR__objc_msgSend_004ae328)
+                         (PTR__OBJC_CLASS___NSArray_004c77c0,PTR_s_arrayWithObjects_count__004c6a08,
+                          &local_50,1);
+      uVar13 = (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_objectLinkedFunctions_004c6cb0)
+      ;
+      puVar4 = PTR_s_setPrivateFunctions__004c6cb8;
+      (*(code *)PTR__objc_msgSend_004ae328)(uVar13,PTR_s_setPrivateFunctions__004c6cb8,uVar12);
+      if (*(long *)(param_1 + 0x578) != 0) {
+        local_58 = *(long *)(param_1 + 0x578);
+        uVar12 = (*(code *)PTR__objc_msgSend_004ae328)
+                           (PTR__OBJC_CLASS___NSArray_004c77c0,puVar32,&local_58,1);
+        uVar13 = (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_meshLinkedFunctions_004c6cd8)
+        ;
+        (*(code *)PTR__objc_msgSend_004ae328)(uVar13,puVar4,uVar12);
+      }
+    }
+    uVar15 = (*(code *)PTR__objc_msgSend_004ae328)
+                       (local_188,PTR_s_maxTotalThreadsPerMeshThreadgrou_004c6ce8);
+    uVar14 = 0x400;
+    if (uVar15 < 0x400) {
+      uVar14 = uVar15;
+    }
+    (*(code *)PTR__objc_msgSend_004ae328)
+              (local_188,PTR_s_setMaxTotalThreadsPerMeshThreadg_004c6cd0,uVar14);
+    uVar15 = (*(code *)PTR__objc_msgSend_004ae328)
+                       (local_188,PTR_s_maxTotalThreadsPerObjectThreadgr_004c6ce0);
+    uVar10 = D3DMDevice::GetMaxThreadsPerObjectShaderThreadgroup();
+    uVar14 = (ulong)uVar10;
+    if (uVar15 < uVar10) {
+      uVar14 = uVar15;
+    }
+    (*(code *)PTR__objc_msgSend_004ae328)
+              (local_188,PTR_s_setMaxTotalThreadsPerObjectThrea_004c6cc0,uVar14);
+    puVar32 = PTR_s_fragmentFunction_004c6cf0;
+    lVar26 = (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_fragmentFunction_004c6cf0);
+    if (lVar26 != 0) {
+      pMVar16 = (MTLRenderPipelineColorAttachmentDescriptorArray *)
+                (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_colorAttachments_004c6750);
+      auVar36 = SetupAttachmentDescriptor
+                          (pMVar16,(StaticGraphicsState *)(param_1 + 0x70),
+                           (DynamicGraphicsState *)param_3);
+      if ((auVar36._0_8_ & 1) != 0) {
+        (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_setLogicOperationEnabled__004c6cf8,1);
+        (*(code *)PTR__objc_msgSend_004ae328)
+                  (local_188,PTR_s_setLogicOperation__004c6d00,auVar36._8_8_);
+      }
+    }
+    pDVar28 = *(D3DMDevice **)(param_1 + 8);
+    if ((pDVar28[0xaca] == (D3DMDevice)0x1) && (D3DMDevice::EnableMPLWithRTV != '\0')) {
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (local_188,PTR_s_setColorAttachmentMappingState__004c6d08,1);
+      pDVar28 = *(D3DMDevice **)(param_1 + 8);
+    }
+    lVar26 = CreateRenderPipelineStateWithMeshDescriptor(pDVar28,local_188,0,&local_f0,&local_160);
+    if (lVar26 != 0) {
+      (*(code *)PTR__objc_release_004ae358)(local_188);
+      goto LAB_0011351f;
+    }
+    if ((*(char *)(param_1 + 0x32e) == '\x01') &&
+       (lVar26 = (*(code *)PTR__objc_msgSend_004ae328)(local_188,puVar32), lVar26 != 0)) {
+      if (__ZZL16D3DMDefaultOSLogvE9onceToken_6875 != -1) {
+        _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_6875,&___block_literal_global_266);
+      }
+      uVar12 = __ZZL16D3DMDefaultOSLogvE6logObj_6876;
+      cVar6 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_6876,0x10);
+      if (cVar6 != '\0') {
+        local_c8._0_4_ = 0x8200202;
+        local_c8._4_4_ = 0x45dc2b;
+        uStack_c0 = 0;
+        uStack_bc = 0x400;
+        uStack_ba = 0x5f5;
+        uStack_b8 = 0;
+        __os_log_error_impl(0,uVar12,0x10,
+                            "[%s:%d][ERROR] Failed to create PSO with streamout - recompiling with fragment shader disabled"
+                            ,&local_c8,0x12);
+      }
+      ::D3DMPrintError("[%s:%d][ERROR] Failed to create PSO with streamout - recompiling with fragment shader disabled\n"
+                       ,"GetRenderPipelineState",0x5f5);
+      (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_setFragmentFunction__004c6748,0);
+      lVar26 = CreateRenderPipelineStateWithMeshDescriptor
+                         (*(D3DMDevice **)(param_1 + 8),local_188,0,&local_f0,&local_160);
+      goto LAB_001133c9;
+    }
+    (*(code *)PTR__objc_release_004ae358)(local_188);
+  }
+  else if (*(long *)(param_1 + 0x540) != 0) {
+    if (*(char *)(*(long *)(param_1 + 8) + 0xac9) == '\x01') {
+      local_188 = (MTLMeshRenderPipelineDescriptor *)
+                  _objc_opt_new(PTR__OBJC_CLASS___MTL4RenderPipelineDescriptor_004c7808);
+      uVar12 = _objc_opt_new(PTR__OBJC_CLASS___MTL4LibraryFunctionDescriptor_004c7810);
+      puVar4 = PTR_s_setName__004c6d10;
+      puVar32 = PTR__objc_msgSend_004ae328;
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (uVar12,PTR_s_setName__004c6d10,*(undefined8 *)(param_1 + 0x550));
+      puVar5 = PTR_s_setLibrary__004c6d18;
+      (*(code *)puVar32)(uVar12,PTR_s_setLibrary__004c6d18,*(undefined8 *)(param_1 + 0x548));
+      local_150 = uVar12;
+      (*(code *)puVar32)(local_188,PTR_s_setVertexFunctionDescriptor__004c6d20,uVar12);
+      uVar12 = _objc_opt_new(PTR__OBJC_CLASS___MTL4LibraryFunctionDescriptor_004c7810);
+      (*(code *)puVar32)(uVar12,puVar4,*(undefined8 *)(param_1 + 0x5a8));
+      (*(code *)puVar32)(uVar12,puVar5,*(undefined8 *)(param_1 + 0x5a0));
+      local_158 = uVar12;
+      (*(code *)puVar32)(local_188,PTR_s_setFragmentFunctionDescriptor__004c6d28,uVar12);
+      (*(code *)puVar32)(local_188,PTR_s_setRasterizationEnabled__004c6740,
+                         (int)*(char *)(param_1 + 0x327));
+      (*(code *)puVar32)(local_188,PTR_s_setAlphaToCoverageState__004c6d30,
+                         *(undefined1 *)(param_1 + 0x32c));
+      (*(code *)puVar32)(local_188,PTR_s_setRasterSampleCount__004c6ca0,
+                         *(undefined1 *)(param_1 + 0x326));
+      (*(code *)puVar32)(local_188,PTR_s_setInputPrimitiveTopology__004c6768,
+                         *(undefined8 *)(param_1 + 0x28e));
+      (*(code *)puVar32)(local_188,PTR_s_setSupportIndirectCommandBuffers_004c6778,param_2 & 1);
+      if (D3DMDevice::EnableMPLWithRTV == '\x01') {
+        (*(code *)PTR__objc_msgSend_004ae328)
+                  (local_188,PTR_s_setColorAttachmentMappingState__004c6d08,1);
+      }
+      uVar12 = _objc_opt_new(PTR__OBJC_CLASS___MTL4LibraryFunctionDescriptor_004c7810);
+      (*(code *)puVar32)(uVar12,puVar4,*(undefined8 *)(param_1 + 0x568));
+      (*(code *)puVar32)(uVar12,puVar5,*(undefined8 *)(param_1 + 0x570));
+      local_60 = uVar12;
+      uVar12 = (*(code *)puVar32)(PTR__OBJC_CLASS___NSArray_004c77c0,
+                                  PTR_s_arrayWithObjects_count__004c6a08,&local_60,1);
+      uVar13 = (*(code *)PTR__objc_msgSend_004ae328)
+                         (local_188,PTR_s_vertexStaticLinkingDescriptor_004c6d38);
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (uVar13,PTR_s_setPrivateFunctionDescriptors__004c6d40,uVar12);
+      auVar36 = (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_colorAttachments_004c6750);
+      local_100 = PTR_s_objectAtIndexedSubscript__004c6600;
+      local_108 = PTR_s_setPixelFormat__004c6410;
+      local_110 = PTR_s_setBlendingState__004c6dc0;
+      local_118 = PTR_s_setSourceRGBBlendFactor__004c6d90;
+      local_120 = PTR_s_setDestinationRGBBlendFactor__004c6d98;
+      local_128 = PTR_s_setRgbBlendOperation__004c6da0;
+      local_130 = PTR_s_setSourceAlphaBlendFactor__004c6da8;
+      local_138 = PTR_s_setDestinationAlphaBlendFactor__004c6db0;
+      local_140 = PTR_s_setAlphaBlendOperation__004c6db8;
+      local_148 = PTR_s_setWriteMask__004c6d60;
+      puVar34 = (undefined1 *)(param_1 + 0x2d1);
+      bVar7 = 0;
+      uVar14 = 0;
+      do {
+        local_f8 = auVar36._0_8_;
+        uVar15 = (ulong)param_3 >> (bVar7 & 0x3f) & 0xff;
+        if ((uVar15 != 0) && (uVar14 < *(byte *)(param_1 + 0x2c5))) {
+          uVar12 = (*(code *)puVar32)(local_f8,local_100,uVar14);
+          (*(code *)puVar32)(uVar12,local_108,uVar15);
+          (*(code *)puVar32)(uVar12,local_110,puVar34[-9]);
+          (*(code *)puVar32)(uVar12,local_118,puVar34[-7]);
+          (*(code *)puVar32)(uVar12,local_120,puVar34[-6]);
+          (*(code *)puVar32)(uVar12,local_128,puVar34[-5]);
+          (*(code *)puVar32)(uVar12,local_130,puVar34[-4]);
+          (*(code *)puVar32)(uVar12,local_138,puVar34[-3]);
+          (*(code *)puVar32)(uVar12,local_140,puVar34[-2]);
+          (*(code *)puVar32)(uVar12,local_148,*puVar34);
+          auVar36._8_8_ = extraout_RDX;
+          auVar36._0_8_ = local_f8;
+        }
+        local_f8 = auVar36._0_8_;
+        uVar14 = uVar14 + 1;
+        puVar34 = puVar34 + 0xc;
+        bVar7 = bVar7 + 8;
+      } while (uVar14 != 8);
+      lVar26 = CreateMTL4RenderPipelineStateWithDescriptor
+                         (*(D3DMDevice **)(param_1 + 8),(MTL4RenderPipelineDescriptor *)local_188,
+                          auVar36._8_8_,&local_f0,&local_160);
+      (*(code *)PTR__objc_release_004ae358)(local_150);
+      (*(code *)PTR__objc_release_004ae358)(local_158);
+    }
+    else {
+      local_188 = (MTLMeshRenderPipelineDescriptor *)
+                  _objc_opt_new(PTR__OBJC_CLASS___MTLRenderPipelineDescriptor_004c7780);
+      puVar32 = PTR__objc_msgSend_004ae328;
+      (*(code *)PTR__objc_msgSend_004ae328)
+                (local_188,PTR_s_setVertexFunction__004c6738,*(undefined8 *)(param_1 + 0x540));
+      (*(code *)puVar32)(local_188,PTR_s_setFragmentFunction__004c6748,
+                         *(undefined8 *)(param_1 + 0x598));
+      (*(code *)puVar32)(local_188,PTR_s_setRasterizationEnabled__004c6740,
+                         (int)*(char *)(param_1 + 0x327));
+      (*(code *)puVar32)(local_188,PTR_s_setAlphaToCoverageEnabled__004c6c98,
+                         (int)*(char *)(param_1 + 0x32c));
+      (*(code *)puVar32)(local_188,PTR_s_setRasterSampleCount__004c6ca0,
+                         *(undefined1 *)(param_1 + 0x326));
+      (*(code *)puVar32)(local_188,PTR_s_setDepthAttachmentPixelFormat__004c6758,lVar26);
+      lVar19 = 0;
+      if ((lVar26 - 0xfdU < 9) && ((0x181UL >> (lVar26 - 0xfdU & 0x3f) & 1) != 0)) {
+        lVar19 = lVar26;
+      }
+      (*(code *)puVar32)(local_188,PTR_s_setStencilAttachmentPixelFormat__004c6760,lVar19);
+      (*(code *)puVar32)(local_188,PTR_s_setInputPrimitiveTopology__004c6768,
+                         *(undefined8 *)(param_1 + 0x28e));
+      (*(code *)puVar32)(local_188,PTR_s_setSupportIndirectCommandBuffers_004c6778,param_2 & 1);
+      local_68 = *(undefined8 *)(param_1 + 0x560);
+      uVar12 = (*(code *)puVar32)(PTR__OBJC_CLASS___NSArray_004c77c0,
+                                  PTR_s_arrayWithObjects_count__004c6a08,&local_68,1);
+      uVar13 = (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_vertexLinkedFunctions_004c6d48)
+      ;
+      (*(code *)PTR__objc_msgSend_004ae328)(uVar13,PTR_s_setPrivateFunctions__004c6cb8,uVar12);
+      if ((*(char *)(*(long *)(param_1 + 8) + 0xaca) == '\x01') &&
+         (D3DMDevice::EnableMPLWithRTV != '\0')) {
+        (*(code *)PTR__objc_msgSend_004ae328)
+                  (local_188,PTR_s_setColorAttachmentMappingState__004c6d08,1);
+      }
+      pMVar16 = (MTLRenderPipelineColorAttachmentDescriptorArray *)
+                (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_colorAttachments_004c6750);
+      auVar36 = SetupAttachmentDescriptor
+                          (pMVar16,(StaticGraphicsState *)(param_1 + 0x70),
+                           (DynamicGraphicsState *)param_3);
+      if ((auVar36._0_8_ & 1) != 0) {
+        (*(code *)PTR__objc_msgSend_004ae328)(local_188,PTR_s_setLogicOperationEnabled__004c6cf8,1);
+        (*(code *)PTR__objc_msgSend_004ae328)
+                  (local_188,PTR_s_setLogicOperation__004c6d00,auVar36._8_8_);
+      }
+      lVar26 = CreateRenderPipelineStateWithDescriptor
+                         (*(D3DMDevice **)(param_1 + 8),(MTLRenderPipelineDescriptor *)local_188,0,
+                          &local_f0,&local_160);
+    }
+LAB_001133c9:
+    (*(code *)PTR__objc_release_004ae358)(local_188);
+    if (lVar26 != 0) goto LAB_0011351f;
+  }
+  if (__ZZL16D3DMDefaultOSLogvE9onceToken_6875 != -1) {
+    _dispatch_once(&__ZZL16D3DMDefaultOSLogvE9onceToken_6875,&___block_literal_global_266);
+  }
+  uVar12 = __ZZL16D3DMDefaultOSLogvE6logObj_6876;
+  cVar6 = _os_log_type_enabled(__ZZL16D3DMDefaultOSLogvE6logObj_6876,0x10);
+  puVar4 = PTR_s_description_004c6c60;
+  puVar32 = PTR_s_UTF8String_004c65f0;
+  if (cVar6 != '\0') {
+    uVar13 = (*(code *)PTR__objc_msgSend_004ae328)(local_160,PTR_s_description_004c6c60);
+    puVar32 = PTR_s_UTF8String_004c65f0;
+    local_b4 = (*(code *)PTR__objc_msgSend_004ae328)(uVar13,PTR_s_UTF8String_004c65f0);
+    pbVar2 = *(byte **)(param_1 + 0x478);
+    local_82 = (byte *)0x4567a0;
+    local_aa = (byte *)0x4567a0;
+    if (pbVar2 != (byte *)0x0) {
+      if ((*pbVar2 & 1) == 0) {
+        local_aa = pbVar2 + 1;
+      }
+      else {
+        local_aa = *(byte **)(pbVar2 + 0x10);
+      }
+    }
+    pbVar2 = *(byte **)(param_1 + 0x498);
+    local_a0 = (byte *)0x4567a0;
+    if (pbVar2 != (byte *)0x0) {
+      if ((*pbVar2 & 1) == 0) {
+        local_a0 = pbVar2 + 1;
+      }
+      else {
+        local_a0 = *(byte **)(pbVar2 + 0x10);
+      }
+    }
+    pbVar2 = *(byte **)(param_1 + 0x490);
+    local_96 = (byte *)0x4567a0;
+    if (pbVar2 != (byte *)0x0) {
+      if ((*pbVar2 & 1) == 0) {
+        local_96 = pbVar2 + 1;
+      }
+      else {
+        local_96 = *(byte **)(pbVar2 + 0x10);
+      }
+    }
+    pbVar2 = *(byte **)(param_1 + 0x480);
+    local_8c = (byte *)0x4567a0;
+    if (pbVar2 != (byte *)0x0) {
+      if ((*pbVar2 & 1) == 0) {
+        local_8c = pbVar2 + 1;
+      }
+      else {
+        local_8c = *(byte **)(pbVar2 + 0x10);
+      }
+    }
+    pbVar2 = *(byte **)(param_1 + 0x488);
+    if (pbVar2 != (byte *)0x0) {
+      if ((*pbVar2 & 1) == 0) {
+        local_82 = pbVar2 + 1;
+      }
+      else {
+        local_82 = *(byte **)(pbVar2 + 0x10);
+      }
+    }
+    local_78 = *(undefined8 *)(param_1 + 0x20);
+    local_c8._0_4_ = 0x8200902;
+    local_c8._4_4_ = 0x45dc2b;
+    uStack_c0 = 0;
+    uStack_bc = 0x400;
+    uStack_ba = 0x657;
+    uStack_b8 = 0;
+    local_b6 = 0x820;
+    local_ac = 0x820;
+    local_a2 = 0x820;
+    local_98 = 0x820;
+    local_8e = 0x820;
+    local_84 = 0x820;
+    local_7a = 0x800;
+    __os_log_error_impl(0,uVar12,0x10,
+                        "[%s:%d][ERROR] Failed to create pipeline state: %s, vs=%s,fs=%s,gs=%s,hs=%s,ds=%s, marking PSO(%llu) as no-op"
+                        ,&local_c8,0x58);
+  }
+  uVar12 = (*(code *)PTR__objc_msgSend_004ae328)(local_160,puVar4);
+  uVar12 = (*(code *)PTR__objc_msgSend_004ae328)(uVar12,puVar32);
+  pbVar2 = *(byte **)(param_1 + 0x478);
+  pcVar20 = "";
+  pcVar30 = "";
+  if (pbVar2 != (byte *)0x0) {
+    if ((*pbVar2 & 1) == 0) {
+      pcVar30 = (char *)(pbVar2 + 1);
+    }
+    else {
+      pcVar30 = *(char **)(pbVar2 + 0x10);
+    }
+  }
+  pbVar2 = *(byte **)(param_1 + 0x498);
+  pcVar31 = "";
+  if (pbVar2 != (byte *)0x0) {
+    if ((*pbVar2 & 1) == 0) {
+      pcVar31 = (char *)(pbVar2 + 1);
+    }
+    else {
+      pcVar31 = *(char **)(pbVar2 + 0x10);
+    }
+  }
+  pbVar2 = *(byte **)(param_1 + 0x490);
+  pcVar24 = "";
+  if (pbVar2 != (byte *)0x0) {
+    if ((*pbVar2 & 1) == 0) {
+      pcVar24 = (char *)(pbVar2 + 1);
+    }
+    else {
+      pcVar24 = *(char **)(pbVar2 + 0x10);
+    }
+  }
+  pbVar2 = *(byte **)(param_1 + 0x480);
+  pcVar25 = "";
+  if (pbVar2 != (byte *)0x0) {
+    if ((*pbVar2 & 1) == 0) {
+      pcVar25 = (char *)(pbVar2 + 1);
+    }
+    else {
+      pcVar25 = *(char **)(pbVar2 + 0x10);
+    }
+  }
+  pbVar2 = *(byte **)(param_1 + 0x488);
+  if (pbVar2 != (byte *)0x0) {
+    if ((*pbVar2 & 1) == 0) {
+      pcVar20 = (char *)(pbVar2 + 1);
+    }
+    else {
+      pcVar20 = *(char **)(pbVar2 + 0x10);
+    }
+  }
+  lVar26 = 0;
+  ::D3DMPrintError("[%s:%d][ERROR] Failed to create pipeline state: %s, vs=%s,fs=%s,gs=%s,hs=%s,ds=%s, marking PSO(%llu) as no-op\n"
+                   ,"GetRenderPipelineState",0x657,uVar12,pcVar30,pcVar31,pcVar24,pcVar25,pcVar20,
+                   *(undefined8 *)(param_1 + 0x20));
+  *(undefined1 *)(param_1 + 0x28) = 1;
+LAB_0011351f:
+  local_168[4] = lVar26;
+  LOCK();
+  *(undefined1 *)(local_168 + 5) = 1;
+  UNLOCK();
+  std::__cxx_atomic_notify_all(local_168 + 5);
+LAB_00113536:
+  if (*(long *)PTR____stack_chk_guard_004ae740 == local_38) {
+    return lVar26;
+  }
+                    /* WARNING: Subroutine does not return */
+  ___stack_chk_fail();
+}
+
+
+=== EncodeDispatchRays @ +0x15fd12 ===
+FUNCTION=EncodeDispatchRays
+ENTRY=0015fd12
+BODY_MIN=0015fd12
+BODY_MAX=0016015a
+PROTOTYPE=undefined __stdcall EncodeDispatchRays(D3D12CommandEncoder * param_1, DispatchRaysCommand * param_2)
+PARAMETERS=2
+PARAM index=0 name=param_1 type=D3D12CommandEncoder * storage=RDI:8
+PARAM index=1 name=param_2 type=DispatchRaysCommand * storage=RSI:8
+CALLERS:
+Entry Point from=unknown
+00570ae2 from=unknown
+0015fd0d from=EncodeDispatchRays
+ENTRY_WINDOW:
+0015fd12  PUSH RBP
+0015fd13  PUSH R15
+0015fd15  PUSH R14
+0015fd17  PUSH R13
+0015fd19  PUSH R12
+0015fd1b  PUSH RBX
+0015fd1c  SUB RSP,0x98
+0015fd23  MOV R14,RSI
+0015fd26  MOV RBX,RDI
+0015fd29  MOV RBP,qword ptr [RDI + 0x28]
+0015fd2d  LEA R15,[RSP + 0x78] -> Stack[-0x50]
+0015fd32  MOV qword ptr [R15],0x0 -> Stack[-0x50]
+0015fd39  MOV RAX,qword ptr [RBP + 0x20]
+0015fd3d  MOV RCX,qword ptr [RAX]
+0015fd40  MOV RCX,qword ptr [RCX + -0x18]
+0015fd44  LEA RDI,[RAX + RCX*0x1]
+0015fd48  MOV RAX,qword ptr [RAX + RCX*0x1]
+0015fd4c  LEA RSI,[0x42ba80] -> 0042ba80
+0015fd53  MOV RDX,R15
+0015fd56  CALL qword ptr [RAX + 0x10]
+0015fd59  MOV RAX,qword ptr [R15] -> Stack[-0x50]
+0015fd5c  TEST RAX,RAX
+0015fd5f  JZ 0x0015fd8c -> 0015fd8c
+0015fd61  MOV R12,qword ptr [RAX + -0x8]
+0015fd65  TEST R12,R12
+DECOMPILE:
+
+/* EncodeDispatchRays(D3D12CommandEncoder&, D3D12::DispatchRaysCommand const&) */
+
+void EncodeDispatchRays(D3D12CommandEncoder *param_1,DispatchRaysCommand *param_2)
+
+{
+  long lVar1;
+  undefined4 uVar2;
+  undefined4 uVar3;
+  undefined4 uVar4;
+  undefined4 uVar5;
+  undefined4 uVar6;
+  undefined4 uVar7;
+  undefined4 uVar8;
+  undefined4 uVar9;
+  undefined4 uVar10;
+  undefined4 uVar11;
+  undefined4 uVar12;
+  undefined4 uVar13;
+  undefined4 uVar14;
+  undefined4 uVar15;
+  undefined4 uVar16;
+  undefined4 uVar17;
+  undefined4 uVar18;
+  undefined4 uVar19;
+  undefined4 uVar20;
+  undefined4 uVar21;
+  undefined4 uVar22;
+  undefined4 uVar23;
+  undefined4 uVar24;
+  undefined4 uVar25;
+  undefined8 uVar26;
+  undefined8 uVar27;
+  undefined8 uVar28;
+  undefined8 uVar29;
+  undefined8 uVar30;
+  undefined *puVar31;
+  undefined *puVar32;
+  undefined8 *puVar33;
+  long lVar34;
+  long *plVar35;
+  long lVar36;
+  undefined8 uVar37;
+  undefined8 uVar38;
+  bool bVar39;
+  undefined8 local_98;
+  undefined8 *local_50;
+  undefined8 local_48;
+  objc_object *local_40;
+  ulonglong local_38;
+  
+  lVar1 = *(long *)(param_1 + 0x28);
+  local_50 = (undefined8 *)0x0;
+  plVar35 = *(long **)(lVar1 + 0x20);
+  (**(code **)(*(long *)((long)plVar35 + *(long *)(*plVar35 + -0x18)) + 0x10))
+            ((long)plVar35 + *(long *)(*plVar35 + -0x18),&_IID_ID3D12StateObject,&local_50);
+  if (local_50 == (undefined8 *)0x0) {
+    lVar34 = 0;
+  }
+  else {
+    plVar35 = (long *)local_50[-1];
+    if (plVar35 == (long *)0x0) {
+      lVar34 = 0;
+    }
+    else {
+      lVar34 = ___dynamic_cast(plVar35,&D3DMUnknown::typeinfo,&D3D12RaytracingStateObject::typeinfo,
+                               0xffffffffffffffff);
+    }
+    plVar35 = (long *)(**(code **)(*plVar35 + 0x18))
+                                (plVar35,PTR___GUID_6ddd0b82_550f_487e_94fe_4473fe0ca95d_004aeb60);
+    (**(code **)(*plVar35 + 0x28))(plVar35);
+  }
+  bVar39 = SUB81(param_1,0);
+  if (((D3D12Device::ForceEIDispatchRays == '\0') && (D3D12Device::ForceICBDispatchRays == '\0')) &&
+     (*(char *)(*(long *)(lVar34 + 0x68) + 0x80) != '\0')) {
+    if (*(long *)(param_2 + 8) != 0) {
+      if ((*(long *)(lVar1 + 0x28) == 0) || (*(int *)(*(long *)(lVar1 + 0x28) + 0x5f0) == 0)) {
+        local_98 = 0;
+      }
+      else {
+        D3DMCommandEncoder::AllocateTransientMemory((uint)&local_50,bVar39);
+        puVar33 = local_50;
+        local_98 = local_48;
+        lVar36 = (*(code *)PTR__objc_msgSend_004ae328)
+                           (*(undefined8 *)(lVar1 + 0x30),PTR_s_contents_004c6490);
+        _memcpy(puVar33,(void *)(lVar36 + *(long *)(lVar1 + 0x38)),
+                (ulong)*(uint *)(*(long *)(lVar1 + 0x28) + 0x5f0));
+      }
+      if (param_1[0x700] == (D3D12CommandEncoder)0x1) {
+        LOCK();
+        DAT_00523f98 = DAT_00523f98 + 1;
+        UNLOCK();
+        if (*(char *)(lVar34 + 0x120) == '\x01') {
+          LOCK();
+          DAT_00523f9c = DAT_00523f9c + 1;
+          UNLOCK();
+        }
+      }
+      uVar37 = D3DMCommandEncoder::GetComputeEncoder((D3DMCommandEncoder *)param_1,0,0x3e);
+      lVar1 = *(long *)(lVar34 + 0x100);
+      (**(code **)(param_1 + 0x1e0))
+                (uVar37,PTR_s_setComputePipelineState__004c64d8,
+                 *(undefined8 *)(*(long *)(lVar1 + 0x20) + 0x18));
+      *(uint *)(*(long *)(param_1 + 0x28) + 8) = *(uint *)(*(long *)(param_1 + 0x28) + 8) | 1;
+      D3DMCommandEncoder::AllocateTransientMemory((uint)&local_50,bVar39);
+      puVar33 = local_50;
+      uVar2 = *(undefined4 *)(param_2 + 8);
+      uVar3 = *(undefined4 *)(param_2 + 0xc);
+      uVar4 = *(undefined4 *)(param_2 + 0x10);
+      uVar5 = *(undefined4 *)(param_2 + 0x14);
+      uVar6 = *(undefined4 *)(param_2 + 0x18);
+      uVar7 = *(undefined4 *)(param_2 + 0x1c);
+      uVar8 = *(undefined4 *)(param_2 + 0x20);
+      uVar9 = *(undefined4 *)(param_2 + 0x24);
+      uVar10 = *(undefined4 *)(param_2 + 0x28);
+      uVar11 = *(undefined4 *)(param_2 + 0x2c);
+      uVar12 = *(undefined4 *)(param_2 + 0x30);
+      uVar13 = *(undefined4 *)(param_2 + 0x34);
+      uVar14 = *(undefined4 *)(param_2 + 0x38);
+      uVar15 = *(undefined4 *)(param_2 + 0x3c);
+      uVar16 = *(undefined4 *)(param_2 + 0x40);
+      uVar17 = *(undefined4 *)(param_2 + 0x44);
+      uVar18 = *(undefined4 *)(param_2 + 0x48);
+      uVar19 = *(undefined4 *)(param_2 + 0x4c);
+      uVar20 = *(undefined4 *)(param_2 + 0x50);
+      uVar21 = *(undefined4 *)(param_2 + 0x54);
+      uVar22 = *(undefined4 *)(param_2 + 0x58);
+      uVar23 = *(undefined4 *)(param_2 + 0x5c);
+      uVar24 = *(undefined4 *)(param_2 + 0x60);
+      uVar25 = *(undefined4 *)(param_2 + 100);
+      local_50[0xc] = *(undefined8 *)(param_2 + 0x68);
+      *(undefined4 *)(local_50 + 10) = uVar22;
+      *(undefined4 *)((long)local_50 + 0x54) = uVar23;
+      *(undefined4 *)(local_50 + 0xb) = uVar24;
+      *(undefined4 *)((long)local_50 + 0x5c) = uVar25;
+      *(undefined4 *)(local_50 + 8) = uVar18;
+      *(undefined4 *)((long)local_50 + 0x44) = uVar19;
+      *(undefined4 *)(local_50 + 9) = uVar20;
+      *(undefined4 *)((long)local_50 + 0x4c) = uVar21;
+      *(undefined4 *)(local_50 + 6) = uVar14;
+      *(undefined4 *)((long)local_50 + 0x34) = uVar15;
+      *(undefined4 *)(local_50 + 7) = uVar16;
+      *(undefined4 *)((long)local_50 + 0x3c) = uVar17;
+      *(undefined4 *)(local_50 + 4) = uVar10;
+      *(undefined4 *)((long)local_50 + 0x24) = uVar11;
+      *(undefined4 *)(local_50 + 5) = uVar12;
+      *(undefined4 *)((long)local_50 + 0x2c) = uVar13;
+      *(undefined4 *)(local_50 + 2) = uVar6;
+      *(undefined4 *)((long)local_50 + 0x14) = uVar7;
+      *(undefined4 *)(local_50 + 3) = uVar8;
+      *(undefined4 *)((long)local_50 + 0x1c) = uVar9;
+      *(undefined4 *)local_50 = uVar2;
+      *(undefined4 *)((long)local_50 + 4) = uVar3;
+      *(undefined4 *)(local_50 + 1) = uVar4;
+      *(undefined4 *)((long)local_50 + 0xc) = uVar5;
+      local_50[0xd] = local_98;
+      puVar32 = PTR_s_gpuAddress_004c6678;
+      puVar31 = PTR__objc_msgSend_004ae328;
+      lVar36 = (*(code *)PTR__objc_msgSend_004ae328)
+                         (*(undefined8 *)(param_1 + 0x30),PTR_s_gpuAddress_004c6678);
+      puVar33[0xe] = lVar36 + 8;
+      lVar36 = (*(code *)puVar31)(*(undefined8 *)(param_1 + 0x38),puVar32);
+      puVar33[0xf] = lVar36 + 8;
+      if (*(long *)(lVar1 + 0x30) == 0) {
+        uVar38 = 0;
+      }
+      else {
+        uVar38 = (*(code *)PTR__objc_msgSend_004ae328)
+                           (*(undefined8 *)(*(long *)(lVar1 + 0x30) + 0x18),
+                            PTR_s_gpuResourceID_004c6788);
+      }
+      puVar33[0x10] = uVar38;
+      if ((D3DMDevice::ResidencySetsEnabled == '\0') && (*(long *)(lVar1 + 0x30) != 0)) {
+        (**(code **)(param_1 + 0x208))
+                  (uVar37,PTR_s_useResource_usage__004c6878,
+                   *(undefined8 *)(*(long *)(lVar1 + 0x30) + 0x18),1);
+      }
+      if ((D3D12Device::IFConfig == 0) && (*(long *)(lVar1 + 0x28) != 0)) {
+        uVar38 = (*(code *)PTR__objc_msgSend_004ae328)
+                           (*(undefined8 *)(*(long *)(lVar1 + 0x28) + 0x18),
+                            PTR_s_gpuResourceID_004c6788);
+        puVar33[0x11] = uVar38;
+        if (D3DMDevice::ResidencySetsEnabled == '\0') {
+          (**(code **)(param_1 + 0x208))
+                    (uVar37,PTR_s_useResource_usage__004c6878,
+                     *(undefined8 *)(*(long *)(lVar1 + 0x28) + 0x18),1);
+        }
+      }
+      *(undefined8 *)((long)puVar33 + 0xa4) = *(undefined8 *)(lVar34 + 0xe8);
+      (**(code **)(param_1 + 0x1c8))
+                (uVar37,PTR_s_setBuffer_offset_atIndex__004c64e8,local_40,local_38,3);
+      D3DMCommandEncoder::UpdateResourceUsage((D3DMCommandEncoder *)param_1,2);
+      (**(code **)(param_1 + 0x1e8))(uVar37,PTR_s_dispatchThreads_threadsPerThread_004c6510);
+    }
+  }
+  else {
+    D3DMCommandEncoder::AllocateTransientMemory((uint)&local_50,bVar39);
+    local_50[0xc] = *(undefined8 *)(param_2 + 0x68);
+    uVar37 = *(undefined8 *)(param_2 + 0x60);
+    local_50[10] = *(undefined8 *)(param_2 + 0x58);
+    local_50[0xb] = uVar37;
+    uVar37 = *(undefined8 *)(param_2 + 0x50);
+    local_50[8] = *(undefined8 *)(param_2 + 0x48);
+    local_50[9] = uVar37;
+    uVar37 = *(undefined8 *)(param_2 + 8);
+    uVar38 = *(undefined8 *)(param_2 + 0x10);
+    uVar26 = *(undefined8 *)(param_2 + 0x18);
+    uVar27 = *(undefined8 *)(param_2 + 0x20);
+    uVar28 = *(undefined8 *)(param_2 + 0x28);
+    uVar29 = *(undefined8 *)(param_2 + 0x30);
+    uVar30 = *(undefined8 *)(param_2 + 0x40);
+    local_50[6] = *(undefined8 *)(param_2 + 0x38);
+    local_50[7] = uVar30;
+    local_50[4] = uVar28;
+    local_50[5] = uVar29;
+    local_50[2] = uVar26;
+    local_50[3] = uVar27;
+    *local_50 = uVar37;
+    local_50[1] = uVar38;
+    DispatchRaysIndirect((D3DMCommandEncoder *)param_1,1,0x68,local_40,local_38);
+  }
+  return;
+}
+
+
+=== DispatchRaysIndirect encoder @ +0x16015b ===
+FUNCTION=DispatchRaysIndirect
+ENTRY=0016015b
+BODY_MIN=0016015b
+BODY_MAX=001607be
+PROTOTYPE=undefined __stdcall DispatchRaysIndirect(D3DMCommandEncoder * param_1, uint param_2, uint param_3, objc_object * param_4, ulonglong param_5)
+PARAMETERS=5
+PARAM index=0 name=param_1 type=D3DMCommandEncoder * storage=RDI:8
+PARAM index=1 name=param_2 type=uint storage=ESI:4
+PARAM index=2 name=param_3 type=uint storage=EDX:4
+PARAM index=3 name=param_4 type=objc_object * storage=RCX:8
+PARAM index=4 name=param_5 type=ulonglong storage=R8:8
+CALLERS:
+Entry Point from=unknown
+00570ae3 from=unknown
+0015feaf from=EncodeDispatchRays
+00131501 from=DrawOrDispatchIndirect
+001631ab from=EncodeDispatchRaysExecuteIndirect
+001631c0 from=EncodeDispatchRaysExecuteIndirect
+ENTRY_WINDOW:
+0016015b  PUSH RBP
+0016015c  PUSH R15
+0016015e  PUSH R14
+00160160  PUSH R13
+00160162  PUSH R12
+00160164  PUSH RBX
+00160165  SUB RSP,0xf8
+0016016c  MOV qword ptr [RSP + 0x98],R8 -> Stack[-0x90]
+00160174  MOV qword ptr [RSP + 0x90],RCX -> Stack[-0x98]
+0016017c  MOV dword ptr [RSP + 0x58],EDX -> Stack[-0xd0]
+00160180  MOV dword ptr [RSP + 0x38],ESI -> Stack[-0xf0]
+00160184  MOV RBX,RDI
+00160187  MOV RAX,qword ptr [RDI + 0x8]
+0016018b  MOV qword ptr [RSP + 0xa0],RAX -> Stack[-0x88]
+00160193  MOV R12,qword ptr [RDI + 0x28]
+00160197  LEA R14,[RSP + 0x60] -> Stack[-0xc8]
+0016019c  MOV qword ptr [R14],0x0 -> Stack[-0xc8]
+001601a3  MOV RAX,qword ptr [R12 + 0x20]
+001601a8  MOV RCX,qword ptr [RAX]
+001601ab  MOV RCX,qword ptr [RCX + -0x18]
+001601af  LEA RDI,[RAX + RCX*0x1]
+001601b3  MOV RAX,qword ptr [RAX + RCX*0x1]
+001601b7  LEA RSI,[0x42ba80] -> 0042ba80
+001601be  MOV RDX,R14
+001601c1  CALL qword ptr [RAX + 0x10]
+DECOMPILE:
+
+/* DispatchRaysIndirect(D3DMCommandEncoder&, unsigned int, unsigned int, objc_object
+   objcproto9MTLBuffer*, unsigned long long) */
+
+void DispatchRaysIndirect
+               (D3DMCommandEncoder *param_1,uint param_2,uint param_3,objc_object *param_4,
+               ulonglong param_5)
+
+{
+  char cVar1;
+  undefined *puVar2;
+  undefined *puVar3;
+  char cVar4;
+  long lVar5;
+  long *plVar6;
+  long lVar7;
+  long lVar8;
+  undefined8 uVar9;
+  undefined8 *puVar10;
+  ulong uVar11;
+  void *pvVar12;
+  undefined1 auVar13 [16];
+  ulong local_e0;
+  void *local_c8;
+  long lStack_c0;
+  undefined8 local_b8;
+  undefined8 local_b0;
+  undefined4 local_a8;
+  undefined4 local_a4;
+  long local_a0;
+  objc_object *local_98;
+  ulonglong local_90;
+  long local_88;
+  ulong local_80;
+  undefined8 uStack_78;
+  undefined8 local_70;
+  undefined8 local_68;
+  undefined8 uStack_60;
+  undefined8 local_58;
+  void *local_50 [2];
+  undefined8 local_40;
+  ulong local_38;
+  
+  local_88 = *(long *)(param_1 + 8);
+  lVar8 = *(long *)(param_1 + 0x28);
+  local_c8 = (void *)0x0;
+  plVar6 = *(long **)(lVar8 + 0x20);
+  local_98 = param_4;
+  local_90 = param_5;
+  (**(code **)(*(long *)((long)plVar6 + *(long *)(*plVar6 + -0x18)) + 0x10))
+            ((long)plVar6 + *(long *)(*plVar6 + -0x18),&_IID_ID3D12StateObject,&local_c8);
+  if (local_c8 == (void *)0x0) {
+    lVar5 = 0;
+  }
+  else {
+    plVar6 = *(long **)((long)local_c8 + -8);
+    if (plVar6 == (long *)0x0) {
+      lVar5 = 0;
+    }
+    else {
+      lVar5 = ___dynamic_cast(plVar6,&D3DMUnknown::typeinfo,&D3D12RaytracingStateObject::typeinfo,
+                              0xffffffffffffffff);
+    }
+    plVar6 = (long *)(**(code **)(*plVar6 + 0x18))
+                               (plVar6,PTR___GUID_6ddd0b82_550f_487e_94fe_4473fe0ca95d_004aeb60);
+    (**(code **)(*plVar6 + 0x28))(plVar6);
+  }
+  cVar4 = D3D12Device::ForceICBDispatchRays;
+  cVar1 = *(char *)(*(long *)(lVar5 + 0x68) + 0x80);
+  if ((*(long *)(lVar8 + 0x28) == 0) || (*(int *)(*(long *)(lVar8 + 0x28) + 0x5f0) == 0)) {
+    lStack_c0 = 0;
+  }
+  else {
+    D3DMCommandEncoder::AllocateTransientMemory((uint)&local_c8,SUB81(param_1,0));
+    pvVar12 = local_c8;
+    lVar7 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (*(undefined8 *)(lVar8 + 0x30),PTR_s_contents_004c6490);
+    _memcpy(pvVar12,(void *)(lVar7 + *(long *)(lVar8 + 0x38)),
+            (ulong)*(uint *)(*(long *)(lVar8 + 0x28) + 0x5f0));
+  }
+  uVar11 = (ulong)param_2;
+  D3DMCommandEncoder::AllocateTransientMemory((uint)local_50,SUB81(param_1,0));
+  if (param_2 != 0) {
+    *(long *)((long)local_50[0] + 0x68) = lStack_c0;
+    puVar3 = PTR_s_gpuAddress_004c6678;
+    puVar2 = PTR__objc_msgSend_004ae328;
+    lVar8 = (*(code *)PTR__objc_msgSend_004ae328)
+                      (*(undefined8 *)(param_1 + 0x30),PTR_s_gpuAddress_004c6678);
+    *(long *)((long)local_50[0] + 0x70) = lVar8 + 8;
+    lVar8 = (*(code *)puVar2)(*(undefined8 *)(param_1 + 0x38),puVar3);
+    *(long *)((long)local_50[0] + 0x78) = lVar8 + 8;
+    if (cVar1 != '\0' && cVar4 == '\0') {
+      lVar8 = *(long *)(lVar5 + 0x100);
+      lVar7 = *(long *)(lVar8 + 0x30);
+      if (lVar7 == 0) {
+        uVar9 = 0;
+      }
+      else {
+        uVar9 = (*(code *)PTR__objc_msgSend_004ae328)
+                          (*(undefined8 *)(lVar7 + 0x18),PTR_s_gpuResourceID_004c6788);
+      }
+      *(undefined8 *)((long)local_50[0] + 0x80) = uVar9;
+      if ((D3D12Device::IFConfig == 0) && (lVar8 = *(long *)(lVar8 + 0x28), lVar8 != 0)) {
+        uVar9 = (*(code *)PTR__objc_msgSend_004ae328)
+                          (*(undefined8 *)(lVar8 + 0x18),PTR_s_gpuResourceID_004c6788);
+        *(undefined8 *)((long)local_50[0] + 0x88) = uVar9;
+      }
+    }
+    *(undefined8 *)((long)local_50[0] + 0xa4) = *(undefined8 *)(lVar5 + 0xe8);
+    if (param_2 != 1) {
+      lVar8 = uVar11 - 1;
+      pvVar12 = local_50[0];
+      do {
+        pvVar12 = (void *)((long)pvVar12 + 0xb8);
+        _memcpy(pvVar12,local_50[0],0xb8);
+        lVar8 = lVar8 + -1;
+      } while (lVar8 != 0);
+    }
+  }
+  if (cVar1 != '\0' && cVar4 == '\0') {
+    auVar13 = ZEXT816(0);
+  }
+  else {
+    auVar13 = D3DMCommandAllocator::GetIndirectCommandBuffer
+                        (*(D3DMCommandAllocator **)(param_1 + 0x288),param_2,0x4000000000000040);
+  }
+  puVar3 = PTR_s_gpuAddress_004c6678;
+  puVar2 = PTR__objc_msgSend_004ae328;
+  local_e0 = auVar13._8_8_;
+  lVar7 = auVar13._0_8_;
+  lVar8 = (*(code *)PTR__objc_msgSend_004ae328)(local_98,PTR_s_gpuAddress_004c6678);
+  local_c8 = (void *)(lVar8 + local_90);
+  lStack_c0 = (*(code *)puVar2)(local_40,puVar3);
+  lStack_c0 = lStack_c0 + local_38;
+  local_b8._0_6_ = CONCAT15(lVar7 != 0,CONCAT14(cVar1 != '\0',param_3));
+  local_a8 = auVar13._8_4_;
+  if (lVar7 == 0) {
+    local_b0 = 0;
+    local_a4 = *(undefined4 *)(lVar5 + 0x108);
+    local_a0 = 0;
+  }
+  else {
+    local_b0 = (*(code *)PTR__objc_msgSend_004ae328)(lVar7,PTR_s_gpuResourceID_004c6788);
+    local_a4 = *(undefined4 *)(lVar5 + 0x108);
+    puVar10 = (undefined8 *)(**(code **)(**(long **)(lVar5 + 0x118) + 0x20))();
+    local_a0 = puVar10[4];
+    if (local_a0 == 0) {
+      local_a0 = (*(code *)PTR__objc_msgSend_004ae328)(*puVar10,puVar3);
+      puVar10[4] = local_a0;
+    }
+  }
+  uVar9 = D3DMCommandEncoder::GetComputeEncoder(param_1,0,6);
+  (**(code **)(param_1 + 0x1e0))
+            (uVar9,PTR_s_setComputePipelineState__004c64d8,*(undefined8 *)(local_88 + 0x5d8));
+  *(uint *)(*(long *)(param_1 + 0x28) + 8) = *(uint *)(*(long *)(param_1 + 0x28) + 8) | 1;
+  if ((lVar7 != 0) && (D3DMDevice::ResidencySetsEnabled == '\0')) {
+    (*(code *)PTR__objc_msgSend_004ae328)(uVar9,PTR_s_useResource_usage__004c6878,lVar7,2);
+  }
+  D3DMCommandEncoder::UpdateResourceUsage(param_1,2);
+  (**(code **)(param_1 + 0x1d8))(uVar9,PTR_s_setBytes_length_atIndex__004c64f0,&local_c8,0x30,3);
+  local_68 = 0x20;
+  uStack_60 = 1;
+  local_58 = 1;
+  uStack_78 = 1;
+  local_70 = 1;
+  local_80 = uVar11;
+  (**(code **)(param_1 + 0x1e8))(uVar9,PTR_s_dispatchThreads_threadsPerThread_004c6510);
+  D3DMCommandEncoder::EnqueueInternalBarrier(param_1,4,4);
+  uVar9 = D3DMCommandEncoder::GetComputeEncoder(param_1,0,0x3e);
+  puVar2 = PTR_s_useResource_usage__004c6878;
+  if (D3DMDevice::ResidencySetsEnabled == '\0') {
+    for (puVar10 = *(undefined8 **)(lVar5 + 0x100); puVar10 != (undefined8 *)0x0;
+        puVar10 = (undefined8 *)*puVar10) {
+      if (puVar10[6] != 0) {
+        (**(code **)(param_1 + 0x208))(uVar9,puVar2,*(undefined8 *)(puVar10[6] + 0x18),1);
+      }
+      if ((D3D12Device::IFConfig == 0) && (puVar10[5] != 0)) {
+        (**(code **)(param_1 + 0x208))(uVar9,puVar2,*(undefined8 *)(puVar10[5] + 0x18),1);
+      }
+    }
+  }
+  if (param_1[0x700] == (D3DMCommandEncoder)0x1) {
+    LOCK();
+    DAT_00523f98 = DAT_00523f98 + param_2;
+    UNLOCK();
+    if (*(char *)(lVar5 + 0x120) == '\x01') {
+      LOCK();
+      DAT_00523f9c = DAT_00523f9c + param_2;
+      UNLOCK();
+    }
+  }
+  if (lVar7 == 0) {
+    (**(code **)(param_1 + 0x1e0))
+              (uVar9,PTR_s_setComputePipelineState__004c64d8,
+               *(undefined8 *)(*(long *)(*(long *)(lVar5 + 0x100) + 0x20) + 0x18));
+    *(uint *)(*(long *)(param_1 + 0x28) + 8) = *(uint *)(*(long *)(param_1 + 0x28) + 8) | 1;
+    puVar2 = PTR_s_dispatchThreadgroupsWithIndirect_004c6868;
+    if (param_2 != 0) {
+      do {
+        (**(code **)(param_1 + 0x1c8))
+                  (uVar9,PTR_s_setBuffer_offset_atIndex__004c64e8,local_40,local_38 & 0xffffffff,3);
+        local_c8 = (void *)0x20;
+        lStack_c0 = 1;
+        local_b8 = 1;
+        (**(code **)(param_1 + 0x1f8))(uVar9,puVar2,local_40,(int)local_38 + 0x98);
+        uVar11 = uVar11 - 1;
+        local_38 = local_38 + 0xb8;
+      } while (uVar11 != 0);
+    }
+  }
+  else {
+    if (D3DMDevice::ResidencySetsEnabled == '\0') {
+      (*(code *)PTR__objc_msgSend_004ae328)(uVar9,PTR_s_useResource_usage__004c6878,lVar7,1);
+    }
+    (*(code *)PTR__objc_msgSend_004ae328)
+              (uVar9,PTR_s_executeCommandsInBuffer_withRang_004c7348,lVar7,local_e0 & 0xffffffff,
+               uVar11);
+  }
+  return;
+}
+
+
