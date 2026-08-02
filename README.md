@@ -1,5 +1,30 @@
 # Yet another anime game launcher (Yaagl)
 
+## Yaagl ZZZ DX12 experimental fork
+
+This fork contains experimental work for running the **ZZZ OS** release through
+the Direct3D 12 path on Apple Silicon. It has only been tested with ZZZ OS; ZZZ
+CN and the other supported games have not been validated with these changes.
+
+**macOS 27 is required to use this fork as intended.**
+
+Work included in this fork:
+
+- A GPTK 4.0 beta 2 / D3DMetal Direct3D 12 launch path for ZZZ OS.
+- MetalFX integration through GPTK's `nvngx-on-metalfx` runtime.
+- DXR and ray-tracing shader translation investigation and compatibility work.
+- Selectable NVIDIA RTX 4060 and RTX 5060 identities for controlled comparison.
+- Runtime evidence collection and Ghidra notes for the D3DMetal DXR flow.
+
+The branches intentionally keep different experimental scopes:
+
+- `main`: clean GPTK/MetalFX baseline without the diagnostic sidecar or hooks.
+- `dev`: full diagnostic Metal-IR sidecar, capture code, and runtime hooks.
+- `codex/zzz-minimal-rt-shim`: minimal RT translation shim without the full
+  capture and observer stack.
+
+This is research software. Back up relevant data and use a test account.
+
 ## Current Supported Game Version:
 ### GI: 5.3.0+ OS/CN **
 ### HSR: 4.3.0 OS/CN
