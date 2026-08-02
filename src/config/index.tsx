@@ -31,6 +31,7 @@ import { createLeftCmdConfig } from "./left-cmd";
 import { createWineDistroConfig } from "./wine-distribution";
 import createLocaleConfig from "./ui-locale";
 import createFPSUnlock from "./fps-unlock";
+import { createD3DMetalGpuSpoofConfig } from "./d3dmetal-gpu-spoof";
 import {
   exec2,
   getKeyOrDefault,
@@ -207,6 +208,7 @@ export async function createConfiguration({
     config,
   });
   const [MH] = await createMetalHUDConfig({ locale, config });
+  const [GPU] = await createD3DMetalGpuSpoofConfig({ config });
   const [R] = await createRetinaConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
   const [GID] = await createGameInstallDirConfig({
@@ -393,6 +395,7 @@ export async function createConfiguration({
                     <Text>D3DMetal: 4.0b2</Text>
                     <D3DMetalMtl4Status />
                     <Text>Direct3D: ZZZ DX12 selector (-use-d3d12)</Text>
+                    <GPU />
                     <D3DMetalMetalFxStatus />
                     <D3DMetalDxrStatus />
                     <Text>Steam stub + timeout fix: enabled</Text>

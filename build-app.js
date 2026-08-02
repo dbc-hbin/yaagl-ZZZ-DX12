@@ -83,26 +83,6 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   }
   try {
     await fs.writeJSON(neutralinoConfigPath, config);
-    if (process.env["YAAGL_CHANNEL_CLIENT"] === "naposdx12") {
-      await Promise.all([
-        execa("bash", [
-          path.resolve(process.cwd(), "scripts", "build-metal-ir-capture.sh"),
-        ]),
-        execa("bash", [
-          path.resolve(
-            process.cwd(),
-            "scripts",
-            "build-capture-fs-helper.sh"
-          ),
-        ]),
-      ]);
-      // The renderer bundle embeds this exact dylib identity. Synchronize it
-      // before TypeScript/Vite so a later native rebuild cannot make the shipped
-      // frontend reject its own sidecar.
-      await execa("node", [
-        path.resolve(process.cwd(), "scripts", "sync-metal-ir-hash.mjs"),
-      ]);
-    }
     await execa("pnpm", ["exec", "tsc"]); // do typecheck first
     await execa("rm", ["-rf", "./.tmp"]);
     await execa("pnpm", ["exec", "vite", "build"]);
@@ -316,31 +296,12 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
   }
   // Remove potentially existing dev sophon_server from sidecar
   await fs.remove(path.resolve(process.cwd(), `sidecar`, `sophon_server`));
-  // The DX12 diagnostic binaries are rebuilt immediately above. Remove the
-  // destination tree so fs-extra cannot preserve a stale same-name artifact
-  // from an earlier bundle when timestamps or copy metadata happen to match.
   await fs.remove(sidecarDst);
   await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
     preserveTimestamps: true,
+    filter: source =>
+      !source.startsWith(path.resolve(process.cwd(), "sidecar", "diagnostics")),
   });
-  if (process.env["YAAGL_CHANNEL_CLIENT"] === "naposdx12") {
-    for (const diagnostic of [
-      "libyaagl-metal-ir-capture.dylib",
-      "yaagl-capture-fs-helper",
-    ]) {
-      const source = path.resolve(
-        process.cwd(),
-        "sidecar",
-        "diagnostics",
-        diagnostic
-      );
-      const destination = path.resolve(sidecarDst, "diagnostics", diagnostic);
-      await fs.copyFile(source, destination);
-      if (!(await fs.readFile(source)).equals(await fs.readFile(destination))) {
-        throw new Error(`DX12 diagnostic bundle copy mismatch: ${diagnostic}`);
-      }
-    }
-  }
   // Remove protonextras for hkrpg
   if (["hkrpgcn", "hkrpgos"].includes(process.env["YAAGL_CHANNEL_CLIENT"])) {
     await fs.remove(path.resolve(sidecarDst, "protonextras"));

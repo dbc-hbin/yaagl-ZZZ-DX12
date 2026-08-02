@@ -10,9 +10,10 @@ import {
   writeFile,
 } from "@utils";
 import {
+  createD3DMetalLaunchEnvironment,
   D3DMETAL_INHERITED_ENVIRONMENT_BLOCKLIST,
-  D3DMETAL_LAUNCH_ENVIRONMENT,
   D3DMETAL_VERSION,
+  ZzzD3DMetalGpuSpoof,
   ZZZ_D3D12_SELECTOR,
 } from "../wine/d3dmetal";
 import {
@@ -109,7 +110,9 @@ export interface D3DMetalLaunchProfile {
   arguments: string[];
   environment: Record<string, string>;
   launchExitCode: number | null;
-  metalIrTerminalStatus: "complete" | "incomplete" | "unavailable" | null;
+  /** Persisted selection used to build the exact D3DMetal DXGI profile. */
+  gpuSpoof?: ZzzD3DMetalGpuSpoof;
+  metalIrTerminalStatus?: "complete" | "incomplete" | "unavailable" | null;
   metalIrSessionRoot?: string;
   metalIrAggregation?: D3DMetalMetalIrAggregation;
   metalIrProbe?: {
@@ -253,13 +256,14 @@ export interface D3DMetalCaptureAcknowledgement
   rawSha256: string;
 }
 
-export const D3DMETAL_CAPTURE_MAX_CONTROL_BYTES =
-  METAL_IR_V2_MAX_CONTROL_BYTES;
+export const D3DMETAL_CAPTURE_MAX_CONTROL_BYTES = METAL_IR_V2_MAX_CONTROL_BYTES;
 
 function secureHexToken(bytes = 16) {
   const data = new Uint8Array(bytes);
   crypto.getRandomValues(data);
-  return Array.from(data, value => value.toString(16).padStart(2, "0")).join("");
+  return Array.from(data, value => value.toString(16).padStart(2, "0")).join(
+    ""
+  );
 }
 
 export interface D3DMetalProcessCandidate {
@@ -277,7 +281,9 @@ export interface D3DMetalProcessIdentity {
   args?: string;
 }
 
-export function parseD3DMetalProcessIdentity(value: string): D3DMetalProcessIdentity | null {
+export function parseD3DMetalProcessIdentity(
+  value: string
+): D3DMetalProcessIdentity | null {
   const match = /^\s*(\d+)\s+(.+?)\s*$/.exec(value);
   if (!match) return null;
   const pid = Number(match[1]);
@@ -290,8 +296,13 @@ export function equalD3DMetalProcessIdentity(
   left: D3DMetalProcessIdentity | null | undefined,
   right: D3DMetalProcessIdentity | null | undefined
 ) {
-  return !!left && !!right && left.pid === right.pid &&
-    left.uid === right.uid && left.startIdentity === right.startIdentity;
+  return (
+    !!left &&
+    !!right &&
+    left.pid === right.pid &&
+    left.uid === right.uid &&
+    left.startIdentity === right.startIdentity
+  );
 }
 
 export function parseD3DMetalDetailedProcessIdentity(
@@ -300,7 +311,12 @@ export function parseD3DMetalDetailedProcessIdentity(
   const match = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(.{24})\s*(.*)$/.exec(value);
   if (!match) return null;
   const [pid, uid, ppid] = match.slice(1, 4).map(Number);
-  if (![pid, uid, ppid].every(Number.isSafeInteger) || pid <= 0 || uid < 0 || ppid < 0) {
+  if (
+    ![pid, uid, ppid].every(Number.isSafeInteger) ||
+    pid <= 0 ||
+    uid < 0 ||
+    ppid < 0
+  ) {
     return null;
   }
   return {
@@ -333,8 +349,11 @@ function parseLsofBigInt(value: string, radix: 10 | 16) {
 }
 
 /** Parse NUL-delimited lsof -F0pcfDintn output without relying on field order. */
-export function parseD3DMetalLsofFields(output: Uint8Array | string): D3DMetalLsofRecord[] {
-  const bytes = typeof output === "string" ? new TextEncoder().encode(output) : output;
+export function parseD3DMetalLsofFields(
+  output: Uint8Array | string
+): D3DMetalLsofRecord[] {
+  const bytes =
+    typeof output === "string" ? new TextEncoder().encode(output) : output;
   const records: D3DMetalLsofRecord[] = [];
   let current: D3DMetalLsofRecord | undefined;
   let seenPid = false;
@@ -344,11 +363,13 @@ export function parseD3DMetalLsofFields(output: Uint8Array | string): D3DMetalLs
     const tag = String.fromCharCode(token[0]);
     const value = new TextDecoder().decode(new Uint8Array(token.slice(1)));
     token = [];
-    if (!"pcfDintn".includes(tag)) throw new Error(`unknown lsof field: ${tag}`);
+    if (!"pcfDintn".includes(tag))
+      throw new Error(`unknown lsof field: ${tag}`);
     if (tag === "p") {
       if (seenPid) throw new Error("duplicate lsof process");
       const pid = Number(value);
-      if (!Number.isSafeInteger(pid) || pid <= 0) throw new Error("invalid lsof pid");
+      if (!Number.isSafeInteger(pid) || pid <= 0)
+        throw new Error("invalid lsof pid");
       if (current) records.push(current);
       current = { pid };
       seenPid = true;
@@ -356,30 +377,26 @@ export function parseD3DMetalLsofFields(output: Uint8Array | string): D3DMetalLs
     }
     if (!current) throw new Error("lsof field before pid");
     if (tag === "c") {
-      if (current.command !== undefined) throw new Error("duplicate lsof command");
+      if (current.command !== undefined)
+        throw new Error("duplicate lsof command");
       current.command = value;
-    }
-    else if (tag === "f") {
+    } else if (tag === "f") {
       if (current.fd !== undefined || current.name !== undefined) {
         records.push(current);
         current = { pid: current.pid, command: current.command };
       }
       if (current.fd !== undefined) throw new Error("duplicate lsof fd");
       current.fd = value;
-    }
-    else if (tag === "D") {
+    } else if (tag === "D") {
       if (current.dev !== undefined) throw new Error("duplicate lsof device");
       current.dev = parseLsofBigInt(value, 16);
-    }
-    else if (tag === "i") {
+    } else if (tag === "i") {
       if (current.inode !== undefined) throw new Error("duplicate lsof inode");
       current.inode = parseLsofBigInt(value, 10);
-    }
-    else if (tag === "t") {
+    } else if (tag === "t") {
       if (current.type !== undefined) throw new Error("duplicate lsof type");
       current.type = value.trim();
-    }
-    else if (tag === "n") {
+    } else if (tag === "n") {
       if (current.name !== undefined) throw new Error("duplicate lsof name");
       current.name = value;
     }
@@ -409,36 +426,61 @@ export interface D3DMetalExpectedVnodeFsOperations {
 }
 
 function isAbsoluteCleanD3DMetalPath(path: string) {
-  return path.startsWith("/") && !path.split("/").some(part => part === "." || part === ".." || part.includes("\\"));
+  return (
+    path.startsWith("/") &&
+    !path
+      .split("/")
+      .some(part => part === "." || part === ".." || part.includes("\\"))
+  );
 }
 
 export async function preflightD3DMetalExpectedVnode(
   requestedPath: string,
   fs: D3DMetalExpectedVnodeFsOperations
 ): Promise<D3DMetalExpectedVnodePath> {
-  if (!isAbsoluteCleanD3DMetalPath(requestedPath)) throw new Error("expected vnode path must be absolute and clean");
+  if (!isAbsoluteCleanD3DMetalPath(requestedPath))
+    throw new Error("expected vnode path must be absolute and clean");
   const parts = requestedPath.split("/").filter(Boolean);
   let current = "";
   for (const part of parts.slice(0, -1)) {
     current += `/${part}`;
     const entry = await fs.lstat(current);
-    if (entry.type === "LNK") throw new Error("expected vnode path contains symlink component");
-    if (entry.type !== "DIR") throw new Error("expected vnode parent is not a directory");
+    if (entry.type === "LNK")
+      throw new Error("expected vnode path contains symlink component");
+    if (entry.type !== "DIR")
+      throw new Error("expected vnode parent is not a directory");
   }
   const link = await fs.lstat(requestedPath);
-  if (link.type !== "REG") throw new Error("expected vnode is not a regular file");
+  if (link.type !== "REG")
+    throw new Error("expected vnode is not a regular file");
   const canonicalPath = await fs.realpath(requestedPath);
-  if (!isAbsoluteCleanD3DMetalPath(canonicalPath)) throw new Error("canonical vnode path is not clean");
+  if (!isAbsoluteCleanD3DMetalPath(canonicalPath))
+    throw new Error("canonical vnode path is not clean");
   const target = await fs.stat(requestedPath);
-  if (target.type !== "REG" || target.dev === undefined || target.ino === undefined) throw new Error("expected vnode stat rejected");
+  if (
+    target.type !== "REG" ||
+    target.dev === undefined ||
+    target.ino === undefined
+  )
+    throw new Error("expected vnode stat rejected");
   const canonicalLink = await fs.lstat(canonicalPath);
   const canonicalTarget = await fs.stat(canonicalPath);
-  if (canonicalLink.type !== "REG" || canonicalTarget.type !== "REG" ||
-      canonicalTarget.dev !== target.dev || canonicalTarget.ino !== target.ino ||
-      target.ino <= BigInt(0)) {
+  if (
+    canonicalLink.type !== "REG" ||
+    canonicalTarget.type !== "REG" ||
+    canonicalTarget.dev !== target.dev ||
+    canonicalTarget.ino !== target.ino ||
+    target.ino <= BigInt(0)
+  ) {
     throw new Error("expected canonical vnode identity rejected");
   }
-  return { requestedPath, canonicalPath, realPath: canonicalPath === requestedPath ? undefined : canonicalPath, device: target.dev, inode: target.ino };
+  return {
+    requestedPath,
+    canonicalPath,
+    realPath: canonicalPath === requestedPath ? undefined : canonicalPath,
+    device: target.dev,
+    inode: target.ino,
+  };
 }
 
 export interface D3DMetalVnodePathEvidence {
@@ -456,9 +498,15 @@ export function isD3DMetalExpectedVnodePath(
   evidence: D3DMetalVnodePathEvidence,
   expected: D3DMetalExpectedVnodePath
 ) {
-  if (evidence.type !== "REG" || evidence.dev !== expected.device || evidence.inode !== expected.inode) return false;
+  if (
+    evidence.type !== "REG" ||
+    evidence.dev !== expected.device ||
+    evidence.inode !== expected.inode
+  )
+    return false;
   const name = normalizeD3DMetalPath(evidence.name || "");
-  const paths = [expected.canonicalPath, expected.realPath].filter((value): value is string => !!value)
+  const paths = [expected.canonicalPath, expected.realPath]
+    .filter((value): value is string => !!value)
     .map(normalizeD3DMetalPath);
   return paths.includes(name);
 }
@@ -484,27 +532,57 @@ export function validateD3DMetalExpectedVnode(
       .filter((value): value is string => typeof value === "string")
       .map(normalizeD3DMetalPath)
   );
-  const matches = records.filter(record => record.type === "REG" && paths.has(normalizeD3DMetalPath(record.name || "")) && !/ \(deleted\)$/i.test(record.name || ""));
+  const matches = records.filter(
+    record =>
+      record.type === "REG" &&
+      paths.has(normalizeD3DMetalPath(record.name || "")) &&
+      !/ \(deleted\)$/i.test(record.name || "")
+  );
   if (!matches.length) return { ok: false, reason: "missing" };
-  const aliases = records.filter(record => record.type === "REG" && record.dev === expected.device && record.inode === expected.inode && !paths.has(normalizeD3DMetalPath(record.name || "")));
+  const aliases = records.filter(
+    record =>
+      record.type === "REG" &&
+      record.dev === expected.device &&
+      record.inode === expected.inode &&
+      !paths.has(normalizeD3DMetalPath(record.name || ""))
+  );
   if (aliases.length) return { ok: false, reason: "hard-link-alias" };
-  const vnodes = new Set(matches.map(record => `${record.dev?.toString()}:${record.inode?.toString()}`));
+  const vnodes = new Set(
+    matches.map(
+      record => `${record.dev?.toString()}:${record.inode?.toString()}`
+    )
+  );
   if (vnodes.size !== 1) return { ok: false, reason: "conflicting-vnode" };
   const vnode = matches[0];
-  if (vnode.dev !== expected.device || vnode.inode !== expected.inode) return { ok: false, reason: "hard-link-alias" };
-  return { ok: true, vnode: { dev: vnode.dev!, inode: vnode.inode! }, paths: [...new Set(matches.map(record => record.name!))] };
+  if (vnode.dev !== expected.device || vnode.inode !== expected.inode)
+    return { ok: false, reason: "hard-link-alias" };
+  return {
+    ok: true,
+    vnode: { dev: vnode.dev!, inode: vnode.inode! },
+    paths: [...new Set(matches.map(record => record.name!))],
+  };
 }
 
 export function hasD3DMetalRuntimeModules(records: D3DMetalLsofRecord[]) {
-  return records.some(record => /D3DMetal\.framework(?:\/|$)/i.test(record.name || "")) &&
-    records.some(record => /(?:^|\/)d3d12\.dll(?:$|\s)/i.test(record.name || ""));
+  return (
+    records.some(record =>
+      /D3DMetal\.framework(?:\/|$)/i.test(record.name || "")
+    ) &&
+    records.some(record =>
+      /(?:^|\/)d3d12\.dll(?:$|\s)/i.test(record.name || "")
+    )
+  );
 }
 
 export function hasD3DMetalRequiredArtifacts(
   records: D3DMetalLsofRecord[],
   requiredPaths: readonly string[]
 ) {
-  const actual = new Set(records.filter(record => record.type === "REG" && record.name).map(record => normalizeD3DMetalPath(record.name!)));
+  const actual = new Set(
+    records
+      .filter(record => record.type === "REG" && record.name)
+      .map(record => normalizeD3DMetalPath(record.name!))
+  );
   const required = new Set(requiredPaths.map(normalizeD3DMetalPath));
   return [...required].every(path => actual.has(path));
 }
@@ -513,7 +591,9 @@ export function validateD3DMetalRequiredVnodes(
   records: D3DMetalLsofRecord[],
   expected: readonly D3DMetalExpectedVnodePath[]
 ) {
-  const validations = expected.map(item => validateD3DMetalExpectedVnode(records, item));
+  const validations = expected.map(item =>
+    validateD3DMetalExpectedVnode(records, item)
+  );
   if (validations.some(item => !item.ok)) {
     return { ok: false as const, validations };
   }
@@ -524,7 +604,8 @@ export function validateD3DMetalRequiredVnodes(
       device: item.device,
       inode: item.inode,
       paths: validations[index].ok
-        ? (validations[index] as Extract<D3DMetalVnodeValidation, { ok: true }>).paths
+        ? (validations[index] as Extract<D3DMetalVnodeValidation, { ok: true }>)
+            .paths
         : [],
     })),
   };
@@ -534,9 +615,14 @@ export function equalD3DMetalRequiredVnodes(
   left: readonly D3DMetalExpectedVnodePath[],
   right: readonly D3DMetalExpectedVnodePath[]
 ) {
-  return left.length === right.length && left.every((item, index) =>
-    item.canonicalPath === right[index].canonicalPath &&
-    item.device === right[index].device && item.inode === right[index].inode
+  return (
+    left.length === right.length &&
+    left.every(
+      (item, index) =>
+        item.canonicalPath === right[index].canonicalPath &&
+        item.device === right[index].device &&
+        item.inode === right[index].inode
+    )
   );
 }
 
@@ -571,8 +657,14 @@ export function findAuthoritativeD3DMetalGameCandidates(
   return rows.filter(row => {
     const normalized = row.args.replaceAll("\\", "/").toLowerCase();
     const exactCommand =
-      new RegExp(`(?:^|\\s)"?${escapeRegExp(expected)}(?:"?(?:\\s|$))`, "i").test(normalized) ||
-      new RegExp(`(?:^|\\s)"?${escapeRegExp(nativeExpected)}(?:"?(?:\\s|$))`, "i").test(normalized);
+      new RegExp(
+        `(?:^|\\s)"?${escapeRegExp(expected)}(?:"?(?:\\s|$))`,
+        "i"
+      ).test(normalized) ||
+      new RegExp(
+        `(?:^|\\s)"?${escapeRegExp(nativeExpected)}(?:"?(?:\\s|$))`,
+        "i"
+      ).test(normalized);
     return (
       exactCommand &&
       normalized.includes(basename) &&
@@ -593,10 +685,11 @@ export async function waitForD3DMetalCaptureAcknowledgement({
   expectedVnode,
   expectedVnodes,
   requiredArtifactPaths,
-  enumerate = () => enumerateD3DMetalCaptureAcknowledgements({
-    directory: path,
-    expected,
-  }),
+  enumerate = () =>
+    enumerateD3DMetalCaptureAcknowledgements({
+      directory: path,
+      expected,
+    }),
   timeoutMs = 10_000,
   pollIntervalMs = 100,
   sleep = ms => new Promise<void>(resolve => setTimeout(resolve, ms)),
@@ -628,16 +721,31 @@ export async function waitForD3DMetalCaptureAcknowledgement({
       }
       const ack = acknowledgements[0];
       if (ack) {
-        const identity = processIdentity ? await processIdentity(ack.pid!) : null;
+        const identity = processIdentity
+          ? await processIdentity(ack.pid!)
+          : null;
         const lsof = await snapshot(ack.pid!);
         const records = parseD3DMetalLsofFields(lsof);
-        if (records.some(record => record.pid !== ack.pid)) throw new Error("lsof PID mismatch");
-        const vnodeOk = expectedVnodes ? validateD3DMetalRequiredVnodes(records, expectedVnodes).ok :
-          expectedVnode ? validateD3DMetalExpectedVnode(records, expectedVnode).ok :
-          typeof lsof === "string" && lsof.includes(snapshotGameExecutable);
-        if (!identity && processIdentity || !vnodeOk || requiredArtifactPaths && !hasD3DMetalRequiredArtifacts(records, requiredArtifactPaths) || !requiredArtifactPaths && !hasD3DMetalRuntimeModules(records) && expectedVnode ||
-            (!expectedVnode && !expectedVnodes && typeof lsof === "string" &&
-              (!/D3DMetal\.framework/i.test(lsof) || !/d3d12\.dll/i.test(lsof)))) {
+        if (records.some(record => record.pid !== ack.pid))
+          throw new Error("lsof PID mismatch");
+        const vnodeOk = expectedVnodes
+          ? validateD3DMetalRequiredVnodes(records, expectedVnodes).ok
+          : expectedVnode
+          ? validateD3DMetalExpectedVnode(records, expectedVnode).ok
+          : typeof lsof === "string" && lsof.includes(snapshotGameExecutable);
+        if (
+          (!identity && processIdentity) ||
+          !vnodeOk ||
+          (requiredArtifactPaths &&
+            !hasD3DMetalRequiredArtifacts(records, requiredArtifactPaths)) ||
+          (!requiredArtifactPaths &&
+            !hasD3DMetalRuntimeModules(records) &&
+            expectedVnode) ||
+          (!expectedVnode &&
+            !expectedVnodes &&
+            typeof lsof === "string" &&
+            (!/D3DMetal\.framework/i.test(lsof) || !/d3d12\.dll/i.test(lsof)))
+        ) {
           lastError = "authoritative game lsof identity mismatch";
         } else {
           if (processIdentity) {
@@ -672,7 +780,8 @@ export async function armD3DMetalCaptureSession({
   const ledgerRoot = join(sessionRoot, "ledger");
   await mkdirp(ledgerRoot);
   const attemptId = `${runId}-${Date.now()}`;
-  if (!/^[0-9]{13}-[0-9]{13}$/.test(attemptId)) throw new Error("invalid capture attempt id");
+  if (!/^[0-9]{13}-[0-9]{13}$/.test(attemptId))
+    throw new Error("invalid capture attempt id");
   const token = secureHexToken(16);
   const attemptPath = join(ledgerRoot, `attempt-${attemptId}`);
   await exec([
@@ -695,13 +804,7 @@ export async function armD3DMetalCaptureSession({
 }
 
 export async function prepareD3DMetalCaptureSession(sessionRoot: string) {
-  for (const name of [
-    "acks",
-    "arms",
-    "controls",
-    "instances",
-    "markers",
-  ]) {
+  for (const name of ["acks", "arms", "controls", "instances", "markers"]) {
     const path = join(sessionRoot, name);
     await mkdirp(path);
     await exec(["/bin/chmod", "700", path]);
@@ -717,21 +820,55 @@ export async function enumerateD3DMetalCaptureAcknowledgements({
   directory: string;
   expected: MetalIrV2AckExpectation;
 }) {
-  const names = (await exec(["/usr/bin/find", directory, "-mindepth", "1", "-maxdepth", "1", "-print"])).stdOut
-    .split(/\r?\n/).filter(Boolean).map(path => path.slice(directory.length + 1));
+  const names = (
+    await exec([
+      "/usr/bin/find",
+      directory,
+      "-mindepth",
+      "1",
+      "-maxdepth",
+      "1",
+      "-print",
+    ])
+  ).stdOut
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map(path => path.slice(directory.length + 1));
   const acknowledgements: D3DMetalCaptureAcknowledgement[] = [];
   for (const name of names) {
     const filename = parseMetalIrV2AcknowledgementFilename(name);
     if (!filename) throw new Error("malformed capture ACK filename");
     const path = join(directory, name);
     await exec(["/bin/test", "!", "-L", path]);
-    const size = Number((await exec(["/usr/bin/stat", "-f", "%z", path])).stdOut.trim());
-    if (!Number.isSafeInteger(size) || size <= 0 || size > D3DMETAL_CAPTURE_MAX_CONTROL_BYTES) throw new Error("capture ACK size rejected");
-    const owner = Number((await exec(["/usr/bin/stat", "-f", "%u", path])).stdOut.trim());
-    const currentOwner = Number((await exec(["/usr/bin/id", "-u"])).stdOut.trim());
-    const mode = Number.parseInt((await exec(["/usr/bin/stat", "-f", "%Lp", path])).stdOut.trim(), 8);
-    const links = Number((await exec(["/usr/bin/stat", "-f", "%l", path])).stdOut.trim());
-    if (owner !== currentOwner || !Number.isInteger(mode) || mode !== 0o600 || links !== 1) throw new Error("capture ACK owner/mode/link rejected");
+    const size = Number(
+      (await exec(["/usr/bin/stat", "-f", "%z", path])).stdOut.trim()
+    );
+    if (
+      !Number.isSafeInteger(size) ||
+      size <= 0 ||
+      size > D3DMETAL_CAPTURE_MAX_CONTROL_BYTES
+    )
+      throw new Error("capture ACK size rejected");
+    const owner = Number(
+      (await exec(["/usr/bin/stat", "-f", "%u", path])).stdOut.trim()
+    );
+    const currentOwner = Number(
+      (await exec(["/usr/bin/id", "-u"])).stdOut.trim()
+    );
+    const mode = Number.parseInt(
+      (await exec(["/usr/bin/stat", "-f", "%Lp", path])).stdOut.trim(),
+      8
+    );
+    const links = Number(
+      (await exec(["/usr/bin/stat", "-f", "%l", path])).stdOut.trim()
+    );
+    if (
+      owner !== currentOwner ||
+      !Number.isInteger(mode) ||
+      mode !== 0o600 ||
+      links !== 1
+    )
+      throw new Error("capture ACK owner/mode/link rejected");
     const rawBytes = new Uint8Array(await readBinary(path));
     const value = parseMetalIrV2AcknowledgementBytes(rawBytes, expected);
     if (value.pid !== filename.pid || value.nonce !== filename.nonce) {
@@ -744,8 +881,11 @@ export async function enumerateD3DMetalCaptureAcknowledgements({
       rawSha256: hashMetalIrV2AcknowledgementBytes(rawBytes),
     });
   }
-  const identities = new Set(acknowledgements.map(value => `${value.pid}:${value.nonce}`));
-  if (identities.size !== acknowledgements.length) throw new Error("duplicate capture ACK");
+  const identities = new Set(
+    acknowledgements.map(value => `${value.pid}:${value.nonce}`)
+  );
+  if (identities.size !== acknowledgements.length)
+    throw new Error("duplicate capture ACK");
   return acknowledgements;
 }
 
@@ -767,8 +907,10 @@ export async function assertD3DMetalCaptureAcknowledgementUnchanged({
   }
   const current = acknowledgements[0];
   if (
-    current.path !== original.path || current.pid !== original.pid ||
-    current.nonce !== original.nonce || current.rawSha256 !== original.rawSha256 ||
+    current.path !== original.path ||
+    current.pid !== original.pid ||
+    current.nonce !== original.nonce ||
+    current.rawSha256 !== original.rawSha256 ||
     current.rawBytes.byteLength !== original.rawBytes.byteLength ||
     current.rawBytes.some((value, index) => value !== original.rawBytes[index])
   ) {
@@ -791,7 +933,11 @@ export async function writeD3DMetalCaptureAuthorityLedger({
   if (!/^[0-9]{13}-[0-9]{13}$/.test(attemptId)) {
     throw new Error("invalid authority ledger attempt id");
   }
-  const destination = join(sessionRoot, "ledger", `authority-${phase}-${attemptId}.json`);
+  const destination = join(
+    sessionRoot,
+    "ledger",
+    `authority-${phase}-${attemptId}.json`
+  );
   const serialized = JSON.stringify(value, (_key, item) =>
     typeof item === "bigint" ? item.toString() : item
   );
@@ -1138,11 +1284,7 @@ export const D3DMETAL_STATE_OBJECT_FAILURE_TAGS = {
 export type D3DMetalStateObjectFailureStage =
   (typeof D3DMETAL_STATE_OBJECT_FAILURE_TAGS)[keyof typeof D3DMETAL_STATE_OBJECT_FAILURE_TAGS];
 
-export type D3DMetalCompileContext =
-  | "rt"
-  | "graphics"
-  | "compute"
-  | "unknown";
+export type D3DMetalCompileContext = "rt" | "graphics" | "compute" | "unknown";
 
 export interface D3DMetalCompileObservation {
   sequence: number;
@@ -1222,6 +1364,7 @@ export interface D3DMetalRuntimeEvidence {
   createdAt: string;
   validatedD3DMetalVersion: string | null;
   exactD3DMetalVersion: boolean;
+  gpuSpoof: ZzzD3DMetalGpuSpoof | null;
   playerLogCaptured: boolean;
   moduleSnapshotCaptured: boolean;
   selectedRenderer: D3DMetalSelectedRenderer;
@@ -1290,22 +1433,6 @@ const DIAGNOSTIC_ENVIRONMENT_KEYS = [
   "D3DM_VENDOR_ID",
   "D3DM_DEVICE_ID",
   "D3DM_DEVICE_DESCRIPTION",
-  "YAAGL_RUNTIME_MODE",
-  "YAAGL_DYLD_INSERT_LIBRARIES",
-  "YAAGL_METAL_IR_REPLACEMENT",
-  "YAAGL_METAL_IR_CAPTURE_PATH",
-  "YAAGL_METAL_IR_CAPTURE_SHA256",
-  "YAAGL_METAL_IR_MANIFEST",
-  "YAAGL_METAL_IR_PROVIDER",
-  "YAAGL_METAL_IR_D3DMETAL",
-  "YAAGL_METAL_IR_DXCOMPILER",
-  "YAAGL_METAL_IR_D3DMETAL_SHA256",
-  "YAAGL_METAL_IR_PROVIDER_SHA256",
-  "YAAGL_METAL_IR_RUN_ID",
-  "YAAGL_METAL_IR_SOURCE_REVISION",
-  "YAAGL_METAL_IR_BUILD_ID",
-  "YAAGL_METAL_IR_SESSION_ROOT",
-  "YAAGL_METAL_IR_SOURCE",
 ] as const;
 
 /**
@@ -1513,8 +1640,8 @@ export function aggregateD3DMetalMetalIrManifests({
               (manifest.records ?? []).filter(
                 record => record.targetObserved === true
               ).length &&
-          (!expectedAckPid || manifest.pid === expectedAckPid)
-          && (!expectedArmNonce || marker.instance.endsWith(expectedArmNonce))
+            (!expectedAckPid || manifest.pid === expectedAckPid) &&
+            (!expectedArmNonce || marker.instance.endsWith(expectedArmNonce))
         )
       ) &&
       manifests.every(
@@ -1962,7 +2089,8 @@ function parseD3DMetalCompileObservations(
       continue;
     }
     const context = match[5].toLowerCase() as D3DMetalCompileContext;
-    const result = match[10].toLowerCase() as D3DMetalCompileObservation["result"];
+    const result =
+      match[10].toLowerCase() as D3DMetalCompileObservation["result"];
     const sourceSha256 = match[8].toLowerCase();
     const errorCode = match[11].toLowerCase();
     const exportPath = match[15] === "none" ? null : match[15];
@@ -1970,7 +2098,8 @@ function parseD3DMetalCompileObservations(
       !match[16] || match[16].toLowerCase() === "none"
         ? null
         : match[16].toLowerCase();
-    const parsedPsoId = match[17] && match[17] !== "none" ? Number(match[17]) : null;
+    const parsedPsoId =
+      match[17] && match[17] !== "none" ? Number(match[17]) : null;
     const psoId =
       parsedPsoId !== null && Number.isSafeInteger(parsedPsoId)
         ? parsedPsoId
@@ -2065,7 +2194,8 @@ function correlateD3DMetalError19(
   for (const systemEvent of systemEvents) {
     const observerIndex = observerErrors.findIndex(
       (observation, index) =>
-        unused.has(index) && effectiveObserverStage(observation) === systemEvent.stage
+        unused.has(index) &&
+        effectiveObserverStage(observation) === systemEvent.stage
     );
     if (observerIndex < 0) {
       unmatchedSystemCount += 1;
@@ -2135,9 +2265,7 @@ function parseD3DMetalRtOutput(contents: string) {
   const dispatchDimensionEvents = evidence.filter(
     line =>
       /\bevent=dispatch-threads\b.*\bgrid=\d+x\d+x\d+\b/.test(line) ||
-      /\bevent=dispatch-threadgroups\b.*\bgroups=\d+x\d+x\d+\b/.test(
-        line
-      ) ||
+      /\bevent=dispatch-threadgroups\b.*\bgroups=\d+x\d+x\d+\b/.test(line) ||
       /\bevent=dispatch-indirect\b.*\bgroups=\d+x\d+x\d+\b/.test(line)
   );
   const unavailableDispatchDimensionEvents = evidence.filter(
@@ -2153,9 +2281,7 @@ function parseD3DMetalRtOutput(contents: string) {
   const resourceIdentityEvents = resourceEvents.filter(
     line =>
       /\bresource=0x[0-9a-f]+\b/i.test(line) &&
-      /\b(?:gpu_resource_id|resource_id|gpu_address)=0x[0-9a-f]+\b/i.test(
-        line
-      )
+      /\b(?:gpu_resource_id|resource_id|gpu_address)=0x[0-9a-f]+\b/i.test(line)
   );
   const resourceStateEvents = resourceEvents.filter(line =>
     /\bstate=(?:read|write|read_write|bound|barrier|unknown)\b/.test(line)
@@ -2466,10 +2592,10 @@ export function createD3DMetalDxrRuntimeStatus(
   const diagnostics = evidence["dxrPipelineDiagnostics"];
   if (
     isRecord(diagnostics) &&
-    (typeof diagnostics["metalCompileFailureCount"] === "number" &&
-      diagnostics["metalCompileFailureCount"] > 0 ||
-      typeof diagnostics["noOpPsoCount"] === "number" &&
-        diagnostics["noOpPsoCount"] > 0)
+    ((typeof diagnostics["metalCompileFailureCount"] === "number" &&
+      diagnostics["metalCompileFailureCount"] > 0) ||
+      (typeof diagnostics["noOpPsoCount"] === "number" &&
+        diagnostics["noOpPsoCount"] > 0))
   ) {
     return {
       status: "shader-graph-failed",
@@ -2757,9 +2883,10 @@ export function verifyD3DMetalLaunchProfile(
   if (profile === undefined) return false;
   const normalized = (value: string) =>
     value.replaceAll("/", "\\").toLowerCase();
-  const requiredEnvironment = Object.entries(D3DMETAL_LAUNCH_ENVIRONMENT).every(
-    ([key, value]) => profile.environment[key] === value
-  );
+  if (profile.gpuSpoof === undefined) return false;
+  const requiredEnvironment = Object.entries(
+    createD3DMetalLaunchEnvironment(profile.gpuSpoof)
+  ).every(([key, value]) => profile.environment[key] === value);
   const inheritedBackendAbsent = D3DMETAL_INHERITED_ENVIRONMENT_BLOCKLIST.every(
     key => !profile.environment[key]
   );
@@ -2857,6 +2984,7 @@ export function analyzeD3DMetalRuntimeEvidence({
     createdAt,
     validatedD3DMetalVersion: validatedD3DMetalVersion ?? null,
     exactD3DMetalVersion: validatedD3DMetalVersion === D3DMETAL_VERSION,
+    gpuSpoof: launchProfile?.gpuSpoof ?? null,
     playerLogCaptured: playerLog !== "",
     moduleSnapshotCaptured: moduleSnapshot !== "",
     selectedRenderer: renderer.selectedRenderer,

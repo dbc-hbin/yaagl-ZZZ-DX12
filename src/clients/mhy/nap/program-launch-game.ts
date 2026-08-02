@@ -16,18 +16,12 @@ import {
 } from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
-import { putLocal, patchProgram, patchRevertProgram } from "../patch";
+import { patchProgram, patchRevertProgram } from "../patch";
 import { NAP_CN_BLOCK_URL, NAP_OS_BLOCK_URL } from "../../secret";
-import { gt } from "semver";
 import {
+  createD3DMetalLaunchEnvironment,
   createD3DMetalLaunchArguments,
   D3DMETAL_VERSION,
-  D3DMETAL_LAUNCH_ENVIRONMENT,
-  D3DMETAL_METAL_IR_PROBE_MODE,
-  createD3DMetalMetalIrEnvironment,
-  D3DMETAL_METAL_IR_PROBE_RELATIVE_PATH,
-  D3DMETAL_UNORM_REPLACEMENT_RELATIVE_PATH,
-  validateD3DMetalMetalIrProbe,
   validateD3DMetalWine,
 } from "../../../wine/d3dmetal";
 import {
@@ -94,9 +88,6 @@ cd /d "${wine.toWinePath(gameDir)}"
   let moduleSnapshotPromise:
     | ReturnType<typeof collectD3DMetalModuleSnapshot>
     | undefined;
-  let metalIrProbeValidation:
-    | Awaited<ReturnType<typeof validateD3DMetalMetalIrProbe>>
-    | undefined;
   let launchFinished = false;
   try {
     yield ["setStateText", "GAME_RUNNING"];
@@ -111,31 +102,12 @@ cd /d "${wine.toWinePath(gameDir)}"
         : undefined;
     if (d3dMetalDiagnostics) {
       try {
-        await mkdirp(d3dMetalDiagnostics.metalIrSessionRoot);
-        await exec(["/bin/chmod", "700", d3dMetalDiagnostics.metalIrSessionRoot]);
         await writePendingD3DMetalRuntimeEvidence({
           destination: d3dMetalDiagnostics.evidence,
           createdAt: launchStartedAt.toISOString(),
         });
         playerLogSource = createZzzPlayerLogPath(wine.prefix);
         playerLogBefore = await fingerprintD3DMetalPlayerLog(playerLogSource);
-        const probePath = resolve(`./${D3DMETAL_METAL_IR_PROBE_RELATIVE_PATH}`);
-        const replacementPath = resolve(
-          `./${D3DMETAL_UNORM_REPLACEMENT_RELATIVE_PATH}`
-        );
-        try {
-          metalIrProbeValidation = await validateD3DMetalMetalIrProbe({
-            wineRoot: wine.root,
-            probePath,
-            replacementPath,
-          });
-        } catch (error) {
-          // Functional instrumentation is never launch authority. Preserve
-          // the direct D3DMetal city path when its sidecar cannot validate.
-          await log(`Metal IR functional mode unavailable: ${String(error)}`);
-        }
-        await writeFile(d3dMetalDiagnostics.metalIrProbe, "");
-        await exec(["/bin/chmod", "600", d3dMetalDiagnostics.metalIrProbe]);
       } catch (error) {
         await log(`D3DMetal diagnostics unavailable: ${String(error)}`);
         d3dMetalDiagnostics = undefined;
@@ -197,22 +169,7 @@ cd /d "${wine.toWinePath(gameDir)}"
           }),
       ...(wine.attributes.renderBackend === "d3dmetal"
         ? {
-            ...D3DMETAL_LAUNCH_ENVIRONMENT,
-            ...(d3dMetalDiagnostics && metalIrProbeValidation
-              ? createD3DMetalMetalIrEnvironment({
-                  mode: D3DMETAL_METAL_IR_PROBE_MODE,
-                  capturePath: d3dMetalDiagnostics.metalIrProbe,
-                  captureHash: metalIrProbeValidation.probeHash,
-                  d3dMetalHash: metalIrProbeValidation.d3dMetalHash,
-                  providerHash: metalIrProbeValidation.providerHash,
-                  manifestPath: d3dMetalDiagnostics.metalIrManifest,
-                  probePath: metalIrProbeValidation.probePath,
-                  providerPath: metalIrProbeValidation.providerPath,
-                  d3dMetalPath: metalIrProbeValidation.d3dMetalPath,
-                  dxcompilerPath: metalIrProbeValidation.dxcompilerPath,
-                  replacementPath: metalIrProbeValidation.replacementPath,
-                })
-              : {}),
+            ...createD3DMetalLaunchEnvironment(config.d3dMetalGpuSpoof),
           }
         : {}),
       ...(wine.attributes.renderBackend == "dxmt"
@@ -247,29 +204,8 @@ cd /d "${wine.toWinePath(gameDir)}"
           arguments: launchArguments,
           environment: launchEnvironment,
           launchExitCode: null,
-          metalIrTerminalStatus: null,
-          ...(metalIrProbeValidation
-            ? {
-                metalIrProbe: {
-                  mode: D3DMETAL_METAL_IR_PROBE_MODE,
-                  capturePath: d3dMetalDiagnostics.metalIrProbe,
-                  captureHash: metalIrProbeValidation.probeHash,
-                  manifestPath: d3dMetalDiagnostics.metalIrManifest,
-                  d3dMetalHash: metalIrProbeValidation.d3dMetalHash,
-                  probeHash: metalIrProbeValidation.probeHash,
-                  probePath: metalIrProbeValidation.probePath,
-                  providerHash: metalIrProbeValidation.providerHash,
-                  providerPath: metalIrProbeValidation.providerPath,
-                  dxcompilerHash: metalIrProbeValidation.dxcompilerHash,
-                  dxcompilerPath: metalIrProbeValidation.dxcompilerPath,
-                  replacementHash: metalIrProbeValidation.replacementHash,
-                  replacementPath: metalIrProbeValidation.replacementPath,
-                },
-              }
-            : {}),
+          gpuSpoof: config.d3dMetalGpuSpoof,
         };
-        d3dMetalLaunchProfile.metalIrSessionRoot =
-          d3dMetalDiagnostics.metalIrSessionRoot;
         const launchProfile = d3dMetalLaunchProfile;
         await writeD3DMetalLaunchProfile(
           d3dMetalDiagnostics.profile,
@@ -318,8 +254,6 @@ cd /d "${wine.toWinePath(gameDir)}"
           launchExitCode = -1;
         }
         d3dMetalLaunchProfile.launchExitCode = launchExitCode;
-        d3dMetalLaunchProfile.metalIrTerminalStatus =
-          metalIrProbeValidation ? "incomplete" : "unavailable";
         try {
           await writeD3DMetalLaunchProfile(
             d3dMetalDiagnostics!.profile,
@@ -365,7 +299,6 @@ cd /d "${wine.toWinePath(gameDir)}"
           systemLog: d3dMetalDiagnostics.systemLog,
           playerLog: d3dMetalDiagnostics.playerLog,
           moduleSnapshot: d3dMetalDiagnostics.moduleSnapshot,
-          metalIrProbe: d3dMetalDiagnostics.metalIrProbe,
           destination: d3dMetalDiagnostics.evidence,
           launchProfile: d3dMetalLaunchProfile,
           validatedD3DMetalVersion,

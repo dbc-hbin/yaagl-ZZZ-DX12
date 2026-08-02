@@ -45,40 +45,6 @@ export const D3DMETAL_4_0_BETA_2_STATE_OBJECT_TRAPS_SHA256 =
 export const D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256 =
   "4925700de03c91e33cd75ac160fac6f9ef8efa7c94a353d4062084cee4b89851" as const;
 
-export const D3DMETAL_METAL_IR_OBSERVER_MODE = "metal-ir-observe-v1" as const;
-export const D3DMETAL_METAL_IR_PROBE_MODE = "metal-ir-unorm-fix-v2" as const;
-export const D3DMETAL_METAL_IR_FUNCTIONAL_OBSERVER_MODE =
-  "metal-ir-unorm-fix-v2-rt" as const;
-export const D3DMETAL_METAL_IR_MULTICAPTURE_MODE =
-  "metal-ir-capture-v2" as const;
-export type D3DMetalMetalIrMode =
-  | typeof D3DMETAL_METAL_IR_OBSERVER_MODE
-  | typeof D3DMETAL_METAL_IR_PROBE_MODE
-  | typeof D3DMETAL_METAL_IR_FUNCTIONAL_OBSERVER_MODE
-  | typeof D3DMETAL_METAL_IR_MULTICAPTURE_MODE;
-export const D3DMETAL_METAL_IR_PROBE_RELATIVE_PATH =
-  "sidecar/diagnostics/libyaagl-metal-ir-capture.dylib" as const;
-export const D3DMETAL_METAL_IR_CAPTURE_RELATIVE_PATH =
-  D3DMETAL_METAL_IR_PROBE_RELATIVE_PATH;
-export const D3DMETAL_CAPTURE_FS_HELPER_RELATIVE_PATH =
-  "sidecar/diagnostics/yaagl-capture-fs-helper" as const;
-export const D3DMETAL_METAL_IR_CONVERTER_RELATIVE_PATH =
-  "lib/external/D3DMetal.framework/Versions/A/Resources/libmetalirconverter.dylib" as const;
-export const D3DMETAL_DXCOMPILER_RELATIVE_PATH =
-  "lib/external/D3DMetal.framework/Versions/A/Resources/libdxcompiler.dylib" as const;
-export const D3DMETAL_METAL_IR_PROBE_SHA256 =
-  "6ef49cfefebf611df13b557e8d06898ced43b365971244fa068da34343d0b862" as const;
-export const D3DMETAL_METAL_IR_CAPTURE_SHA256 =
-  D3DMETAL_METAL_IR_PROBE_SHA256;
-export const D3DMETAL_METAL_IR_CONVERTER_SHA256 =
-  "75974d49ad4dd1bdf17ab3cd666ae7cac43e7f7a5760237699ab33ecd3d31daf" as const;
-export const D3DMETAL_DXCOMPILER_SHA256 =
-  "57dc9421af62c35b372adf7536f07b1e2c20ef32dc1f4c16930a42fc12ed1fd2" as const;
-export const D3DMETAL_UNORM_REPLACEMENT_RELATIVE_PATH =
-  "sidecar/diagnostics/zzz-rt-unorm-float.dxil" as const;
-export const D3DMETAL_UNORM_REPLACEMENT_SHA256 =
-  "c64e67eabc3cf5ff89359c3075ebe00387c5a46d5136ea61dfbdd832b2f01717" as const;
-
 /** Signed diagnostic that traps with EAX at CreateStateObject's return edge. */
 export const D3DMETAL_4_0_BETA_2_STATE_OBJECT_RETURN_TRAP_SHA256 =
   "f19a6b89a668eefd628a8b95126b8099dfae7b2e85861710498be0e57e46b5fb" as const;
@@ -142,17 +108,56 @@ export const D3DMETAL_NVAPI_RUNTIME_ALIASES = [
   },
 ] as const;
 
-export const D3DMETAL_LAUNCH_ENVIRONMENT = {
+const D3DMETAL_CORE_LAUNCH_ENVIRONMENT = {
   WINE_ENABLE_TIMEOUT_FIX: "1",
   WINEMSYNC: "1",
   CX_ACTIVE_GRAPHICS_BACKEND: "d3dmetal",
   D3DM_MTL4: "1",
   D3DM_ENABLE_METALFX: "1",
   D3DM_SUPPORT_DXR: "1",
-  D3DM_VENDOR_ID: "0x10de",
-  D3DM_DEVICE_ID: "0x2882",
-  D3DM_DEVICE_DESCRIPTION: "NVIDIA GeForce RTX 4060",
 } as const;
+
+/**
+ * DXGI identities exposed by the pure GPTK path. These only select the
+ * application-visible NVIDIA profile; Metal execution remains on the host GPU.
+ */
+export const ZZZ_D3DMETAL_GPU_SPOOFS = {
+  rtx4060: {
+    id: "rtx4060",
+    label: "NVIDIA GeForce RTX 4060",
+    vendorId: "0x10de",
+    deviceId: "0x2882",
+  },
+  rtx5060: {
+    id: "rtx5060",
+    label: "NVIDIA GeForce RTX 5060",
+    vendorId: "0x10de",
+    deviceId: "0x2d05",
+  },
+} as const;
+
+export type ZzzD3DMetalGpuSpoof = keyof typeof ZZZ_D3DMETAL_GPU_SPOOFS;
+export const DEFAULT_ZZZ_D3DMETAL_GPU_SPOOF = "rtx4060" as const;
+
+export function resolveZzzD3DMetalGpuSpoof(
+  value: string | undefined
+): ZzzD3DMetalGpuSpoof {
+  return value === "rtx5060" ? value : DEFAULT_ZZZ_D3DMETAL_GPU_SPOOF;
+}
+
+export function createD3DMetalLaunchEnvironment(gpuSpoof?: string) {
+  const selected =
+    ZZZ_D3DMETAL_GPU_SPOOFS[resolveZzzD3DMetalGpuSpoof(gpuSpoof)];
+  return {
+    ...D3DMETAL_CORE_LAUNCH_ENVIRONMENT,
+    D3DM_VENDOR_ID: selected.vendorId,
+    D3DM_DEVICE_ID: selected.deviceId,
+    D3DM_DEVICE_DESCRIPTION: selected.label,
+  } as const;
+}
+
+/** The default profile is retained for static settings/status presentation. */
+export const D3DMETAL_LAUNCH_ENVIRONMENT = createD3DMetalLaunchEnvironment();
 
 export const ZZZ_D3D12_SELECTOR = "-use-d3d12" as const;
 
@@ -172,16 +177,11 @@ export const D3DMETAL_INHERITED_ENVIRONMENT_BLOCKLIST = [
   "VK_LAYER_PATH",
   "MVK_ALLOW_METAL_FENCES",
   "MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS",
+  "DYLD_INSERT_LIBRARIES",
+  "YAAGL_DYLD_INSERT_LIBRARIES",
 ] as const;
 
-export const D3DMETAL_DYLD_INSERT_BRIDGE =
-  "YAAGL_DYLD_INSERT_LIBRARIES" as const;
-
-/**
- * SIP strips DYLD_* while starting platform binaries such as /usr/bin/env.
- * Start the platform shell without DYLD_*, set it from a private bridge only
- * inside that process, then exec the non-platform Wine loader.
- */
+/** Starts a clean GPTK process without inherited DYLD interposition. */
 export function createD3DMetalIsolatedCommand(
   executable: string,
   args: readonly string[]
@@ -190,112 +190,12 @@ export function createD3DMetalIsolatedCommand(
   // newlines as backslash-n, so keep the -c program on one line.
   const script =
     `unset ${D3DMETAL_INHERITED_ENVIRONMENT_BLOCKLIST.join(" ")}; ` +
-    `if [ -n "\${${D3DMETAL_DYLD_INSERT_BRIDGE}:-}" ]; then ` +
-    `export DYLD_INSERT_LIBRARIES="$${D3DMETAL_DYLD_INSERT_BRIDGE}"; ` +
-    `else unset DYLD_INSERT_LIBRARIES; fi; ` +
-    `unset ${D3DMETAL_DYLD_INSERT_BRIDGE}; exec "$@"`;
+    `exec "$@"`;
   return ["/bin/sh", "-c", script, "yaagl-d3dmetal-env", executable, ...args];
 }
 
 export function createD3DMetalLaunchArguments(gameExecutablePath: string) {
   return [gameExecutablePath, ZZZ_D3D12_SELECTOR];
-}
-
-export function isD3DMetalPassiveMetalIrCaptureEnabled() {
-  return (
-    import.meta.env["YAAGL_METAL_IR_MODE"] ===
-    D3DMETAL_METAL_IR_MULTICAPTURE_MODE
-  );
-}
-
-export function createD3DMetalMetalIrEnvironment({
-  mode,
-  capturePath,
-  captureHash,
-  d3dMetalHash,
-  providerHash,
-  manifestPath,
-  probePath,
-  providerPath,
-  d3dMetalPath,
-  dxcompilerPath,
-  replacementPath,
-  runId,
-  sourceRevision,
-  buildIdentity,
-  acknowledgementPath,
-  acknowledgementToken,
-  attemptId,
-  executable,
-  gameExecutable,
-  armDirectory,
-  controlsDirectory,
-}: {
-  mode: D3DMetalMetalIrMode;
-  capturePath: string;
-  captureHash: string;
-  d3dMetalHash?: string;
-  providerHash?: string;
-  manifestPath: string;
-  probePath?: string;
-  providerPath?: string;
-  d3dMetalPath?: string;
-  dxcompilerPath?: string;
-  replacementPath?: string;
-  runId?: string;
-  sourceRevision?: string;
-  buildIdentity?: string;
-  acknowledgementPath?: string;
-  acknowledgementToken?: string;
-  attemptId?: string;
-  executable?: string;
-  gameExecutable?: string;
-  armDirectory?: string;
-  controlsDirectory?: string;
-}) {
-  const passive = mode === D3DMETAL_METAL_IR_MULTICAPTURE_MODE;
-  const observer = mode === D3DMETAL_METAL_IR_OBSERVER_MODE;
-  return {
-    YAAGL_RUNTIME_MODE: mode,
-    YAAGL_METAL_IR_LOG: capturePath,
-    YAAGL_METAL_IR_CAPTURE_PATH: capturePath,
-    YAAGL_METAL_IR_CAPTURE_SHA256: captureHash,
-    YAAGL_METAL_IR_D3DMETAL_SHA256: d3dMetalHash!,
-    YAAGL_METAL_IR_PROVIDER_SHA256: providerHash!,
-    YAAGL_METAL_IR_MANIFEST: manifestPath,
-    ...(passive
-      ? {
-          YAAGL_METAL_IR_PROVIDER: providerPath!,
-          YAAGL_METAL_IR_D3DMETAL: d3dMetalPath!,
-          [D3DMETAL_DYLD_INSERT_BRIDGE]: probePath!,
-          YAAGL_METAL_IR_RUN_ID: runId!,
-          YAAGL_METAL_IR_SOURCE_REVISION: sourceRevision!,
-          YAAGL_METAL_IR_BUILD_ID: buildIdentity!,
-          YAAGL_METAL_IR_SOURCE: sourceRevision!,
-          YAAGL_METAL_IR_BUILD: buildIdentity!,
-          YAAGL_METAL_IR_ACK_PATH: acknowledgementPath!,
-          YAAGL_METAL_IR_ACK_DIR: acknowledgementPath!,
-          YAAGL_METAL_IR_ARM_DIR: armDirectory!,
-          YAAGL_METAL_IR_CONTROLS_DIR: controlsDirectory!,
-          YAAGL_METAL_IR_ACK_TOKEN: acknowledgementToken!,
-          YAAGL_METAL_IR_ATTEMPT_ID: attemptId!,
-          YAAGL_METAL_IR_EXECUTABLE: executable!,
-          YAAGL_METAL_IR_GAME_EXECUTABLE: gameExecutable!,
-        }
-      : observer
-      ? {
-          YAAGL_METAL_IR_PROVIDER: providerPath!,
-          YAAGL_METAL_IR_D3DMETAL: d3dMetalPath!,
-          [D3DMETAL_DYLD_INSERT_BRIDGE]: probePath!,
-        }
-      : {
-          YAAGL_METAL_IR_REPLACEMENT: replacementPath!,
-          YAAGL_METAL_IR_DXCOMPILER: dxcompilerPath!,
-          YAAGL_METAL_IR_PROVIDER: providerPath!,
-          YAAGL_METAL_IR_D3DMETAL: d3dMetalPath!,
-          [D3DMETAL_DYLD_INSERT_BRIDGE]: probePath!,
-        }),
-  };
 }
 
 export function d3dMetalWineRuntimePath(sourceRelativePath: string) {
@@ -370,223 +270,6 @@ async function sha256File(target: string) {
     throw new Error(`Unable to read SHA-256 for D3DMetal artifact: ${target}`);
   }
   return match[1].toLowerCase();
-}
-
-export async function validateD3DMetalMetalIrObserver({
-  wineRoot,
-  probePath,
-}: {
-  wineRoot: string;
-  probePath: string;
-}) {
-  const d3dMetalPath = join(
-    wineRoot,
-    D3DMETAL_FRAMEWORK_RUNTIME_CANONICAL_PATH
-  );
-  const providerPath = join(
-    wineRoot,
-    D3DMETAL_METAL_IR_CONVERTER_RELATIVE_PATH
-  );
-  const [d3dMetalHash, probeHash, providerHash] = await Promise.all([
-    sha256File(d3dMetalPath),
-    sha256File(probePath),
-    sha256File(providerPath),
-  ]);
-  if (d3dMetalHash !== D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256) {
-    throw new Error(
-      `Metal IR observer requires pinned D3DMetal ${D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256}, found ${d3dMetalHash}`
-    );
-  }
-  if (probeHash !== D3DMETAL_METAL_IR_PROBE_SHA256) {
-    throw new Error(
-      `Metal IR observer hash mismatch: expected ${D3DMETAL_METAL_IR_PROBE_SHA256}, found ${probeHash}`
-    );
-  }
-  if (providerHash !== D3DMETAL_METAL_IR_CONVERTER_SHA256) {
-    throw new Error(
-      `Metal IR observer provider mismatch: expected ${D3DMETAL_METAL_IR_CONVERTER_SHA256}, found ${providerHash}`
-    );
-  }
-  await exec(["/usr/bin/codesign", "--verify", "--strict", probePath]);
-  const fileDescription = (await exec(["/usr/bin/file", probePath])).stdOut;
-  if (!/Mach-O 64-bit[^\n]*x86_64/i.test(fileDescription)) {
-    throw new Error(
-      `Metal IR observer must be a Mach-O x86_64 dylib: ${fileDescription.trim()}`
-    );
-  }
-  return {
-    d3dMetalPath,
-    d3dMetalHash,
-    probePath,
-    probeHash,
-    providerPath,
-    providerHash,
-  };
-}
-
-export async function validateD3DMetalMetalIrProbe({
-  wineRoot,
-  probePath,
-  replacementPath,
-}: {
-  wineRoot: string;
-  probePath: string;
-  replacementPath: string;
-}) {
-  const d3dMetalPath = join(
-    wineRoot,
-    D3DMETAL_FRAMEWORK_RUNTIME_CANONICAL_PATH
-  );
-  const providerPath = join(
-    wineRoot,
-    D3DMETAL_METAL_IR_CONVERTER_RELATIVE_PATH
-  );
-  const dxcompilerPath = join(wineRoot, D3DMETAL_DXCOMPILER_RELATIVE_PATH);
-  const [
-    d3dMetalHash,
-    probeHash,
-    providerHash,
-    dxcompilerHash,
-    replacementHash,
-  ] =
-    await Promise.all([
-      sha256File(d3dMetalPath),
-      sha256File(probePath),
-      sha256File(providerPath),
-      sha256File(dxcompilerPath),
-      sha256File(replacementPath),
-    ]);
-  if (d3dMetalHash !== D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256) {
-    throw new Error(
-      `Metal IR probe requires no-op-only D3DMetal ${D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256}, found ${d3dMetalHash}`
-    );
-  }
-  if (probeHash !== D3DMETAL_METAL_IR_PROBE_SHA256) {
-    throw new Error(
-      `Metal IR probe hash mismatch: expected ${D3DMETAL_METAL_IR_PROBE_SHA256}, found ${probeHash}`
-    );
-  }
-  if (providerHash !== D3DMETAL_METAL_IR_CONVERTER_SHA256) {
-    throw new Error(
-      `Metal IR converter hash mismatch: expected ${D3DMETAL_METAL_IR_CONVERTER_SHA256}, found ${providerHash}`
-    );
-  }
-  if (dxcompilerHash !== D3DMETAL_DXCOMPILER_SHA256) {
-    throw new Error(
-      `DXC runtime hash mismatch: expected ${D3DMETAL_DXCOMPILER_SHA256}, found ${dxcompilerHash}`
-    );
-  }
-  if (replacementHash !== D3DMETAL_UNORM_REPLACEMENT_SHA256) {
-    throw new Error(
-      `Metal IR replacement hash mismatch: expected ${D3DMETAL_UNORM_REPLACEMENT_SHA256}, found ${replacementHash}`
-    );
-  }
-  await exec(["/usr/bin/codesign", "--verify", "--strict", probePath]);
-  const fileDescription = (await exec(["/usr/bin/file", probePath])).stdOut;
-  if (!/Mach-O 64-bit[^\n]*x86_64/i.test(fileDescription)) {
-    throw new Error(
-      `Metal IR probe must be a Mach-O x86_64 dylib: ${fileDescription.trim()}`
-    );
-  }
-  return {
-    d3dMetalPath,
-    d3dMetalHash,
-    probePath,
-    probeHash,
-    providerPath,
-    providerHash,
-    dxcompilerPath,
-    dxcompilerHash,
-    replacementPath,
-    replacementHash,
-  };
-}
-
-export async function validateD3DMetalMetalIrCapture({
-  wineRoot,
-  capturePath,
-  controlHelperPath,
-  expectedHash,
-}: {
-  wineRoot: string;
-  capturePath: string;
-  controlHelperPath: string;
-  expectedHash: string;
-}) {
-  const captureHash = await sha256File(capturePath);
-  if (
-    !/^[a-f0-9]{64}$/i.test(expectedHash) ||
-    captureHash !== expectedHash.toLowerCase()
-  ) {
-    throw new Error(
-      `Metal IR capture hash mismatch: expected ${
-        expectedHash || "missing"
-      }, found ${captureHash}`
-    );
-  }
-  await exec(["/usr/bin/codesign", "--verify", "--strict", capturePath]);
-  const fileDescription = (await exec(["/usr/bin/file", capturePath])).stdOut;
-  if (!/Mach-O 64-bit[^\n]*x86_64/i.test(fileDescription)) {
-    throw new Error(
-      `Metal IR capture must be a Mach-O x86_64 dylib: ${fileDescription.trim()}`
-    );
-  }
-  if (!(await fileOrDirExists(controlHelperPath))) {
-    throw new Error(`Missing capture-control helper: ${controlHelperPath}`);
-  }
-  const controlHelperHash = await sha256File(controlHelperPath);
-  await exec([
-    "/usr/bin/codesign",
-    "--verify",
-    "--strict",
-    controlHelperPath,
-  ]);
-  const controlHelperDescription = (
-    await exec(["/usr/bin/file", controlHelperPath])
-  ).stdOut;
-  if (!/Mach-O 64-bit[^\n]*x86_64/i.test(controlHelperDescription)) {
-    throw new Error(
-      `capture-control helper must be a Mach-O x86_64 executable: ${controlHelperDescription.trim()}`
-    );
-  }
-  const d3dMetalPath = join(
-    wineRoot,
-    D3DMETAL_FRAMEWORK_RUNTIME_CANONICAL_PATH
-  );
-  const providerPath = join(
-    wineRoot,
-    D3DMETAL_METAL_IR_CONVERTER_RELATIVE_PATH
-  );
-  if (!(await fileOrDirExists(d3dMetalPath))) {
-    throw new Error(`Missing passive capture D3DMetal image: ${d3dMetalPath}`);
-  }
-  if (!(await fileOrDirExists(providerPath))) {
-    throw new Error(`Missing passive capture provider image: ${providerPath}`);
-  }
-  const [d3dMetalHash, providerHash] = await Promise.all([
-    sha256File(d3dMetalPath),
-    sha256File(providerPath),
-  ]);
-  if (d3dMetalHash !== D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256) {
-    throw new Error(
-      `Passive capture requires pinned D3DMetal ${D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256}, found ${d3dMetalHash}`
-    );
-  }
-  if (providerHash !== D3DMETAL_METAL_IR_CONVERTER_SHA256) {
-    throw new Error(
-      `Passive capture requires pinned Metal IR provider ${D3DMETAL_METAL_IR_CONVERTER_SHA256}, found ${providerHash}`
-    );
-  }
-  return {
-    capturePath,
-    captureHash,
-    d3dMetalPath,
-    d3dMetalHash,
-    providerPath,
-    providerHash,
-    controlHelperPath,
-    controlHelperHash,
-  };
 }
 
 /**

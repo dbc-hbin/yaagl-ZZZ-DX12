@@ -57,6 +57,7 @@ const launchProfile: D3DMetalLaunchProfile = {
     D3DM_DEVICE_DESCRIPTION: "NVIDIA GeForce RTX 4060",
   },
   launchExitCode: 0,
+  gpuSpoof: "rtx4060",
   metalIrTerminalStatus: "complete",
 };
 
@@ -101,7 +102,7 @@ describe("D3DMetal diagnostic paths", () => {
     );
   });
 
-  it("omits proxy URLs and unrelated secrets from launch evidence", () => {
+  it("omits proxy URLs, unrelated secrets, and retired hook fields", () => {
     expect(
       createD3DMetalDiagnosticEnvironment({
         WINE_ENABLE_TIMEOUT_FIX: "1",
@@ -128,12 +129,12 @@ describe("D3DMetal diagnostic paths", () => {
       D3DM_VENDOR_ID: "0x10de",
       D3DM_DEVICE_ID: "0x2882",
       D3DM_DEVICE_DESCRIPTION: "NVIDIA GeForce RTX 4060",
-      YAAGL_RUNTIME_MODE: "metal-ir-probe-v1",
     });
   });
 
   it("distinguishes probe reachability from resolver failure", () => {
-    const functional = parseD3DMetalMetalIrProbe(`probe loaded mode=metal-ir-unorm-fix-v2-rt
+    const functional =
+      parseD3DMetalMetalIrProbe(`probe loaded mode=metal-ir-unorm-fix-v2-rt
 probe resolved=0x1234
 probe installed got=0x4ae1a0 mode=metal-ir-unorm-fix-v2-rt rt_output=installed compute_correlation=installed
 probe observation sequence=0 size=26964 selected=replacement export=complete
@@ -168,13 +169,14 @@ probe replacement-compile-succeeded`);
   });
 
   it("recognizes the observation-only compiler and RT-output sidecar", () => {
-    const observer = parseD3DMetalMetalIrProbe(`observer loaded mode=metal-ir-observe-v1
+    const observer =
+      parseD3DMetalMetalIrProbe(`observer loaded mode=metal-ir-observe-v1
 observer resolved=0x1234
 observer rt-output installed target=0x16015b body_end=0x1607be method_hooks=8
 observer installed got=0x4ae1a0 mode=metal-ir-observe-v1 rt_output=installed
 observer compile sequence=0 time_ns=123 tid=7 caller=0x87ec9 context=compute stage=compute size=64 sha256=${"a".repeat(
-      64
-    )} capture=none result=returned_null error=0x13 error_status=code sink=non-null export=complete path=/tmp/source.dxil stack=0x87ec9`);
+        64
+      )} capture=none result=returned_null error=0x13 error_status=code sink=non-null export=complete path=/tmp/source.dxil stack=0x87ec9`);
     expect(observer).toMatchObject({
       loaded: true,
       resolved: true,
@@ -619,9 +621,13 @@ observer rt-output sequence=0 time_ns=203 tid=9 encoder=0x1 event=end path=direc
     const compileLines = residuals
       .map(
         ([sha, size, psoId], sequence) =>
-          `observer compile sequence=${sequence} time_ns=${100 + sequence} tid=7 caller=0x87ec9 context=compute stage=compute size=${size} sha256=${sha} capture=none result=returned_null error=0x13 error_status=code sink=non-null export=complete path=/tmp/${sha}.dxil pso_object=0x${(
+          `observer compile sequence=${sequence} time_ns=${
+            100 + sequence
+          } tid=7 caller=0x87ec9 context=compute stage=compute size=${size} sha256=${sha} capture=none result=returned_null error=0x13 error_status=code sink=non-null export=complete path=/tmp/${sha}.dxil pso_object=0x${(
             0xabc0 + sequence
-          ).toString(16)} pso_id=${psoId} selection=original selection_reason=unhandled_fp64 stack=0x87ec9,0x86e90`
+          ).toString(
+            16
+          )} pso_id=${psoId} selection=original selection_reason=unhandled_fp64 stack=0x87ec9,0x86e90`
       )
       .join("\n");
     const systemLines = residuals
@@ -1039,6 +1045,31 @@ d3d12: could not create a Ray Tracing Pipeline State Object (0x8004d003)
     });
   });
 
+  it("records and verifies the RTX 5060 profile exactly", () => {
+    const evidence = analyzeD3DMetalRuntimeEvidence({
+      wineLog: "Loaded d3d12.dll",
+      systemLog: "",
+      playerLog: d3d12PlayerLog,
+      moduleSnapshot:
+        "/tmp/D3DMetal.framework/D3DMetal C:\\windows\\system32\\d3d12.dll",
+      launchProfile: {
+        ...launchProfile,
+        gpuSpoof: "rtx5060",
+        environment: {
+          ...launchProfile.environment,
+          D3DM_DEVICE_ID: "0x2d05",
+          D3DM_DEVICE_DESCRIPTION: "NVIDIA GeForce RTX 5060",
+        },
+      },
+      validatedD3DMetalVersion: "4.0b2",
+    });
+    expect(evidence).toMatchObject({
+      gpuSpoof: "rtx5060",
+      launchProfileVerified: true,
+      backendVerified: true,
+    });
+  });
+
   it("verifies MetalFX only with an explicit successful DLSS conversion", () => {
     const base = {
       wineLog: "Loaded d3d12.dll and nvngx.dll",
@@ -1110,18 +1141,22 @@ describe("D3DMetal multi-instance Metal IR aggregation", () => {
   });
 
   it("parses stable PID identity and NUL lsof vnode fields", () => {
-    expect(parseD3DMetalProcessIdentity("29660 Mon Aug  2 05:00:01 2026")).toEqual({
+    expect(
+      parseD3DMetalProcessIdentity("29660 Mon Aug  2 05:00:01 2026")
+    ).toEqual({
       pid: 29660,
       startIdentity: "Mon Aug  2 05:00:01 2026",
     });
-    expect(equalD3DMetalProcessIdentity(
-      parseD3DMetalProcessIdentity("29660 start"),
-      parseD3DMetalProcessIdentity("29660 start")
-    )).toBe(true);
+    expect(
+      equalD3DMetalProcessIdentity(
+        parseD3DMetalProcessIdentity("29660 start"),
+        parseD3DMetalProcessIdentity("29660 start")
+      )
+    ).toBe(true);
     const records = parseD3DMetalLsofFields(
       "p29660\0cWine\0f cwd\0D0x100002\0i123\0tREG\0n/Applications/ZenlessZoneZero/ZenlessZoneZero.exe\0" +
-      "f txt\0tREG\0n/opt/D3DMetal.framework/Versions/A/D3DMetal\0" +
-      "f txt\0tREG\0nd3d12.dll\0"
+        "f txt\0tREG\0n/opt/D3DMetal.framework/Versions/A/D3DMetal\0" +
+        "f txt\0tREG\0nd3d12.dll\0"
     );
     expect(records).toHaveLength(3);
     expect(records[0].dev).toBe(0x100002n);
@@ -1137,24 +1172,54 @@ describe("D3DMetal multi-instance Metal IR aggregation", () => {
       device: 0x100002n,
       inode: 123n,
     };
-    const base = { pid: 29660, type: "REG", dev: 0x100002n, inode: 123n } as const;
-    expect(validateD3DMetalExpectedVnode([
-      { ...base, name: expected.canonicalPath },
-      { ...base, name: expected.canonicalPath },
-      { ...base, name: expected.realPath },
-    ], expected)).toMatchObject({ ok: true });
-    expect(validateD3DMetalExpectedVnode([
-      { ...base, name: expected.canonicalPath },
-      { ...base, name: expected.canonicalPath + ".bak" },
-      { ...base, name: expected.realPath },
-    ], expected)).toEqual({ ok: false, reason: "hard-link-alias" });
-    expect(validateD3DMetalExpectedVnode([
-      { ...base, name: expected.canonicalPath },
-      { ...base, inode: 124n, name: expected.realPath },
-    ], expected)).toEqual({ ok: false, reason: "conflicting-vnode" });
-    expect(validateD3DMetalExpectedVnode([
-      { ...base, type: "REG", dev: 0x100003n, name: expected.canonicalPath },
-    ], expected)).toEqual({ ok: false, reason: "hard-link-alias" });
+    const base = {
+      pid: 29660,
+      type: "REG",
+      dev: 0x100002n,
+      inode: 123n,
+    } as const;
+    expect(
+      validateD3DMetalExpectedVnode(
+        [
+          { ...base, name: expected.canonicalPath },
+          { ...base, name: expected.canonicalPath },
+          { ...base, name: expected.realPath },
+        ],
+        expected
+      )
+    ).toMatchObject({ ok: true });
+    expect(
+      validateD3DMetalExpectedVnode(
+        [
+          { ...base, name: expected.canonicalPath },
+          { ...base, name: expected.canonicalPath + ".bak" },
+          { ...base, name: expected.realPath },
+        ],
+        expected
+      )
+    ).toEqual({ ok: false, reason: "hard-link-alias" });
+    expect(
+      validateD3DMetalExpectedVnode(
+        [
+          { ...base, name: expected.canonicalPath },
+          { ...base, inode: 124n, name: expected.realPath },
+        ],
+        expected
+      )
+    ).toEqual({ ok: false, reason: "conflicting-vnode" });
+    expect(
+      validateD3DMetalExpectedVnode(
+        [
+          {
+            ...base,
+            type: "REG",
+            dev: 0x100003n,
+            name: expected.canonicalPath,
+          },
+        ],
+        expected
+      )
+    ).toEqual({ ok: false, reason: "hard-link-alias" });
   });
 
   it("holds stand-in workload release until ACK and confirms mismatch termination", async () => {
@@ -1167,8 +1232,8 @@ describe("D3DMetal multi-instance Metal IR aggregation", () => {
         run_id: "r",
         session_root: "/s",
         capture_sha256: "c",
-      d3dmetal_sha256: "d",
-      module_sha256: "d",
+        d3dmetal_sha256: "d",
+        module_sha256: "d",
         configured_offset: "0x87ec9",
         pid: 7,
         executable: "e",
@@ -1260,7 +1325,8 @@ describe("D3DMetal multi-instance Metal IR aggregation", () => {
       waitForD3DMetalCaptureAcknowledgement({
         path: "/unused",
         expected: {} as any,
-        snapshotGameExecutable: "/Applications/ZenlessZoneZero/ZenlessZoneZero.exe",
+        snapshotGameExecutable:
+          "/Applications/ZenlessZoneZero/ZenlessZoneZero.exe",
         candidates,
         enumerate: async () => [ack],
         snapshot: async () =>
@@ -1275,25 +1341,57 @@ describe("D3DMetal multi-instance Metal IR aggregation", () => {
   it("rejects malformed NUL fields and validates exact required artifact sets", () => {
     expect(() => parseD3DMetalLsofFields("p7\0xunknown\0")).toThrow("unknown");
     expect(() => parseD3DMetalLsofFields("p7\0cWine")).toThrow("unterminated");
-    expect(() => parseD3DMetalLsofFields("p7\0cWine\0cWine\0")).toThrow("duplicate");
-    expect(parseD3DMetalLsofFields("p7\0cWine\0\nf txt\0tREG\0n/game.exe\0\n"))
-      .toHaveLength(1);
-    const output = new TextEncoder().encode("p7\0f txt\0t REG\0n/game.exe\0f txt\0t REG\0n/D3DMetal.framework/D3DMetal\0f txt\0t REG\0n/d3d12.dll\0");
+    expect(() => parseD3DMetalLsofFields("p7\0cWine\0cWine\0")).toThrow(
+      "duplicate"
+    );
+    expect(
+      parseD3DMetalLsofFields("p7\0cWine\0\nf txt\0tREG\0n/game.exe\0\n")
+    ).toHaveLength(1);
+    const output = new TextEncoder().encode(
+      "p7\0f txt\0t REG\0n/game.exe\0f txt\0t REG\0n/D3DMetal.framework/D3DMetal\0f txt\0t REG\0n/d3d12.dll\0"
+    );
     const records = parseD3DMetalLsofFields(output);
-    expect(hasD3DMetalRequiredArtifacts(records, ["/game.exe", "/D3DMetal.framework/D3DMetal", "/d3d12.dll"])).toBe(true);
-    expect(hasD3DMetalRequiredArtifacts(records, ["/game.exe", "/D3DMetal.framework/D3DMetal"])).toBe(true);
-    expect(hasD3DMetalRequiredArtifacts(records, ["/game.exe", "/missing.dll"])).toBe(false);
+    expect(
+      hasD3DMetalRequiredArtifacts(records, [
+        "/game.exe",
+        "/D3DMetal.framework/D3DMetal",
+        "/d3d12.dll",
+      ])
+    ).toBe(true);
+    expect(
+      hasD3DMetalRequiredArtifacts(records, [
+        "/game.exe",
+        "/D3DMetal.framework/D3DMetal",
+      ])
+    ).toBe(true);
+    expect(
+      hasD3DMetalRequiredArtifacts(records, ["/game.exe", "/missing.dll"])
+    ).toBe(false);
   });
 
   it("preflights an absolute regular executable and rejects symlink components", async () => {
     const fs = {
-      lstat: async (path: string) => ({ type: path === "/Applications" || path === "/Applications/ZenlessZoneZero" ? "DIR" : "REG" }),
+      lstat: async (path: string) => ({
+        type:
+          path === "/Applications" || path === "/Applications/ZenlessZoneZero"
+            ? "DIR"
+            : "REG",
+      }),
       stat: async () => ({ type: "REG", dev: 12n, ino: 34n }),
       realpath: async (path: string) => path,
     };
-    await expect(preflightD3DMetalExpectedVnode("/Applications/ZenlessZoneZero/game.exe", fs)).resolves.toMatchObject({ device: 12n, inode: 34n });
-    await expect(preflightD3DMetalExpectedVnode("relative/game.exe", fs)).rejects.toThrow("absolute");
-    await expect(preflightD3DMetalExpectedVnode("/Applications/../game.exe", fs)).rejects.toThrow("clean");
+    await expect(
+      preflightD3DMetalExpectedVnode(
+        "/Applications/ZenlessZoneZero/game.exe",
+        fs
+      )
+    ).resolves.toMatchObject({ device: 12n, inode: 34n });
+    await expect(
+      preflightD3DMetalExpectedVnode("relative/game.exe", fs)
+    ).rejects.toThrow("absolute");
+    await expect(
+      preflightD3DMetalExpectedVnode("/Applications/../game.exe", fs)
+    ).rejects.toThrow("clean");
   });
 
   it("fails closed when two candidate PIDs publish valid ACKs", async () => {
