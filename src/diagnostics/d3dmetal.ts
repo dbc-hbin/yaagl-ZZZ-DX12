@@ -11,6 +11,9 @@ import {
 } from "@utils";
 import {
   D3DMETAL_INHERITED_ENVIRONMENT_BLOCKLIST,
+  D3DMetalZzzGpuSpoof,
+  isD3DMetalZzzGpuEnvironment,
+  isD3DMetalZzzGpuSpoofEnvironment,
   D3DMETAL_LAUNCH_ENVIRONMENT,
   D3DMETAL_VERSION,
   ZZZ_D3D12_SELECTOR,
@@ -108,9 +111,18 @@ export interface D3DMetalLaunchProfile {
   gameExecutable: string;
   arguments: string[];
   environment: Record<string, string>;
+  gpuSpoof: D3DMetalZzzGpuSpoof;
   launchExitCode: number | null;
-  metalIrTerminalStatus: "complete" | "incomplete" | "unavailable" | null;
+  metalIrTerminalStatus?: "complete" | "incomplete" | "unavailable" | null;
   metalIrSessionRoot?: string;
+  rtShim?: {
+    path: string;
+    hash: string;
+    d3dMetalHash: string;
+    providerHash: string;
+    dxcompilerHash: string;
+    replacementHash: string;
+  };
   metalIrAggregation?: D3DMetalMetalIrAggregation;
   metalIrProbe?: {
     mode:
@@ -1246,6 +1258,7 @@ export interface D3DMetalRuntimeEvidence {
   metalIrRunId: string | null;
   metalIrSourceRevision: string | null;
   metalIrBuildIdentity: string | null;
+  gpuSpoof: D3DMetalZzzGpuSpoof | null;
   launchExitCode: number | null;
   metalIrTerminalStatus: "complete" | "incomplete" | "unavailable" | null;
   metalIrDiagnosticPass: boolean;
@@ -2757,9 +2770,18 @@ export function verifyD3DMetalLaunchProfile(
   if (profile === undefined) return false;
   const normalized = (value: string) =>
     value.replaceAll("/", "\\").toLowerCase();
-  const requiredEnvironment = Object.entries(D3DMETAL_LAUNCH_ENVIRONMENT).every(
-    ([key, value]) => profile.environment[key] === value
-  );
+  const requiredEnvironment = Object.entries(D3DMETAL_LAUNCH_ENVIRONMENT)
+    .filter(
+      ([key]) =>
+        ![
+          "D3DM_VENDOR_ID",
+          "D3DM_DEVICE_ID",
+          "D3DM_DEVICE_DESCRIPTION",
+        ].includes(key)
+    )
+    .every(([key, value]) => profile.environment[key] === value) &&
+    isD3DMetalZzzGpuEnvironment(profile.environment) &&
+    isD3DMetalZzzGpuSpoofEnvironment(profile.gpuSpoof, profile.environment);
   const inheritedBackendAbsent = D3DMETAL_INHERITED_ENVIRONMENT_BLOCKLIST.every(
     key => !profile.environment[key]
   );
@@ -2848,6 +2870,7 @@ export function analyzeD3DMetalRuntimeEvidence({
     observations.nvngx && metalFxConversion && !metalFxFailure;
   const dxrVerified = backendVerified && dxr.capability === "supported";
   const launchExitCode = launchProfile?.launchExitCode ?? null;
+  const gpuSpoof = launchProfile?.gpuSpoof ?? null;
   const metalIrTerminalStatus = launchProfile?.metalIrTerminalStatus ?? null;
   const metalIrDiagnosticPass =
     launchProfile?.metalIrProbe?.passive === true &&
@@ -2878,6 +2901,7 @@ export function analyzeD3DMetalRuntimeEvidence({
     metalIrRunId: launchProfile?.metalIrProbe?.runId ?? null,
     metalIrSourceRevision: launchProfile?.metalIrProbe?.sourceRevision ?? null,
     metalIrBuildIdentity: launchProfile?.metalIrProbe?.buildIdentity ?? null,
+    gpuSpoof,
     launchExitCode,
     metalIrTerminalStatus,
     metalIrDiagnosticPass,

@@ -40,6 +40,7 @@ import createResolution from "./config/resolution";
 import createBlockNet from "./config/block-net";
 import createSteamPatch from "./config/steam-patch";
 import createTimeoutFix from "./config/timeout-fix";
+import createD3DMetalGpuSpoof from "./config/d3dmetal-gpu-spoof";
 import { getGameVersion as _getGameVersion } from "../unity";
 import {
   HoyoConnectGameBackgroundType,
@@ -369,6 +370,7 @@ export async function createNAPChannelClient({
       const [BN] = await createBlockNet({ locale, config });
       const [SP] = await createSteamPatch({ locale, config });
       const [TF] = await createTimeoutFix({ locale, config });
+      const [GPU] = await createD3DMetalGpuSpoof({ locale, config });
 
       if (wine.attributes.renderBackend === "d3dmetal") {
         config.patchOff = true;
@@ -386,6 +388,7 @@ export async function createNAPChannelClient({
           <BN />,
           wine.attributes.renderBackend === "d3dmetal" ? null : <SP />,
           wine.attributes.renderBackend === "d3dmetal" ? null : <TF />,
+          wine.attributes.renderBackend === "d3dmetal" ? <GPU /> : null,
         ];
       };
     },

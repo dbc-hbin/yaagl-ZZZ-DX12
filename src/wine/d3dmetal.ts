@@ -75,9 +75,36 @@ export const D3DMETAL_METAL_IR_CONVERTER_SHA256 =
 export const D3DMETAL_DXCOMPILER_SHA256 =
   "57dc9421af62c35b372adf7536f07b1e2c20ef32dc1f4c16930a42fc12ed1fd2" as const;
 export const D3DMETAL_UNORM_REPLACEMENT_RELATIVE_PATH =
-  "sidecar/diagnostics/zzz-rt-unorm-float.dxil" as const;
+  "sidecar/runtime/zzz-rt-unorm-float.dxil" as const;
 export const D3DMETAL_UNORM_REPLACEMENT_SHA256 =
   "c64e67eabc3cf5ff89359c3075ebe00387c5a46d5136ea61dfbdd832b2f01717" as const;
+
+/**
+ * Production-only ZZZ RT translator. Unlike the retired diagnostic probe it
+ * has no capture protocol, observers, source exports, lifecycle workers, or
+ * teardown callback. It only substitutes verified UNORM/InjectCache DXIL at
+ * the two known D3DMetal compiler callers and otherwise calls the original.
+ */
+export const D3DMETAL_ZZZ_RT_SHIM_MODE = "zzz-rt-shim-v1" as const;
+export const D3DMETAL_ZZZ_RT_SHIM_RELATIVE_PATH =
+  "sidecar/runtime/libyaagl-zzz-rt-shim.dylib" as const;
+export const D3DMETAL_ZZZ_RT_SHIM_SHA256 =
+  "cdc25f54ba455437a79ae00d3797aa401dce2c8171654f56ce9b7bb1aca3f53d" as const;
+
+export const D3DMETAL_ZZZ_GPU_SPOOFS = {
+  rtx4060: {
+    vendorId: "0x10de",
+    deviceId: "0x2882",
+    description: "NVIDIA GeForce RTX 4060",
+  },
+  rtx5060: {
+    vendorId: "0x10de",
+    deviceId: "0x2d05",
+    description: "NVIDIA GeForce RTX 5060",
+  },
+} as const;
+export type D3DMetalZzzGpuSpoof = keyof typeof D3DMETAL_ZZZ_GPU_SPOOFS;
+export const D3DMETAL_DEFAULT_ZZZ_GPU_SPOOF = "rtx4060" as const;
 
 /** Signed diagnostic that traps with EAX at CreateStateObject's return edge. */
 export const D3DMETAL_4_0_BETA_2_STATE_OBJECT_RETURN_TRAP_SHA256 =
@@ -153,6 +180,39 @@ export const D3DMETAL_LAUNCH_ENVIRONMENT = {
   D3DM_DEVICE_ID: "0x2882",
   D3DM_DEVICE_DESCRIPTION: "NVIDIA GeForce RTX 4060",
 } as const;
+
+export function createD3DMetalLaunchEnvironment(
+  spoof: D3DMetalZzzGpuSpoof = D3DMETAL_DEFAULT_ZZZ_GPU_SPOOF
+) {
+  const gpu = D3DMETAL_ZZZ_GPU_SPOOFS[spoof];
+  return {
+    ...D3DMETAL_LAUNCH_ENVIRONMENT,
+    D3DM_VENDOR_ID: gpu.vendorId,
+    D3DM_DEVICE_ID: gpu.deviceId,
+    D3DM_DEVICE_DESCRIPTION: gpu.description,
+  };
+}
+
+export function isD3DMetalZzzGpuEnvironment(environment: Record<string, string>) {
+  return Object.values(D3DMETAL_ZZZ_GPU_SPOOFS).some(
+    gpu =>
+      environment.D3DM_VENDOR_ID === gpu.vendorId &&
+      environment.D3DM_DEVICE_ID === gpu.deviceId &&
+      environment.D3DM_DEVICE_DESCRIPTION === gpu.description
+  );
+}
+
+export function isD3DMetalZzzGpuSpoofEnvironment(
+  spoof: D3DMetalZzzGpuSpoof,
+  environment: Record<string, string>
+) {
+  const gpu = D3DMETAL_ZZZ_GPU_SPOOFS[spoof];
+  return (
+    environment.D3DM_VENDOR_ID === gpu.vendorId &&
+    environment.D3DM_DEVICE_ID === gpu.deviceId &&
+    environment.D3DM_DEVICE_DESCRIPTION === gpu.description
+  );
+}
 
 export const ZZZ_D3D12_SELECTOR = "-use-d3d12" as const;
 
@@ -295,6 +355,29 @@ export function createD3DMetalMetalIrEnvironment({
           YAAGL_METAL_IR_D3DMETAL: d3dMetalPath!,
           [D3DMETAL_DYLD_INSERT_BRIDGE]: probePath!,
         }),
+  };
+}
+
+export function createD3DMetalZzzRtShimEnvironment({
+  shimPath,
+  replacementPath,
+  d3dMetalPath,
+  providerPath,
+  dxcompilerPath,
+}: {
+  shimPath: string;
+  replacementPath: string;
+  d3dMetalPath: string;
+  providerPath: string;
+  dxcompilerPath: string;
+}) {
+  return {
+    YAAGL_RUNTIME_MODE: D3DMETAL_ZZZ_RT_SHIM_MODE,
+    [D3DMETAL_DYLD_INSERT_BRIDGE]: shimPath,
+    YAAGL_ZZZ_RT_SHIM_REPLACEMENT: replacementPath,
+    YAAGL_ZZZ_RT_SHIM_D3DMETAL: d3dMetalPath,
+    YAAGL_ZZZ_RT_SHIM_PROVIDER: providerPath,
+    YAAGL_ZZZ_RT_SHIM_DXCOMPILER: dxcompilerPath,
   };
 }
 
@@ -499,6 +582,84 @@ export async function validateD3DMetalMetalIrProbe({
     dxcompilerHash,
     replacementPath,
     replacementHash,
+  };
+}
+
+export async function validateD3DMetalZzzRtShim({
+  wineRoot,
+  shimPath,
+  replacementPath,
+}: {
+  wineRoot: string;
+  shimPath: string;
+  replacementPath: string;
+}) {
+  const d3dMetalPath = join(
+    wineRoot,
+    D3DMETAL_FRAMEWORK_RUNTIME_CANONICAL_PATH
+  );
+  const providerPath = join(
+    wineRoot,
+    D3DMETAL_METAL_IR_CONVERTER_RELATIVE_PATH
+  );
+  const dxcompilerPath = join(wineRoot, D3DMETAL_DXCOMPILER_RELATIVE_PATH);
+  const [
+    d3dMetalHash,
+    shimHash,
+    providerHash,
+    dxcompilerHash,
+    replacementHash,
+  ] =
+    await Promise.all([
+      sha256File(d3dMetalPath),
+      sha256File(shimPath),
+      sha256File(providerPath),
+      sha256File(dxcompilerPath),
+      sha256File(replacementPath),
+    ]);
+  if (d3dMetalHash !== D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256) {
+    throw new Error(
+      `ZZZ RT shim requires D3DMetal ${D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256}, found ${d3dMetalHash}`
+    );
+  }
+  if (shimHash !== D3DMETAL_ZZZ_RT_SHIM_SHA256) {
+    throw new Error(
+      `ZZZ RT shim hash mismatch: expected ${D3DMETAL_ZZZ_RT_SHIM_SHA256}, found ${shimHash}`
+    );
+  }
+  if (providerHash !== D3DMETAL_METAL_IR_CONVERTER_SHA256) {
+    throw new Error(
+      `ZZZ RT shim provider mismatch: expected ${D3DMETAL_METAL_IR_CONVERTER_SHA256}, found ${providerHash}`
+    );
+  }
+  if (dxcompilerHash !== D3DMETAL_DXCOMPILER_SHA256) {
+    throw new Error(
+      `ZZZ RT shim DXC mismatch: expected ${D3DMETAL_DXCOMPILER_SHA256}, found ${dxcompilerHash}`
+    );
+  }
+  if (replacementHash !== D3DMETAL_UNORM_REPLACEMENT_SHA256) {
+    throw new Error(
+      `ZZZ RT shim replacement mismatch: expected ${D3DMETAL_UNORM_REPLACEMENT_SHA256}, found ${replacementHash}`
+    );
+  }
+  await exec(["/usr/bin/codesign", "--verify", "--strict", shimPath]);
+  const fileDescription = (await exec(["/usr/bin/file", shimPath])).stdOut;
+  if (!/Mach-O 64-bit[^\n]*x86_64/i.test(fileDescription)) {
+    throw new Error(
+      `ZZZ RT shim must be a Mach-O x86_64 dylib: ${fileDescription.trim()}`
+    );
+  }
+  return {
+    shimPath,
+    shimHash,
+    replacementPath,
+    replacementHash,
+    d3dMetalPath,
+    d3dMetalHash,
+    providerPath,
+    providerHash,
+    dxcompilerPath,
+    dxcompilerHash,
   };
 }
 

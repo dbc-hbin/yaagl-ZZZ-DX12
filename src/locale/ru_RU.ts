@@ -69,6 +69,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_LEFT_CMD: "Назначить левый CMD как CTRL",
   SETTING_TURN_OFF_AC_PATCH: "Отключить патч АЧ",
   SETTING_CUSTOM_RESOLUTION: "Пользовательское разрешение",
+  SETTING_D3DMETAL_GPU_SPOOF: "Подмена GPU D3DMetal",
   SETTING_SAVE: "Сохранить",
   SETTING_CANCEL: "Отменить",
 

@@ -72,6 +72,7 @@ export const fr_FR: typeof zh_CN = {
   SETTING_LEFT_CMD: "Mapper CMD gauche à CTRL",
   SETTING_TURN_OFF_AC_PATCH: "Désactiver le patch AC",
   SETTING_CUSTOM_RESOLUTION: "Résolution personnalisée",
+  SETTING_D3DMETAL_GPU_SPOOF: "Usurpation GPU D3DMetal",
   SETTING_SAVE: "Sauvegarder",
   SETTING_CANCEL: "Annuler",
 

@@ -72,6 +72,7 @@ export const es_ES: typeof zh_CN = {
   SETTING_LEFT_CMD: "Asignar CMD izquierdo a CTRL",
   SETTING_TURN_OFF_AC_PATCH: "Apagar el AC parche",
   SETTING_CUSTOM_RESOLUTION: "Resolución personalizada",
+  SETTING_D3DMETAL_GPU_SPOOF: "Suplantación de GPU D3DMetal",
   SETTING_SAVE: "Guardar",
   SETTING_CANCEL: "Cancelar",
 

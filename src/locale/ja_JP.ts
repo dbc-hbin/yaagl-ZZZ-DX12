@@ -69,6 +69,7 @@ export const ja_JP: typeof zh_CN = {
   SETTING_LEFT_CMD: "左CMDキーをCTRLキーにマップ",
   SETTING_TURN_OFF_AC_PATCH: "ACパッチを無効にする",
   SETTING_CUSTOM_RESOLUTION: "カスタム解像度",
+  SETTING_D3DMETAL_GPU_SPOOF: "D3DMetal GPU スプーフィング",
   SETTING_SAVE: "保存",
   SETTING_CANCEL: "キャンセル",
 

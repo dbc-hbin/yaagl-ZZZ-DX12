@@ -84,23 +84,12 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   try {
     await fs.writeJSON(neutralinoConfigPath, config);
     if (process.env["YAAGL_CHANNEL_CLIENT"] === "naposdx12") {
-      await Promise.all([
-        execa("bash", [
-          path.resolve(process.cwd(), "scripts", "build-metal-ir-capture.sh"),
-        ]),
-        execa("bash", [
-          path.resolve(
-            process.cwd(),
-            "scripts",
-            "build-capture-fs-helper.sh"
-          ),
-        ]),
+      await execa("bash", [
+        path.resolve(process.cwd(), "scripts", "build-zzz-rt-shim.sh"),
       ]);
-      // The renderer bundle embeds this exact dylib identity. Synchronize it
-      // before TypeScript/Vite so a later native rebuild cannot make the shipped
-      // frontend reject its own sidecar.
+      // The renderer bundle embeds this exact production shim identity.
       await execa("node", [
-        path.resolve(process.cwd(), "scripts", "sync-metal-ir-hash.mjs"),
+        path.resolve(process.cwd(), "scripts", "sync-zzz-rt-shim-hash.mjs"),
       ]);
     }
     await execa("pnpm", ["exec", "tsc"]); // do typecheck first
@@ -316,28 +305,22 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
   }
   // Remove potentially existing dev sophon_server from sidecar
   await fs.remove(path.resolve(process.cwd(), `sidecar`, `sophon_server`));
-  // The DX12 diagnostic binaries are rebuilt immediately above. Remove the
-  // destination tree so fs-extra cannot preserve a stale same-name artifact
-  // from an earlier bundle when timestamps or copy metadata happen to match.
+  // The DX12 RT shim is rebuilt immediately above. Remove the destination
+  // tree so fs-extra cannot preserve a stale same-name artifact.
   await fs.remove(sidecarDst);
   await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
     preserveTimestamps: true,
   });
   if (process.env["YAAGL_CHANNEL_CLIENT"] === "naposdx12") {
-    for (const diagnostic of [
-      "libyaagl-metal-ir-capture.dylib",
-      "yaagl-capture-fs-helper",
+    for (const runtime of [
+      "libyaagl-zzz-rt-shim.dylib",
+      "zzz-rt-unorm-float.dxil",
     ]) {
-      const source = path.resolve(
-        process.cwd(),
-        "sidecar",
-        "diagnostics",
-        diagnostic
-      );
-      const destination = path.resolve(sidecarDst, "diagnostics", diagnostic);
+      const source = path.resolve(process.cwd(), "sidecar", "runtime", runtime);
+      const destination = path.resolve(sidecarDst, "runtime", runtime);
       await fs.copyFile(source, destination);
       if (!(await fs.readFile(source)).equals(await fs.readFile(destination))) {
-        throw new Error(`DX12 diagnostic bundle copy mismatch: ${diagnostic}`);
+        throw new Error(`DX12 RT runtime bundle copy mismatch: ${runtime}`);
       }
     }
   }

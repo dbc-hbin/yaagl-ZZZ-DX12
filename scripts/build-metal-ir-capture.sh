@@ -138,7 +138,7 @@ if [[ "${1:-}" == "--dxc-roundtrip-proof" ]]; then
     -o "$build_dir/dxc-roundtrip-proof"
   "$build_dir/dxc-roundtrip-proof" \
     "$repo_dir/naposdx12/gptk/4.0b2/lib/external/D3DMetal.framework/Versions/A/Resources/libdxcompiler.dylib" \
-    "$repo_dir/sidecar/diagnostics/zzz-rt-unorm-float.dxil" \
+    "$repo_dir/sidecar/runtime/zzz-rt-unorm-float.dxil" \
     "$build_dir/zzz-rt-unorm-float-roundtrip.dxil"
   exit 0
 fi

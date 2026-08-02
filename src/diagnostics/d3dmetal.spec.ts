@@ -33,6 +33,7 @@ import {
   hasD3DMetalRequiredArtifacts,
   hasD3DMetalRuntimeModules,
   terminateAndConfirmD3DMetalWineTree,
+  verifyD3DMetalLaunchProfile,
 } from "./d3dmetal";
 
 const launchProfile: D3DMetalLaunchProfile = {
@@ -56,6 +57,7 @@ const launchProfile: D3DMetalLaunchProfile = {
     D3DM_DEVICE_ID: "0x2882",
     D3DM_DEVICE_DESCRIPTION: "NVIDIA GeForce RTX 4060",
   },
+  gpuSpoof: "rtx4060",
   launchExitCode: 0,
   metalIrTerminalStatus: "complete",
 };
@@ -68,6 +70,21 @@ Direct3D:
 There are more uavs on D3D11.0. This is only a shader capability warning.`;
 
 describe("D3DMetal diagnostic paths", () => {
+  it("accepts both supported ZZZ GPU spoof profiles", () => {
+    expect(verifyD3DMetalLaunchProfile(launchProfile)).toBe(true);
+    expect(
+      verifyD3DMetalLaunchProfile({
+        ...launchProfile,
+        environment: {
+          ...launchProfile.environment,
+          D3DM_DEVICE_ID: "0x2d05",
+          D3DM_DEVICE_DESCRIPTION: "NVIDIA GeForce RTX 5060",
+        },
+        gpuSpoof: "rtx5060",
+      })
+    ).toBe(true);
+  });
+
   it("collects the actual D3DMetal and Metal compiler unified-log sources", () => {
     expect(D3DMETAL_SYSTEM_LOG_PREDICATE).toContain('subsystem == "D3DMetal"');
     expect(D3DMETAL_SYSTEM_LOG_PREDICATE).toContain(
