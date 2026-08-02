@@ -122,13 +122,15 @@ bool digestMatches(const uint8_t value[32], const char *expected) {
 bool fileDigestMatches(const char *path, const char *expected) {
   if (!path || !*path || !expected)
     return false;
-  struct stat status{};
-  if (stat(path, &status) != 0 || !S_ISREG(status.st_mode) ||
-      status.st_size <= 0 || status.st_size > INT32_MAX)
-    return false;
   const int fd = open(path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
   if (fd < 0)
     return false;
+  struct stat status{};
+  if (fstat(fd, &status) != 0 || !S_ISREG(status.st_mode) ||
+      status.st_size <= 0 || status.st_size > INT32_MAX) {
+    close(fd);
+    return false;
+  }
   const size_t size = static_cast<size_t>(status.st_size);
   const void *mapping = mmap(nullptr, size, PROT_READ, MAP_PRIVATE, fd, 0);
   close(fd);
@@ -422,13 +424,17 @@ void tryInstall() {
                                                     __ATOMIC_ACQUIRE);
   const bool protectedAgain = setPageProtection(slot, g_slotProtection);
   if (!installed || !protectedAgain) {
+    bool restored = !installed;
     if (installed && setPageProtection(slot, g_slotProtection | VM_PROT_WRITE)) {
       CompileAndLink current = wrapper;
-      (void)__atomic_compare_exchange(slot, &current, &original, false,
-                                      __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE);
+      restored = __atomic_compare_exchange(slot, &current, &original, false,
+                                           __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE);
       (void)setPageProtection(slot, g_slotProtection);
     }
-    g_original.store(nullptr, std::memory_order_release);
+    // If rollback could not restore the slot, keep the original published so
+    // the already-reachable wrapper remains a transparent pass-through.
+    if (restored)
+      g_original.store(nullptr, std::memory_order_release);
     return;
   }
   g_slot = slot;

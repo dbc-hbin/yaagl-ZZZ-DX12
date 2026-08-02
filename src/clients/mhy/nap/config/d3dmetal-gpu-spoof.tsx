@@ -40,7 +40,7 @@ export default async function ({
   try {
     const stored = await getKey(CONFIG_KEY);
     config.d3dMetalGpuSpoof =
-      stored in D3DMETAL_ZZZ_GPU_SPOOFS
+      Object.prototype.hasOwnProperty.call(D3DMETAL_ZZZ_GPU_SPOOFS, stored)
         ? (stored as D3DMetalZzzGpuSpoof)
         : D3DMETAL_DEFAULT_ZZZ_GPU_SPOOF;
   } catch {

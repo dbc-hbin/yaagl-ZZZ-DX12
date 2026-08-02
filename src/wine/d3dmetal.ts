@@ -89,7 +89,7 @@ export const D3DMETAL_ZZZ_RT_SHIM_MODE = "zzz-rt-shim-v1" as const;
 export const D3DMETAL_ZZZ_RT_SHIM_RELATIVE_PATH =
   "sidecar/runtime/libyaagl-zzz-rt-shim.dylib" as const;
 export const D3DMETAL_ZZZ_RT_SHIM_SHA256 =
-  "cdc25f54ba455437a79ae00d3797aa401dce2c8171654f56ce9b7bb1aca3f53d" as const;
+  "5dafe3d49ec8ee6f1ef08186f0a537063397aa6697cd2b4361f18d2c2fb5b11d" as const;
 
 export const D3DMETAL_ZZZ_GPU_SPOOFS = {
   rtx4060: {
