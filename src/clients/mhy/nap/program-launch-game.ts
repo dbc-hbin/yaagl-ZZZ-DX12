@@ -41,6 +41,7 @@ import {
   writeD3DMetalLaunchProfile,
   writeD3DMetalRuntimeEvidence,
 } from "../../../diagnostics/d3dmetal";
+import { d3dMetalRuntimeDiagnosticsEnabled } from "../../../wine/d3dmetal-runtime-profile";
 
 export async function* launchGameProgram({
   gameDir,
@@ -100,14 +101,39 @@ cd /d "${wine.toWinePath(gameDir)}"
   try {
     yield ["setStateText", "GAME_RUNNING"];
     launchStartedAt = new Date();
-    const logfile = resolve(`./logs/game_${launchStartedAt.getTime()}.log`);
-    d3dMetalDiagnostics =
-      wine.attributes.renderBackend === "d3dmetal"
-        ? createD3DMetalDiagnosticPaths(
-            resolve("./logs"),
-            launchStartedAt.getTime()
-          )
-        : undefined;
+    const runtimeDiagnosticsEnabled =
+      wine.attributes.renderBackend === "d3dmetal" &&
+      d3dMetalRuntimeDiagnosticsEnabled();
+    const logfile =
+      wine.attributes.renderBackend === "d3dmetal" &&
+      !runtimeDiagnosticsEnabled
+        ? undefined
+        : resolve(`./logs/game_${launchStartedAt.getTime()}.log`);
+    d3dMetalDiagnostics = runtimeDiagnosticsEnabled
+      ? createD3DMetalDiagnosticPaths(
+          resolve("./logs"),
+          launchStartedAt.getTime()
+        )
+      : undefined;
+
+    if (wine.attributes.renderBackend === "d3dmetal") {
+      const shimPath = resolve(`./${D3DMETAL_ZZZ_RT_SHIM_RELATIVE_PATH}`);
+      const replacementPath = resolve(
+        `./${D3DMETAL_UNORM_REPLACEMENT_RELATIVE_PATH}`
+      );
+      try {
+        rtShimValidation = await validateD3DMetalZzzRtShim({
+          wineRoot: wine.root,
+          shimPath,
+          replacementPath,
+        });
+      } catch (error) {
+        // The RT shim is optional for launch authority. Never regress the
+        // proven direct D3DMetal city path because its artifact is absent.
+        await log(`ZZZ RT shim unavailable: ${String(error)}`);
+      }
+    }
+
     if (d3dMetalDiagnostics) {
       try {
         await writePendingD3DMetalRuntimeEvidence({
@@ -116,21 +142,6 @@ cd /d "${wine.toWinePath(gameDir)}"
         });
         playerLogSource = createZzzPlayerLogPath(wine.prefix);
         playerLogBefore = await fingerprintD3DMetalPlayerLog(playerLogSource);
-        const shimPath = resolve(`./${D3DMETAL_ZZZ_RT_SHIM_RELATIVE_PATH}`);
-        const replacementPath = resolve(
-          `./${D3DMETAL_UNORM_REPLACEMENT_RELATIVE_PATH}`
-        );
-        try {
-          rtShimValidation = await validateD3DMetalZzzRtShim({
-            wineRoot: wine.root,
-            shimPath,
-            replacementPath,
-          });
-        } catch (error) {
-          // The RT shim is optional for launch authority. Never regress the
-          // proven direct D3DMetal city path because its artifact is absent.
-          await log(`ZZZ RT shim unavailable: ${String(error)}`);
-        }
       } catch (error) {
         await log(`D3DMetal diagnostics unavailable: ${String(error)}`);
         d3dMetalDiagnostics = undefined;

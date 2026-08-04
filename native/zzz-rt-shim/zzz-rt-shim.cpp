@@ -14,6 +14,8 @@
 #include <mach-o/dyld.h>
 #include <mach-o/loader.h>
 #include <mach/mach.h>
+#include <memory>
+#include <mutex>
 #include <new>
 #include <string>
 #include <sys/mman.h>
@@ -21,7 +23,9 @@
 #include <unistd.h>
 #include <vector>
 
+#include "decision-cache.hpp"
 #include "../metal-ir-capture/dxc-runtime.hpp"
+#include "../metal-ir-capture/translation-synchronization.hpp"
 #include "../metal-ir-capture/unorm24-transform.hpp"
 
 struct IRCompiler;
@@ -33,7 +37,7 @@ using CreateDxilObject = IRObject *(*)(const char *, size_t);
 
 namespace {
 
-constexpr const char *kMode = "zzz-rt-shim-v1";
+constexpr const char *kMode = "zzz-rt-shim-v2";
 constexpr uintptr_t kGotOffset = 0x4ae1a0;
 constexpr uintptr_t kCityCompileCallerOffset = 0x87ec9;
 constexpr uintptr_t kHistoricalRtCompileCallerOffset = 0x9a12f;
@@ -43,7 +47,7 @@ constexpr uintptr_t kDxilVtableOffset = 0x14940e0;
 constexpr size_t kDxilObjectHeaderBytes = 0x20;
 constexpr size_t kSourceCap = 64 * 1024;
 constexpr size_t kAssembledCap = 256 * 1024;
-constexpr uint32_t kCacheCap = 32;
+constexpr size_t kDecisionCacheCapacity = 2048;
 constexpr uint32_t kExactSourceBytes = 26964;
 constexpr uint32_t kExactReplacementBytes = 17720;
 constexpr const char *kExactSourceSha256 =
@@ -56,40 +60,47 @@ constexpr const char *kInjectCacheSourceSha256 =
 constexpr const char *kDxcompilerSha256 =
     "57dc9421af62c35b372adf7536f07b1e2c20ef32dc1f4c16930a42fc12ed1fd2";
 
+struct ObjectHeader {
+  const uint8_t *bytes = nullptr;
+  uint32_t size = 0;
+};
 struct ObjectSnapshot {
+  const uint8_t *bytes = nullptr;
   uint32_t size = 0;
   uint8_t digest[CC_SHA256_DIGEST_LENGTH]{};
-  alignas(64) uint8_t bytes[kSourceCap]{};
-};
-struct CacheEntry {
-  bool occupied = false;
-  uint8_t sourceDigest[CC_SHA256_DIGEST_LENGTH]{};
-  IRObject *object = nullptr;
-};
-struct NegativeCacheEntry {
-  bool occupied = false;
-  uint8_t sourceDigest[CC_SHA256_DIGEST_LENGTH]{};
 };
 
 std::atomic<CompileAndLink> g_original{nullptr};
 std::atomic<bool> g_installed{false};
-std::atomic<bool> g_runtimeReady{false};
-std::atomic<bool> g_runtimeAttempted{false};
 std::atomic_flag g_installLock = ATOMIC_FLAG_INIT;
-std::atomic_flag g_runtimeLock = ATOMIC_FLAG_INIT;
-std::atomic_flag g_cacheLock = ATOMIC_FLAG_INIT;
-const mach_header_64 *g_d3dmetal = nullptr;
-const mach_header_64 *g_provider = nullptr;
+yaagl::metal_ir::RuntimeInitializationGate g_exactReplacementInitializer;
+yaagl::metal_ir::RuntimeInitializationGate g_dxcInitializer;
+std::mutex g_transformMutex;
+std::atomic<const mach_header_64 *> g_d3dmetal{nullptr};
+std::atomic<const mach_header_64 *> g_provider{nullptr};
 CompileAndLink *g_slot = nullptr;
 vm_prot_t g_slotProtection = VM_PROT_NONE;
 yaagl::dxc::Runtime *g_dxc = nullptr;
 const uint8_t *g_exactReplacementBytes = nullptr;
 IRObject *g_exactReplacement = nullptr;
-CacheEntry g_cache[kCacheCap];
-uint32_t g_cacheCount = 0;
-NegativeCacheEntry g_negativeCache[kCacheCap];
-uint32_t g_negativeCacheCount = 0;
-thread_local ObjectSnapshot g_snapshot;
+yaagl::zzz_rt::DecisionCache<kDecisionCacheCapacity, IRObject *>
+    g_decisionCache;
+thread_local std::unique_ptr<uint8_t[]> g_snapshotStorage;
+thread_local size_t g_snapshotCapacity = 0;
+std::string g_d3dmetalPath;
+std::string g_providerPath;
+
+enum class CacheLookupStatus {
+  kMiss,
+  kPositive,
+  kNegative,
+  kTransientFailure,
+};
+
+struct CacheLookupResult {
+  CacheLookupStatus status = CacheLookupStatus::kMiss;
+  IRObject *object = nullptr;
+};
 
 bool image(const mach_header_64 *header) {
   return header && header->magic == MH_MAGIC_64 &&
@@ -163,8 +174,10 @@ bool setPageProtection(void *pointer, vm_prot_t protection) {
          KERN_SUCCESS;
 }
 
-bool readObject(const IRObject *object, ObjectSnapshot *snapshot) {
-  if (!object || !snapshot || !g_provider)
+bool readObjectHeader(const IRObject *object, ObjectHeader *output) {
+  const mach_header_64 *provider =
+      g_provider.load(std::memory_order_acquire);
+  if (!object || !output || !provider)
     return false;
   uint8_t header[kDxilObjectHeaderBytes]{};
   vm_size_t copied = 0;
@@ -182,25 +195,45 @@ bool readObject(const IRObject *object, ObjectSnapshot *snapshot) {
   std::memcpy(&size, header + 0x18, sizeof(size));
   std::memcpy(&type, header + 0x1c, sizeof(type));
   std::memcpy(&owns, header + 0x1d, sizeof(owns));
-  const void *expectedVtable = reinterpret_cast<const uint8_t *>(g_provider) +
+  const void *expectedVtable = reinterpret_cast<const uint8_t *>(provider) +
                                kDxilVtableOffset;
   if (vtable != expectedVtable || type != 2 || owns != 0 || !bytes || size == 0 ||
       size > kSourceCap)
     return false;
-  copied = 0;
-  if (vm_read_overwrite(mach_task_self(), reinterpret_cast<vm_address_t>(bytes),
-                        size, reinterpret_cast<vm_address_t>(snapshot->bytes),
-                        &copied) != KERN_SUCCESS || copied != size)
+  output->bytes = bytes;
+  output->size = size;
+  return true;
+}
+
+bool snapshotObject(const ObjectHeader &header, ObjectSnapshot *snapshot) {
+  if (!snapshot || !header.bytes || header.size == 0 || header.size > kSourceCap)
     return false;
-  snapshot->size = size;
-  return digest(snapshot->bytes, size, snapshot->digest);
+  if (header.size > g_snapshotCapacity) {
+    std::unique_ptr<uint8_t[]> expanded(
+        new (std::nothrow) uint8_t[header.size]);
+    if (!expanded)
+      return false;
+    g_snapshotStorage = std::move(expanded);
+    g_snapshotCapacity = header.size;
+  }
+  vm_size_t copied = 0;
+  if (vm_read_overwrite(
+          mach_task_self(), reinterpret_cast<vm_address_t>(header.bytes),
+          header.size, reinterpret_cast<vm_address_t>(g_snapshotStorage.get()),
+          &copied) != KERN_SUCCESS || copied != header.size)
+    return false;
+  snapshot->bytes = g_snapshotStorage.get();
+  snapshot->size = header.size;
+  return digest(snapshot->bytes, snapshot->size, snapshot->digest);
 }
 
 bool createBorrowedObject(const uint8_t *bytes, size_t size, IRObject **output) {
-  if (!bytes || !size || size > UINT32_MAX || !output || !g_provider)
+  const mach_header_64 *provider =
+      g_provider.load(std::memory_order_acquire);
+  if (!bytes || !size || size > UINT32_MAX || !output || !provider)
     return false;
   const auto create = reinterpret_cast<CreateDxilObject>(
-      reinterpret_cast<uintptr_t>(g_provider) + kProviderCreateDxilOffset);
+      reinterpret_cast<uintptr_t>(provider) + kProviderCreateDxilOffset);
   IRObject *object = create(reinterpret_cast<const char *>(bytes), size);
   if (!object)
     return false;
@@ -220,7 +253,7 @@ bool createBorrowedObject(const uint8_t *bytes, size_t size, IRObject **output) 
   std::memcpy(&storedSize, header + 0x18, sizeof(storedSize));
   std::memcpy(&type, header + 0x1c, sizeof(type));
   std::memcpy(&owns, header + 0x1d, sizeof(owns));
-  if (vtable != reinterpret_cast<const uint8_t *>(g_provider) + kDxilVtableOffset ||
+  if (vtable != reinterpret_cast<const uint8_t *>(provider) + kDxilVtableOffset ||
       storedBytes != bytes || storedSize != size || type != 2 || owns != 0)
     return false;
   *output = object;
@@ -243,81 +276,79 @@ bool createPersistentObject(const void *bytes, size_t size, IRObject **output) {
   return true; // D3DMetal's IR object borrows this mapping for process lifetime.
 }
 
-bool initializeRuntime() {
-  if (g_runtimeReady.load(std::memory_order_acquire))
-    return true;
-  if (g_runtimeAttempted.exchange(true, std::memory_order_acq_rel))
-    return false;
-  while (g_runtimeLock.test_and_set(std::memory_order_acquire)) {}
-  struct Unlock { ~Unlock() { g_runtimeLock.clear(std::memory_order_release); } };
-  const char *dxcompilerPath = getenv("YAAGL_ZZZ_RT_SHIM_DXCOMPILER");
-  const char *replacementPath = getenv("YAAGL_ZZZ_RT_SHIM_REPLACEMENT");
-  if (!dxcompilerPath || !replacementPath || !fileDigestMatches(dxcompilerPath, kDxcompilerSha256))
-    return false;
-  auto *dxc = new (std::nothrow) yaagl::dxc::Runtime();
-  if (!dxc || !dxc->open(dxcompilerPath))
-    return false;
-  const int fd = open(replacementPath, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
-  if (fd < 0)
-    return false;
-  struct stat status{};
-  const bool validSize = fstat(fd, &status) == 0 && S_ISREG(status.st_mode) &&
-                         status.st_size == static_cast<off_t>(kExactReplacementBytes);
-  void *mapping = validSize ? mmap(nullptr, kExactReplacementBytes, PROT_READ,
-                                   MAP_PRIVATE, fd, 0)
-                            : MAP_FAILED;
-  close(fd);
-  uint8_t replacementDigest[32]{};
-  IRObject *replacement = nullptr;
-  if (mapping == MAP_FAILED || !digest(mapping, kExactReplacementBytes, replacementDigest) ||
-      !digestMatches(replacementDigest, kExactReplacementSha256) ||
-      !createBorrowedObject(static_cast<const uint8_t *>(mapping),
-                            kExactReplacementBytes, &replacement)) {
-    if (mapping != MAP_FAILED)
-      munmap(mapping, kExactReplacementBytes);
-    return false;
-  }
-  g_dxc = dxc;
-  g_exactReplacementBytes = static_cast<const uint8_t *>(mapping);
-  g_exactReplacement = replacement;
-  g_runtimeReady.store(true, std::memory_order_release);
-  return true;
+CacheLookupResult lookupCache(const uint8_t sourceDigest[32]) {
+  const auto cached = g_decisionCache.lookup(sourceDigest);
+  if (cached.kind == yaagl::zzz_rt::DecisionKind::kPositive)
+    return {CacheLookupStatus::kPositive, cached.value};
+  if (cached.kind == yaagl::zzz_rt::DecisionKind::kNegative)
+    return {CacheLookupStatus::kNegative, nullptr};
+  return {CacheLookupStatus::kMiss, nullptr};
 }
 
-IRObject *selectReplacement(const ObjectSnapshot &source) {
-  if (!initializeRuntime())
-    return nullptr;
-  if (source.size == kExactSourceBytes &&
-      digestMatches(source.digest, kExactSourceSha256))
-    return g_exactReplacement;
+bool initializeExactReplacement() {
+  return g_exactReplacementInitializer.ensure([] {
+    const char *replacementPath = getenv("YAAGL_ZZZ_RT_SHIM_REPLACEMENT");
+    if (!replacementPath)
+      return false;
+    const int fd = open(replacementPath, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+    if (fd < 0)
+      return false;
+    struct stat status{};
+    bool valid = fstat(fd, &status) == 0 && S_ISREG(status.st_mode) &&
+                 status.st_size == static_cast<off_t>(kExactReplacementBytes);
+    void *mapping = valid ? mmap(nullptr, kExactReplacementBytes, PROT_READ,
+                                 MAP_PRIVATE, fd, 0)
+                          : MAP_FAILED;
+    if (close(fd) != 0)
+      valid = false;
 
-  while (g_cacheLock.test_and_set(std::memory_order_acquire)) {}
-  struct Unlock { ~Unlock() { g_cacheLock.clear(std::memory_order_release); } };
-  for (uint32_t index = 0; index < g_cacheCount; ++index)
-    if (g_cache[index].occupied &&
-        std::memcmp(g_cache[index].sourceDigest, source.digest, 32) == 0)
-      return g_cache[index].object;
-  // A source-only no-match/unhandled-FP64 outcome cannot change during the
-  // process. Cache it so repeat city shaders do not repeatedly disassemble.
-  for (uint32_t index = 0; index < g_negativeCacheCount; ++index)
-    if (g_negativeCache[index].occupied &&
-        std::memcmp(g_negativeCache[index].sourceDigest, source.digest, 32) == 0)
-      return nullptr;
-  if (g_cacheCount >= kCacheCap)
-    return nullptr;
+    uint8_t replacementDigest[32]{};
+    IRObject *replacement = nullptr;
+    if (!valid || mapping == MAP_FAILED ||
+        !digest(mapping, kExactReplacementBytes, replacementDigest) ||
+        !digestMatches(replacementDigest, kExactReplacementSha256) ||
+        !createBorrowedObject(static_cast<const uint8_t *>(mapping),
+                              kExactReplacementBytes, &replacement)) {
+      if (mapping != MAP_FAILED)
+        munmap(mapping, kExactReplacementBytes);
+      return false;
+    }
 
+    g_exactReplacementBytes = static_cast<const uint8_t *>(mapping);
+    g_exactReplacement = replacement;
+    return true;
+  });
+}
+
+bool initializeDxcRuntime() {
+  return g_dxcInitializer.ensure([] {
+    const char *dxcompilerPath = getenv("YAAGL_ZZZ_RT_SHIM_DXCOMPILER");
+    if (!dxcompilerPath ||
+        !fileDigestMatches(dxcompilerPath, kDxcompilerSha256))
+      return false;
+    std::unique_ptr<yaagl::dxc::Runtime> dxc(
+        new (std::nothrow) yaagl::dxc::Runtime());
+    if (!dxc || !dxc->open(dxcompilerPath))
+      return false;
+    g_dxc = dxc.release();
+    return true;
+  });
+}
+
+CacheLookupResult transformAndCache(const ObjectSnapshot &source) {
   try {
     yaagl::dxc::ComPtr<yaagl::dxc::BlobEncoding> sourceBlob;
     if (!yaagl::dxc::succeeded(g_dxc->utils()->CreateBlob(
             source.bytes, source.size, yaagl::dxc::kUtf8, sourceBlob.put())) ||
         !sourceBlob)
-      return nullptr;
+      return {CacheLookupStatus::kTransientFailure, nullptr};
     yaagl::dxc::ComPtr<yaagl::dxc::BlobEncoding> disassembly;
     if (!yaagl::dxc::succeeded(g_dxc->compiler()->Disassemble(sourceBlob.get(),
                                                                disassembly.put())) ||
         !disassembly || !disassembly->GetBufferPointer() ||
-        !disassembly->GetBufferSize() || disassembly->GetBufferSize() > 1024 * 1024)
-      return nullptr;
+        !disassembly->GetBufferSize() ||
+        disassembly->GetBufferSize() > 1024 * 1024)
+      return {CacheLookupStatus::kTransientFailure, nullptr};
     std::string transformed;
     const std::string_view llvm(
         static_cast<const char *>(disassembly->GetBufferPointer()),
@@ -325,50 +356,75 @@ IRObject *selectReplacement(const ObjectSnapshot &source) {
     const bool injectCache = source.size == kInjectCacheSourceBytes &&
                              digestMatches(source.digest, kInjectCacheSourceSha256);
     const auto result = injectCache
-                            ? yaagl::metal_ir::transformKnownInjectCache843Only(llvm, &transformed)
-                            : yaagl::metal_ir::transformUnorm24Only(llvm, &transformed);
+                            ? yaagl::metal_ir::transformKnownInjectCache843Only(
+                                  llvm, &transformed)
+                            : yaagl::metal_ir::transformUnorm24Only(llvm,
+                                                                    &transformed);
     if (result.status != yaagl::metal_ir::Unorm24TransformStatus::kSuccess) {
-      if ((result.status == yaagl::metal_ir::Unorm24TransformStatus::kNoMatch ||
-           result.status == yaagl::metal_ir::Unorm24TransformStatus::kUnhandledFp64) &&
-          g_negativeCacheCount < kCacheCap) {
-        NegativeCacheEntry &entry = g_negativeCache[g_negativeCacheCount++];
-        entry.occupied = true;
-        std::memcpy(entry.sourceDigest, source.digest, sizeof(entry.sourceDigest));
+      if (result.status == yaagl::metal_ir::Unorm24TransformStatus::kNoMatch ||
+          result.status ==
+              yaagl::metal_ir::Unorm24TransformStatus::kUnhandledFp64) {
+        (void)g_decisionCache.publishNegative(source.digest);
+        return {CacheLookupStatus::kNegative, nullptr};
       }
-      return nullptr;
+      return {CacheLookupStatus::kTransientFailure, nullptr};
     }
     if (transformed.empty() || transformed.size() > UINT32_MAX)
-      return nullptr;
+      return {CacheLookupStatus::kTransientFailure, nullptr};
     yaagl::dxc::ComPtr<yaagl::dxc::BlobEncoding> transformedBlob;
     if (!yaagl::dxc::succeeded(g_dxc->utils()->CreateBlob(
             transformed.data(), static_cast<uint32_t>(transformed.size()),
-            yaagl::dxc::kUtf8, transformedBlob.put())) || !transformedBlob)
-      return nullptr;
+            yaagl::dxc::kUtf8, transformedBlob.put())) ||
+        !transformedBlob)
+      return {CacheLookupStatus::kTransientFailure, nullptr};
     yaagl::dxc::ComPtr<yaagl::dxc::OperationResult> operation;
     if (!yaagl::dxc::succeeded(g_dxc->assembler()->AssembleToContainer(
-            transformedBlob.get(), operation.put())) || !operation)
-      return nullptr;
+            transformedBlob.get(), operation.put())) ||
+        !operation)
+      return {CacheLookupStatus::kTransientFailure, nullptr};
     yaagl::dxc::HRESULT status = -1;
     if (!yaagl::dxc::succeeded(operation->GetStatus(&status)) ||
         !yaagl::dxc::succeeded(status))
-      return nullptr;
+      return {CacheLookupStatus::kTransientFailure, nullptr};
     yaagl::dxc::ComPtr<yaagl::dxc::Blob> output;
     if (!yaagl::dxc::succeeded(operation->GetResult(output.put())) || !output ||
         !output->GetBufferPointer() || !output->GetBufferSize() ||
         output->GetBufferSize() > kAssembledCap)
-      return nullptr;
+      return {CacheLookupStatus::kTransientFailure, nullptr};
     IRObject *object = nullptr;
-    if (!createPersistentObject(output->GetBufferPointer(), output->GetBufferSize(),
-                                &object))
-      return nullptr;
-    CacheEntry &entry = g_cache[g_cacheCount++];
-    entry.occupied = true;
-    std::memcpy(entry.sourceDigest, source.digest, sizeof(entry.sourceDigest));
-    entry.object = object;
-    return object;
+    if (!createPersistentObject(output->GetBufferPointer(),
+                                output->GetBufferSize(), &object))
+      return {CacheLookupStatus::kTransientFailure, nullptr};
+    // Saturation may prevent memoization, but never changes correctness for
+    // the current compile: the freshly transformed object is still returned.
+    (void)g_decisionCache.publishPositive(source.digest, object);
+    return {CacheLookupStatus::kPositive, object};
   } catch (...) {
-    return nullptr;
+    return {CacheLookupStatus::kTransientFailure, nullptr};
   }
+}
+
+IRObject *selectExactReplacement(const ObjectSnapshot &source) {
+  if (source.size != kExactSourceBytes ||
+      !digestMatches(source.digest, kExactSourceSha256) ||
+      !initializeExactReplacement())
+    return nullptr;
+  return g_exactReplacement;
+}
+
+IRObject *selectStructuralReplacement(const ObjectSnapshot &source) {
+  const CacheLookupResult result = yaagl::metal_ir::lookupOrTransform(
+      g_transformMutex, [&] { return lookupCache(source.digest); },
+      [](const CacheLookupResult &cached) {
+        return cached.status == CacheLookupStatus::kMiss;
+      },
+      [&] {
+        if (!initializeDxcRuntime())
+          return CacheLookupResult{CacheLookupStatus::kTransientFailure,
+                                   nullptr};
+        return transformAndCache(source);
+      });
+  return result.status == CacheLookupStatus::kPositive ? result.object : nullptr;
 }
 
 extern "C" IRObject *YaaglZzzRtShimCompileAndLink(
@@ -377,15 +433,34 @@ extern "C" IRObject *YaaglZzzRtShimCompileAndLink(
   CompileAndLink original = g_original.load(std::memory_order_acquire);
   if (!original)
     return nullptr;
-  const uintptr_t caller = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
-  const uintptr_t base = reinterpret_cast<uintptr_t>(g_d3dmetal);
+  const uintptr_t caller =
+      reinterpret_cast<uintptr_t>(__builtin_return_address(0));
+  const mach_header_64 *d3dmetal =
+      g_d3dmetal.load(std::memory_order_acquire);
+  const uintptr_t base = reinterpret_cast<uintptr_t>(d3dmetal);
   const uintptr_t offset = caller >= base ? caller - base : 0;
-  if (offset != kCityCompileCallerOffset && offset != kHistoricalRtCompileCallerOffset)
+  const bool exactCaller = offset == kHistoricalRtCompileCallerOffset;
+  const bool structuralCaller = offset == kCityCompileCallerOffset;
+  if (!exactCaller && !structuralCaller)
     return original(compiler, args, object, sink);
-  g_snapshot = ObjectSnapshot{};
-  if (!readObject(object, &g_snapshot))
-    return original(compiler, args, object, sink);
-  const IRObject *replacement = selectReplacement(g_snapshot);
+
+  const IRObject *replacement = nullptr;
+  try {
+    ObjectHeader header{};
+    if (!readObjectHeader(object, &header))
+      return original(compiler, args, object, sink);
+    // The historical RT caller has exactly one proven broken source. All other
+    // RT libraries avoid the body copy, SHA, DXC initialization, and cache path.
+    if (exactCaller && header.size != kExactSourceBytes)
+      return original(compiler, args, object, sink);
+    ObjectSnapshot snapshot{};
+    if (!snapshotObject(header, &snapshot))
+      return original(compiler, args, object, sink);
+    replacement = exactCaller ? selectExactReplacement(snapshot)
+                              : selectStructuralReplacement(snapshot);
+  } catch (...) {
+    replacement = nullptr;
+  }
   return original(compiler, args, replacement ? replacement : object, sink);
 }
 
@@ -394,23 +469,16 @@ void tryInstall() {
       g_installLock.test_and_set(std::memory_order_acquire))
     return;
   struct Unlock { ~Unlock() { g_installLock.clear(std::memory_order_release); } };
-  const char *d3dmetalPath = getenv("YAAGL_ZZZ_RT_SHIM_D3DMETAL");
-  const char *providerPath = getenv("YAAGL_ZZZ_RT_SHIM_PROVIDER");
-  if (!d3dmetalPath || !providerPath)
-    return;
-  for (uint32_t index = 0; index < _dyld_image_count(); ++index) {
-    const char *name = _dyld_get_image_name(index);
-    if (name && std::strcmp(name, d3dmetalPath) == 0)
-      g_d3dmetal = reinterpret_cast<const mach_header_64 *>(_dyld_get_image_header(index));
-    if (name && std::strcmp(name, providerPath) == 0)
-      g_provider = reinterpret_cast<const mach_header_64 *>(_dyld_get_image_header(index));
-  }
-  if (!image(g_d3dmetal) || !image(g_provider))
+  const mach_header_64 *d3dmetal =
+      g_d3dmetal.load(std::memory_order_acquire);
+  const mach_header_64 *provider =
+      g_provider.load(std::memory_order_acquire);
+  if (!image(d3dmetal) || !image(provider))
     return;
   auto *slot = reinterpret_cast<CompileAndLink *>(
-      reinterpret_cast<uintptr_t>(g_d3dmetal) + kGotOffset);
+      reinterpret_cast<uintptr_t>(d3dmetal) + kGotOffset);
   CompileAndLink original = reinterpret_cast<CompileAndLink>(
-      reinterpret_cast<uintptr_t>(g_provider) + kProviderCompileAndLinkOffset);
+      reinterpret_cast<uintptr_t>(provider) + kProviderCompileAndLinkOffset);
   CompileAndLink observed = nullptr;
   __atomic_load(slot, &observed, __ATOMIC_ACQUIRE);
   if (observed != original || !pageProtection(slot, &g_slotProtection) ||
@@ -441,15 +509,43 @@ void tryInstall() {
   g_installed.store(true, std::memory_order_release);
 }
 
-void imageAdded(const mach_header *, intptr_t) { tryInstall(); }
+void imageAdded(const mach_header *header, intptr_t) {
+  if (!header || g_installed.load(std::memory_order_acquire))
+    return;
+  Dl_info info{};
+  if (dladdr(reinterpret_cast<const void *>(header), &info) == 0 ||
+      !info.dli_fname)
+    return;
+  const auto *imageHeader = reinterpret_cast<const mach_header_64 *>(header);
+  if (g_d3dmetalPath == info.dli_fname) {
+    const mach_header_64 *expected = nullptr;
+    (void)g_d3dmetal.compare_exchange_strong(
+        expected, imageHeader, std::memory_order_release,
+        std::memory_order_relaxed);
+  } else if (g_providerPath == info.dli_fname) {
+    const mach_header_64 *expected = nullptr;
+    (void)g_provider.compare_exchange_strong(
+        expected, imageHeader, std::memory_order_release,
+        std::memory_order_relaxed);
+  }
+  if (g_d3dmetal.load(std::memory_order_acquire) &&
+      g_provider.load(std::memory_order_acquire))
+    tryInstall();
+}
 
 __attribute__((constructor)) void init() {
   const char *mode = getenv("YAAGL_RUNTIME_MODE");
   if (!mode || std::strcmp(mode, kMode) != 0)
     return;
-  // Registration invokes imageAdded for already loaded images. The callback
-  // performs only image lookup and an atomic GOT swap; DXC is loaded lazily
-  // from the compiler call, so CEF/helper processes without D3DMetal remain inert.
+  const char *d3dmetalPath = getenv("YAAGL_ZZZ_RT_SHIM_D3DMETAL");
+  const char *providerPath = getenv("YAAGL_ZZZ_RT_SHIM_PROVIDER");
+  if (!d3dmetalPath || !*d3dmetalPath || !providerPath || !*providerPath)
+    return;
+  g_d3dmetalPath = d3dmetalPath;
+  g_providerPath = providerPath;
+  // Registration invokes imageAdded for already loaded images. Each callback
+  // examines only the supplied image, avoiding repeated whole-image scans in
+  // Wine helper processes. DXC remains lazy until a structural cache miss.
   _dyld_register_func_for_add_image(imageAdded);
 }
 

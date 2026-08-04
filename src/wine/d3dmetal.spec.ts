@@ -239,6 +239,7 @@ describe("D3DMetal launch contract", () => {
   });
 
   it("uses only the minimal RT shim runtime contract", () => {
+    expect(D3DMETAL_ZZZ_RT_SHIM_MODE).toBe("zzz-rt-shim-v2");
     expect(D3DMETAL_ZZZ_RT_SHIM_RELATIVE_PATH).toBe(
       "sidecar/runtime/libyaagl-zzz-rt-shim.dylib"
     );

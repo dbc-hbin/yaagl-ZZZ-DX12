@@ -11,6 +11,10 @@ import {
   GPTK_D3DMETAL_INFO_PLIST,
   GPTK_REQUIRED_RUNTIME_FILES,
 } from "../gptk/constants";
+import {
+  fingerprintD3DMetalRuntimeFiles,
+  RuntimeValidationCache,
+} from "./d3dmetal-validation-cache";
 
 export const D3DMETAL_VERSION = "4.0b2" as const;
 
@@ -85,11 +89,11 @@ export const D3DMETAL_UNORM_REPLACEMENT_SHA256 =
  * teardown callback. It only substitutes verified UNORM/InjectCache DXIL at
  * the two known D3DMetal compiler callers and otherwise calls the original.
  */
-export const D3DMETAL_ZZZ_RT_SHIM_MODE = "zzz-rt-shim-v1" as const;
+export const D3DMETAL_ZZZ_RT_SHIM_MODE = "zzz-rt-shim-v2" as const;
 export const D3DMETAL_ZZZ_RT_SHIM_RELATIVE_PATH =
   "sidecar/runtime/libyaagl-zzz-rt-shim.dylib" as const;
 export const D3DMETAL_ZZZ_RT_SHIM_SHA256 =
-  "5dafe3d49ec8ee6f1ef08186f0a537063397aa6697cd2b4361f18d2c2fb5b11d" as const;
+  "ae60f06e5ef792dd5646c665e9796f0444ceb9d081039e21b00f450a47c1898f" as const;
 
 export const D3DMETAL_ZZZ_GPU_SPOOFS = {
   rtx4060: {
@@ -585,6 +589,22 @@ export async function validateD3DMetalMetalIrProbe({
   };
 }
 
+type D3DMetalZzzRtShimValidation = {
+  shimPath: string;
+  shimHash: string;
+  replacementPath: string;
+  replacementHash: string;
+  d3dMetalPath: string;
+  d3dMetalHash: string;
+  providerPath: string;
+  providerHash: string;
+  dxcompilerPath: string;
+  dxcompilerHash: string;
+};
+
+const d3dMetalZzzRtShimValidationCache =
+  new RuntimeValidationCache<D3DMetalZzzRtShimValidation>();
+
 export async function validateD3DMetalZzzRtShim({
   wineRoot,
   shimPath,
@@ -603,6 +623,19 @@ export async function validateD3DMetalZzzRtShim({
     D3DMETAL_METAL_IR_CONVERTER_RELATIVE_PATH
   );
   const dxcompilerPath = join(wineRoot, D3DMETAL_DXCOMPILER_RELATIVE_PATH);
+  const runtimePaths = [
+    d3dMetalPath,
+    shimPath,
+    providerPath,
+    dxcompilerPath,
+    replacementPath,
+  ] as const;
+  const identityPrefix = JSON.stringify(runtimePaths);
+  const beforeFingerprint = await fingerprintD3DMetalRuntimeFiles(runtimePaths);
+  const beforeIdentity = `${identityPrefix}|${beforeFingerprint}`;
+  const cached = d3dMetalZzzRtShimValidationCache.get(beforeIdentity);
+  if (cached) return cached;
+
   const [
     d3dMetalHash,
     shimHash,
@@ -649,7 +682,7 @@ export async function validateD3DMetalZzzRtShim({
       `ZZZ RT shim must be a Mach-O x86_64 dylib: ${fileDescription.trim()}`
     );
   }
-  return {
+  const validation: D3DMetalZzzRtShimValidation = {
     shimPath,
     shimHash,
     replacementPath,
@@ -661,6 +694,15 @@ export async function validateD3DMetalZzzRtShim({
     dxcompilerPath,
     dxcompilerHash,
   };
+  const afterFingerprint = await fingerprintD3DMetalRuntimeFiles(runtimePaths);
+  if (afterFingerprint !== beforeFingerprint) {
+    throw new Error("ZZZ RT shim runtime changed during validation");
+  }
+  d3dMetalZzzRtShimValidationCache.set(
+    `${identityPrefix}|${afterFingerprint}`,
+    validation
+  );
+  return validation;
 }
 
 export async function validateD3DMetalMetalIrCapture({

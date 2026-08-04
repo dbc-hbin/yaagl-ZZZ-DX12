@@ -30,7 +30,7 @@
     "test:dxcompiler-hash": "shasum -a 256 naposdx12/gptk/4.0b2/lib/external/D3DMetal.framework/Versions/A/Resources/libdxcompiler.dylib",
     "test:sync-metal-ir-hash": "node scripts/sync-zzz-rt-shim-hash.mjs",
     "test:rt-artifacts": "node scripts/verify-zzz-rt-shim-artifacts.mjs",
-    "test:rt": "vitest run src/wine/d3dmetal.spec.ts src/diagnostics/d3dmetal.spec.ts",
+    "test:rt": "vitest run src/wine/d3dmetal.spec.ts src/wine/d3dmetal-runtime-profile.spec.ts src/wine/d3dmetal-validation-cache.spec.ts src/diagnostics/d3dmetal.spec.ts",
     "test:d3dmetal-observer-ghidra": "mkdir -p build/ghidra-dxr-observer-temp && tools/ghidra_12.1.2_PUBLIC/support/analyzeHeadless build/ghidra-dxr-observer-temp D3DMetal-DXR-Observer -import naposdx12/gptk/4.0b2/lib/external/D3DMetal.framework/Versions/A/D3DMetal -scriptPath scripts/ghidra -postScript TraceDxrInstrumentationPoints.java docs/zzz-dxr-ghidra-instrumentation-points.generated.txt -deleteProject",
     "typecheck": "tsc",
     "precommit": "tsc && pnpm run lint && pnpm run format-check"

@@ -16,6 +16,7 @@ import {
 import { dirname, join } from "path-browserify";
 import { WineDistribution } from "./distro";
 import { createD3DMetalIsolatedCommand } from "./d3dmetal";
+import { d3dMetalWineDebug } from "./d3dmetal-runtime-profile";
 
 export async function createWine(options: {
   prefix: string;
@@ -108,7 +109,7 @@ export async function createWine(options: {
     return {
       WINEDEBUG:
         options.distro.attributes.renderBackend === "d3dmetal"
-          ? "fixme-all,err-unwind,+timestamp,+loaddll"
+          ? d3dMetalWineDebug()
           : "fixme-all,err-unwind,+timestamp",
       WINEPREFIX: options.prefix,
     };

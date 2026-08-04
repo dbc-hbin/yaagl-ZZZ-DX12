@@ -31,157 +31,27 @@ import { createLeftCmdConfig } from "./left-cmd";
 import { createWineDistroConfig } from "./wine-distribution";
 import createLocaleConfig from "./ui-locale";
 import createFPSUnlock from "./fps-unlock";
-import {
-  exec2,
-  getKeyOrDefault,
-  mkdirp,
-  readFile,
-  resolve,
-  setKey,
-} from "../utils";
-import { createSignal, JSXElement, onCleanup, onMount, Show } from "solid-js";
+import { exec2, getKeyOrDefault, mkdirp, resolve, setKey } from "../utils";
+import { createSignal, JSXElement, Show } from "solid-js";
 import createReShade from "./reshade";
 import { createProxyEnabledConfig } from "@config/proxy-enabled";
 import { createProxyHostConfig } from "@config/proxy-host";
-import { join } from "path-browserify";
-import {
-  createD3DMetalDxrRuntimeStatus,
-  createD3DMetalMetalFxRuntimeStatus,
-  createD3DMetalMtl4RuntimeStatus,
-  D3DMetalDxrRuntimeStatusDisplay,
-  D3DMetalMetalFxRuntimeStatusDisplay,
-  D3DMetalMtl4RuntimeStatusDisplay,
-  findLatestD3DMetalEvidenceFile,
-} from "../diagnostics/d3dmetal";
-
-const DXR_STATUS_REFRESH_INTERVAL_MS = 5_000;
-
-async function readLatestD3DMetalEvidence() {
-  const logs = resolve("./logs");
-  let entries: Neutralino.filesystem.DirectoryEntry[];
-  try {
-    entries = await Neutralino.filesystem.readDirectory(logs);
-  } catch {
-    return undefined;
-  }
-  const latest = findLatestD3DMetalEvidenceFile(entries);
-  if (!latest) return undefined;
-  try {
-    return JSON.parse(await readFile(join(logs, latest)));
-  } catch {
-    return "unreadable";
-  }
-}
+import { d3dMetalConfiguredStatus } from "../wine/d3dmetal-runtime-profile";
 
 function D3DMetalDxrStatus() {
-  const dxrConfigured = D3DMETAL_LAUNCH_ENVIRONMENT.D3DM_SUPPORT_DXR === "1";
-  const [status, setStatus] = createSignal<D3DMetalDxrRuntimeStatusDisplay>(
-    createD3DMetalDxrRuntimeStatus(dxrConfigured)
-  );
-
-  let mounted = true;
-  let refreshInProgress = false;
-  async function refresh() {
-    if (refreshInProgress) return;
-    refreshInProgress = true;
-    try {
-      const evidence = await readLatestD3DMetalEvidence();
-      if (mounted) {
-        setStatus(createD3DMetalDxrRuntimeStatus(dxrConfigured, evidence));
-      }
-    } finally {
-      refreshInProgress = false;
-    }
-  }
-
-  onMount(() => {
-    void refresh();
-    const interval = window.setInterval(
-      () => void refresh(),
-      DXR_STATUS_REFRESH_INTERVAL_MS
-    );
-    onCleanup(() => {
-      mounted = false;
-      window.clearInterval(interval);
-    });
-  });
-
-  return <Text>DXR: {status().label}</Text>;
+  const configured = D3DMETAL_LAUNCH_ENVIRONMENT.D3DM_SUPPORT_DXR === "1";
+  return <Text>DXR: {d3dMetalConfiguredStatus(configured)}</Text>;
 }
 
 function D3DMetalMtl4Status() {
-  const mtl4Configured = D3DMETAL_LAUNCH_ENVIRONMENT.D3DM_MTL4 === "1";
-  const [status, setStatus] = createSignal<D3DMetalMtl4RuntimeStatusDisplay>(
-    createD3DMetalMtl4RuntimeStatus(mtl4Configured)
-  );
-
-  let mounted = true;
-  let refreshInProgress = false;
-  async function refresh() {
-    if (refreshInProgress) return;
-    refreshInProgress = true;
-    try {
-      const evidence = await readLatestD3DMetalEvidence();
-      if (mounted) {
-        setStatus(createD3DMetalMtl4RuntimeStatus(mtl4Configured, evidence));
-      }
-    } finally {
-      refreshInProgress = false;
-    }
-  }
-
-  onMount(() => {
-    void refresh();
-    const interval = window.setInterval(
-      () => void refresh(),
-      DXR_STATUS_REFRESH_INTERVAL_MS
-    );
-    onCleanup(() => {
-      mounted = false;
-      window.clearInterval(interval);
-    });
-  });
-
-  return <Text>Metal 4 backend: {status().label}</Text>;
+  const configured = D3DMETAL_LAUNCH_ENVIRONMENT.D3DM_MTL4 === "1";
+  return <Text>Metal 4 backend: {d3dMetalConfiguredStatus(configured)}</Text>;
 }
 
 function D3DMetalMetalFxStatus() {
-  const metalFxConfigured =
+  const configured =
     D3DMETAL_LAUNCH_ENVIRONMENT.D3DM_ENABLE_METALFX === "1";
-  const [status, setStatus] = createSignal<D3DMetalMetalFxRuntimeStatusDisplay>(
-    createD3DMetalMetalFxRuntimeStatus(metalFxConfigured)
-  );
-
-  let mounted = true;
-  let refreshInProgress = false;
-  async function refresh() {
-    if (refreshInProgress) return;
-    refreshInProgress = true;
-    try {
-      const evidence = await readLatestD3DMetalEvidence();
-      if (mounted) {
-        setStatus(
-          createD3DMetalMetalFxRuntimeStatus(metalFxConfigured, evidence)
-        );
-      }
-    } finally {
-      refreshInProgress = false;
-    }
-  }
-
-  onMount(() => {
-    void refresh();
-    const interval = window.setInterval(
-      () => void refresh(),
-      DXR_STATUS_REFRESH_INTERVAL_MS
-    );
-    onCleanup(() => {
-      mounted = false;
-      window.clearInterval(interval);
-    });
-  });
-
-  return <Text>DLSS → MetalFX: {status().label}</Text>;
+  return <Text>DLSS → MetalFX: {d3dMetalConfiguredStatus(configured)}</Text>;
 }
 
 export async function createConfiguration({
