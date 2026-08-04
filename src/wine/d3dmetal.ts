@@ -45,6 +45,13 @@ export const D3DMETAL_4_0_BETA_2_STATE_OBJECT_TRAPS_SHA256 =
 export const D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256 =
   "4925700de03c91e33cd75ac160fac6f9ef8efa7c94a353d4062084cee4b89851" as const;
 
+/**
+ * Signed experiment with the no-op PSO fix retained and the GPTK 4.0b2
+ * Metal IR converter patched at the three FP64 codec sites.
+ */
+export const D3DMETAL_4_0_BETA_2_FP64_CODEC_PATCH_SHA256 =
+  "6b9bd455eb0d11472380008dc025edc4b2aa1f11dceceebfa4d241e57e2a773c" as const;
+
 /** Signed diagnostic that traps with EAX at CreateStateObject's return edge. */
 export const D3DMETAL_4_0_BETA_2_STATE_OBJECT_RETURN_TRAP_SHA256 =
   "f19a6b89a668eefd628a8b95126b8099dfae7b2e85861710498be0e57e46b5fb" as const;
@@ -222,6 +229,7 @@ export function isAllowedD3DMetalRuntimeHashPair({
       targetHash === D3DMETAL_4_0_BETA_2_GUARD_FAILURE_TAGS_SHA256 ||
       targetHash === D3DMETAL_4_0_BETA_2_STATE_OBJECT_TRAPS_SHA256 ||
       targetHash === D3DMETAL_4_0_BETA_2_NO_OP_PSO_FIX_SHA256 ||
+      targetHash === D3DMETAL_4_0_BETA_2_FP64_CODEC_PATCH_SHA256 ||
       targetHash === D3DMETAL_4_0_BETA_2_STATE_OBJECT_RETURN_TRAP_SHA256 ||
       targetHash ===
         D3DMETAL_4_0_BETA_2_STATE_OBJECT_PARSER_PHASE_TRAP_SHA256 ||

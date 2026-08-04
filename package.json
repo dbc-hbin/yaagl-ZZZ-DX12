@@ -23,6 +23,7 @@
     "format": "prettier -w ./src",
     "format-check": "prettier -c ./src",
     "test:metal-ir-fp64-ghidra": "mkdir -p build/ghidra-fp64-temp && tools/ghidra_12.1.2_PUBLIC/support/analyzeHeadless build/ghidra-fp64-temp MetalIRConverter-FP64-Decompile -import naposdx12/gptk/4.0b2/lib/external/D3DMetal.framework/Versions/A/Resources/libmetalirconverter.dylib -noanalysis -scriptPath scripts/ghidra -postScript TraceFP64Operations.java -deleteProject",
+    "test:metal-ir-fp64-patch": "node --test scripts/metalir-fp64-codec-patch.test.mjs",
     "test:llvm-toolchain": "which llvm-dis; which llvm-as; which llvm-config; which opt; which clang",
     "test:dxcompiler-exports": "nm -gU naposdx12/gptk/4.0b2/lib/external/D3DMetal.framework/Versions/A/Resources/libdxcompiler.dylib",
     "test:dxcompiler-hash": "shasum -a 256 naposdx12/gptk/4.0b2/lib/external/D3DMetal.framework/Versions/A/Resources/libdxcompiler.dylib",
