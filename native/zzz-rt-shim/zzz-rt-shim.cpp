@@ -23,7 +23,9 @@
 #include <unistd.h>
 #include <vector>
 
+#include "compile-boundary-dispatch.hpp"
 #include "decision-cache.hpp"
+#include "pinned-sha256.hpp"
 #include "../metal-ir-capture/dxc-runtime.hpp"
 #include "../metal-ir-capture/translation-synchronization.hpp"
 #include "../metal-ir-capture/unorm24-transform.hpp"
@@ -47,18 +49,10 @@ constexpr uintptr_t kDxilVtableOffset = 0x14940e0;
 constexpr size_t kDxilObjectHeaderBytes = 0x20;
 constexpr size_t kSourceCap = 64 * 1024;
 constexpr size_t kAssembledCap = 256 * 1024;
-constexpr size_t kDecisionCacheCapacity = 2048;
+constexpr size_t kDecisionCacheCapacity = 1024;
 constexpr uint32_t kExactSourceBytes = 26964;
 constexpr uint32_t kExactReplacementBytes = 17720;
-constexpr const char *kExactSourceSha256 =
-    "02d3db46e867f0b38da35a492101ae35544f5f93425fb4fb29120aeeea431869";
-constexpr const char *kExactReplacementSha256 =
-    "c64e67eabc3cf5ff89359c3075ebe00387c5a46d5136ea61dfbdd832b2f01717";
 constexpr uint32_t kInjectCacheSourceBytes = 33228;
-constexpr const char *kInjectCacheSourceSha256 =
-    "843be9c95dd09b3e4da739d67b91257495fb746da91b57eb52f859e682dd55ff";
-constexpr const char *kDxcompilerSha256 =
-    "57dc9421af62c35b372adf7536f07b1e2c20ef32dc1f4c16930a42fc12ed1fd2";
 
 struct ObjectHeader {
   const uint8_t *bytes = nullptr;
@@ -107,31 +101,14 @@ bool image(const mach_header_64 *header) {
          header->cputype == CPU_TYPE_X86_64;
 }
 
-bool hex(const uint8_t *bytes, size_t size, char *out, size_t capacity) {
-  if (!bytes || !out || capacity < size * 2 + 1)
-    return false;
-  static constexpr char table[] = "0123456789abcdef";
-  for (size_t index = 0; index < size; ++index) {
-    out[index * 2] = table[bytes[index] >> 4];
-    out[index * 2 + 1] = table[bytes[index] & 0x0f];
-  }
-  out[size * 2] = 0;
-  return true;
-}
-
 bool digest(const void *bytes, size_t size, uint8_t output[32]) {
   return bytes && size <= UINT32_MAX &&
          CC_SHA256(bytes, static_cast<CC_LONG>(size), output) != nullptr;
 }
 
-bool digestMatches(const uint8_t value[32], const char *expected) {
-  char actual[65]{};
-  return expected && hex(value, 32, actual, sizeof(actual)) &&
-         std::strcmp(actual, expected) == 0;
-}
-
-bool fileDigestMatches(const char *path, const char *expected) {
-  if (!path || !*path || !expected)
+bool fileDigestMatches(const char *path,
+                       const yaagl::zzz_rt::Sha256Digest &expected) {
+  if (!path || !*path)
     return false;
   const int fd = open(path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
   if (fd < 0)
@@ -147,7 +124,7 @@ bool fileDigestMatches(const char *path, const char *expected) {
   close(fd);
   uint8_t value[32]{};
   const bool ok = mapping != MAP_FAILED && digest(mapping, size, value) &&
-                  digestMatches(value, expected);
+                  yaagl::zzz_rt::sha256Matches(value, expected);
   if (mapping != MAP_FAILED)
     munmap(const_cast<void *>(mapping), size);
   return ok;
@@ -306,7 +283,8 @@ bool initializeExactReplacement() {
     IRObject *replacement = nullptr;
     if (!valid || mapping == MAP_FAILED ||
         !digest(mapping, kExactReplacementBytes, replacementDigest) ||
-        !digestMatches(replacementDigest, kExactReplacementSha256) ||
+        !yaagl::zzz_rt::sha256Matches(
+            replacementDigest, yaagl::zzz_rt::kExactReplacementSha256) ||
         !createBorrowedObject(static_cast<const uint8_t *>(mapping),
                               kExactReplacementBytes, &replacement)) {
       if (mapping != MAP_FAILED)
@@ -324,7 +302,7 @@ bool initializeDxcRuntime() {
   return g_dxcInitializer.ensure([] {
     const char *dxcompilerPath = getenv("YAAGL_ZZZ_RT_SHIM_DXCOMPILER");
     if (!dxcompilerPath ||
-        !fileDigestMatches(dxcompilerPath, kDxcompilerSha256))
+        !fileDigestMatches(dxcompilerPath, yaagl::zzz_rt::kDxcompilerSha256))
       return false;
     std::unique_ptr<yaagl::dxc::Runtime> dxc(
         new (std::nothrow) yaagl::dxc::Runtime());
@@ -353,8 +331,10 @@ CacheLookupResult transformAndCache(const ObjectSnapshot &source) {
     const std::string_view llvm(
         static_cast<const char *>(disassembly->GetBufferPointer()),
         disassembly->GetBufferSize());
-    const bool injectCache = source.size == kInjectCacheSourceBytes &&
-                             digestMatches(source.digest, kInjectCacheSourceSha256);
+    const bool injectCache =
+        source.size == kInjectCacheSourceBytes &&
+        yaagl::zzz_rt::sha256Matches(
+            source.digest, yaagl::zzz_rt::kInjectCacheSourceSha256);
     const auto result = injectCache
                             ? yaagl::metal_ir::transformKnownInjectCache843Only(
                                   llvm, &transformed)
@@ -406,7 +386,8 @@ CacheLookupResult transformAndCache(const ObjectSnapshot &source) {
 
 IRObject *selectExactReplacement(const ObjectSnapshot &source) {
   if (source.size != kExactSourceBytes ||
-      !digestMatches(source.digest, kExactSourceSha256) ||
+      !yaagl::zzz_rt::sha256Matches(
+          source.digest, yaagl::zzz_rt::kExactSourceSha256) ||
       !initializeExactReplacement())
     return nullptr;
   return g_exactReplacement;
@@ -427,6 +408,34 @@ IRObject *selectStructuralReplacement(const ObjectSnapshot &source) {
   return result.status == CacheLookupStatus::kPositive ? result.object : nullptr;
 }
 
+__attribute__((noinline)) IRObject *compileTarget(
+    CompileAndLink original, bool exactCaller, IRCompiler *compiler,
+    const std::vector<std::string> &args, const IRObject *object,
+    IRError **sink) {
+  return yaagl::zzz_rt::submitWithOptionalCorrection(
+      [&]() -> const IRObject * {
+        ObjectHeader header{};
+        if (!readObjectHeader(object, &header))
+          return nullptr;
+        // The historical RT caller has exactly one proven broken source. All
+        // other RT libraries avoid the body copy, SHA, DXC initialization, and
+        // cache path.
+        if (exactCaller && header.size != kExactSourceBytes)
+          return nullptr;
+        ObjectSnapshot snapshot{};
+        if (!snapshotObject(header, &snapshot))
+          return nullptr;
+        return exactCaller ? selectExactReplacement(snapshot)
+                           : selectStructuralReplacement(snapshot);
+      },
+      [&](const IRObject *replacement) -> IRObject * {
+        // Keep the provider outside the correction recovery boundary. Its
+        // failures and exceptions remain authoritative and it runs once.
+        return original(compiler, args, replacement ? replacement : object,
+                        sink);
+      });
+}
+
 extern "C" IRObject *YaaglZzzRtShimCompileAndLink(
     IRCompiler *compiler, const std::vector<std::string> &args,
     const IRObject *object, IRError **sink) {
@@ -440,28 +449,9 @@ extern "C" IRObject *YaaglZzzRtShimCompileAndLink(
   const uintptr_t base = reinterpret_cast<uintptr_t>(d3dmetal);
   const uintptr_t offset = caller >= base ? caller - base : 0;
   const bool exactCaller = offset == kHistoricalRtCompileCallerOffset;
-  const bool structuralCaller = offset == kCityCompileCallerOffset;
-  if (!exactCaller && !structuralCaller)
+  if (!exactCaller && offset != kCityCompileCallerOffset)
     return original(compiler, args, object, sink);
-
-  const IRObject *replacement = nullptr;
-  try {
-    ObjectHeader header{};
-    if (!readObjectHeader(object, &header))
-      return original(compiler, args, object, sink);
-    // The historical RT caller has exactly one proven broken source. All other
-    // RT libraries avoid the body copy, SHA, DXC initialization, and cache path.
-    if (exactCaller && header.size != kExactSourceBytes)
-      return original(compiler, args, object, sink);
-    ObjectSnapshot snapshot{};
-    if (!snapshotObject(header, &snapshot))
-      return original(compiler, args, object, sink);
-    replacement = exactCaller ? selectExactReplacement(snapshot)
-                              : selectStructuralReplacement(snapshot);
-  } catch (...) {
-    replacement = nullptr;
-  }
-  return original(compiler, args, replacement ? replacement : object, sink);
+  return compileTarget(original, exactCaller, compiler, args, object, sink);
 }
 
 void tryInstall() {

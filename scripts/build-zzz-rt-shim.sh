@@ -43,6 +43,18 @@ if [[ "${1:-}" == "--test" ]]; then
     -o "$build_dir/image-callback-proof"
   "$build_dir/image-callback-proof"
   xcrun clang++ -std=c++17 -arch x86_64 -Wall -Wextra -Werror \
+    "$repo_dir/native/zzz-rt-shim/tests/compile-boundary-dispatch-proof.cpp" \
+    -o "$build_dir/compile-boundary-dispatch-proof"
+  "$build_dir/compile-boundary-dispatch-proof"
+  xcrun clang++ -std=c++17 -arch x86_64 -Wall -Wextra -Werror \
+    "$repo_dir/native/zzz-rt-shim/tests/pinned-sha256-proof.cpp" \
+    -o "$build_dir/pinned-sha256-proof"
+  "$build_dir/pinned-sha256-proof"
+  xcrun clang++ -std=c++17 -arch x86_64 -Wall -Wextra -Werror \
+    "$repo_dir/native/zzz-rt-shim/tests/correction-cache-policy-proof.cpp" \
+    -o "$build_dir/correction-cache-policy-proof"
+  "$build_dir/correction-cache-policy-proof"
+  xcrun clang++ -std=c++17 -arch x86_64 -Wall -Wextra -Werror \
     "$repo_dir/native/metal-ir-capture/tests/unorm24-transform-proof.cpp" \
     -o "$build_dir/unorm24-transform-proof"
   "$build_dir/unorm24-transform-proof"
@@ -54,4 +66,11 @@ if [[ "${1:-}" == "--test" ]]; then
     "$repo_dir/native/metal-ir-capture/tests/translation-synchronization-proof.cpp" \
     -o "$build_dir/translation-synchronization-proof"
   "$build_dir/translation-synchronization-proof"
+fi
+
+if [[ "${1:-}" == "--benchmark" ]]; then
+  xcrun clang++ -std=c++17 -arch x86_64 -O2 -Wall -Wextra -Werror \
+    "$repo_dir/native/zzz-rt-shim/tests/runtime-overhead-benchmark.cpp" \
+    -o "$build_dir/runtime-overhead-benchmark"
+  "$build_dir/runtime-overhead-benchmark"
 fi
