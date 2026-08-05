@@ -4,8 +4,6 @@ An experimental Apple Silicon fork of [Yaagl](https://github.com/yaagl/yet-anoth
 
 The current `main` branch is the single supported branch in this fork. The previous runtime shim and diagnostic branches have been retired after the shader failure was reduced to a narrow FP64 lowering defect in GPTK 4.0b2's Metal IR converter.
 
-This is research software. Use a test account, preserve your game data, and expect breakage after game, macOS, Wine, or GPTK updates.
-
 ## Current scope
 
 - Apple Silicon Mac
@@ -96,8 +94,6 @@ Place the GPTK disk image in:
 ```text
 ~/Downloads/Game_Porting_Toolkit_4.0_beta_2.dmg
 ```
-
-Apple's GPTK components are governed by Apple's license. Do not redistribute the generated Wine archive or extracted GPTK runtime.
 
 ## Build the launcher
 
@@ -267,11 +263,9 @@ docs/local-d3dmetal-wine-runtime.md
 
 Generated archives, imported GPTK files, Wine prefixes, caches, logs, and local recovery artifacts are not source and should not be committed.
 
-## Support and upstream
+## Reporting problems
 
-This fork is not an official Apple, HoYoverse, CodeWeavers, or upstream Yaagl project. Upstream Yaagl's support channels are not responsible for this experimental D3DMetal runtime or binary patch.
-
-For actionable reports, include a reproducible case, exact runtime hashes, relevant logs, and whether the cache was cold or warm. Generic launch failures without evidence are not sufficient for diagnosis.
+Include a reproducible case, exact runtime hashes, relevant logs, and whether the cache was cold or warm.
 
 ## Related projects
 
@@ -280,8 +274,6 @@ For actionable reports, include a reproducible case, exact runtime hashes, relev
 - [anime-game-wine](https://github.com/yaagl/anime-game-wine)
 - [Game Porting Toolkit](https://developer.apple.com/games/game-porting-toolkit/)
 
-## License and acknowledgements
-
-Retain the upstream project licenses and notices. GPTK and D3DMetal remain Apple components under Apple's terms. The launcher changes and helper scripts in this repository do not grant redistribution rights for Apple or game binaries.
+## Acknowledgements
 
 Thanks to the upstream Yaagl, Wine, DXMT, and related compatibility-tooling contributors whose work made this investigation possible.
