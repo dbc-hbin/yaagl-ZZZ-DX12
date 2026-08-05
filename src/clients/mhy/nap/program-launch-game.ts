@@ -57,6 +57,9 @@ export async function* launchGameProgram({
   await wine.setProps(config);
 
   const args: string[] = [];
+  if (config.forceDirect3D12) {
+    args.push("-use-d3d12");
+  }
   if (wine.attributes.renderBackend !== "d3dmetal" && config.resolutionCustom) {
     args.push("-screen-width", config.resolutionWidth);
     args.push("-screen-height", config.resolutionHeight);
@@ -155,10 +158,11 @@ cd /d "${wine.toWinePath(gameDir)}"
     const launchArguments =
       wine.attributes.renderBackend === "d3dmetal"
         ? createD3DMetalLaunchArguments(
-            wine.toWinePath(join(gameDir, gameExecutable))
+            wine.toWinePath(join(gameDir, gameExecutable)),
+            config.forceDirect3D12
           )
         : config.steamPatch
-        ? [wine.toWinePath(join(gameDir, gameExecutable))]
+        ? [wine.toWinePath(join(gameDir, gameExecutable)), ...args]
         : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `];
     const launchEnvironment = {
       MTL_HUD_ENABLED: config.metalHud ? "1" : "",

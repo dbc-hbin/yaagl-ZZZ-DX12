@@ -201,8 +201,13 @@ export function createD3DMetalIsolatedCommand(
   return ["/bin/sh", "-c", script, "yaagl-d3dmetal-env", executable, ...args];
 }
 
-export function createD3DMetalLaunchArguments(gameExecutablePath: string) {
-  return [gameExecutablePath, ZZZ_D3D12_SELECTOR];
+export function createD3DMetalLaunchArguments(
+  gameExecutablePath: string,
+  forceDirect3D12: boolean
+) {
+  return forceDirect3D12
+    ? [gameExecutablePath, ZZZ_D3D12_SELECTOR]
+    : [gameExecutablePath];
 }
 
 export function d3dMetalWineRuntimePath(sourceRelativePath: string) {

@@ -394,7 +394,7 @@ export async function createConfiguration({
                     <Text>Wine: 11.0-1-crossover-signed-experimental</Text>
                     <Text>D3DMetal: 4.0b2</Text>
                     <D3DMetalMtl4Status />
-                    <Text>Direct3D: ZZZ DX12 selector (-use-d3d12)</Text>
+                    <Text>Direct3D 12: controlled by the per-game option</Text>
                     <GPU />
                     <D3DMetalMetalFxStatus />
                     <D3DMetalDxrStatus />

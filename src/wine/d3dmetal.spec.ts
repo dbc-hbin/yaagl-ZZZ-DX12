@@ -52,11 +52,20 @@ describe("D3DMetal clean environment", () => {
 });
 
 describe("D3DMetal launch contract", () => {
-  it("uses ZZZ's Direct3D 12 selector", () => {
+  it("adds ZZZ's Direct3D 12 selector only when requested", () => {
     expect(ZZZ_D3D12_SELECTOR).toBe("-use-d3d12");
     expect(
-      createD3DMetalLaunchArguments("Z:\\Games\\ZenlessZoneZero.exe")
+      createD3DMetalLaunchArguments(
+        "Z:\\Games\\ZenlessZoneZero.exe",
+        true
+      )
     ).toEqual(["Z:\\Games\\ZenlessZoneZero.exe", "-use-d3d12"]);
+    expect(
+      createD3DMetalLaunchArguments(
+        "Z:\\Games\\ZenlessZoneZero.exe",
+        false
+      )
+    ).toEqual(["Z:\\Games\\ZenlessZoneZero.exe"]);
   });
 
   it("keeps the default RTX 4060 MetalFX invariants enabled", () => {
