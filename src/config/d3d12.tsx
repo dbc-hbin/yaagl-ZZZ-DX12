@@ -5,7 +5,6 @@ import { assertValueDefined, getKey, setKey } from "@utils";
 import { NOOP } from "@config/config-def";
 import type { Config } from "@config/config-def";
 import type { Wine } from "@wine";
-import { D3DMETAL_RUNTIME_ID } from "../wine/d3dmetal";
 
 declare module "@config/config-def" {
   interface Config {
@@ -58,10 +57,7 @@ export async function createD3D12({
           <Box>
             <Checkbox
               checked={value()}
-              disabled={
-                wine.id !== D3DMETAL_RUNTIME_ID ||
-                wine.attributes.supportsD3d12 !== true
-              }
+              disabled={wine.attributes.supportsD3d12 !== true}
               onChange={() => setValue(x => !x)}
               size="md"
             >
