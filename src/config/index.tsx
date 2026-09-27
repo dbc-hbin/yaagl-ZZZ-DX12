@@ -230,14 +230,14 @@ export async function createConfiguration({
               <TabPanel flex={1} pt={0} pb={0} h="100%">
                 <VStack spacing={"$4"} w="40%" alignItems="start">
                   <ChannelClientConfig />
+                  <Show when={supportsD3d12}>
+                    <D3D12 />
+                  </Show>
                 </VStack>
               </TabPanel>
               <TabPanel flex={1} pt={0} pb={0} h="100%">
                 <VStack spacing={"$4"} w="40%" alignItems="start">
                   <WD />
-                  <Show when={supportsD3d12}>
-                    <D3D12 />
-                  </Show>
                 </VStack>
               </TabPanel>
               <Show when={advanceSetting()}>
