@@ -13,7 +13,6 @@ import {
   getKey,
   getKeyOrDefault,
   md5,
-  resolve,
   setKey,
   stats,
   waitImageReady,
