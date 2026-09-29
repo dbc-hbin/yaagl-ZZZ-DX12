@@ -1580,3 +1580,15 @@ type NeutralinoCustomGlobals<T = DefaultCustomGlobals> = {
 interface Window extends NeutralinoCustomGlobals {}
 
 // interface globalThis extends NeutralinoCustomGlobals {}
+
+// ES2024 Promise.withResolvers (native in the macOS 26 WebKit runtime); the
+// pinned TypeScript 4.9 lib predates it.
+interface PromiseWithResolvers<T> {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: unknown) => void;
+}
+
+interface PromiseConstructor {
+  withResolvers<T>(): PromiseWithResolvers<T>;
+}

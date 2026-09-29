@@ -1,7 +1,7 @@
 import { getKey } from "@utils";
 import { DEFAULT_WINE_DISTRO_TAG } from "../clients";
 import { Github } from "../github";
-import { D3DMETAL_RUNTIME_ID, D3DMETAL_RUNTIME_URL } from "./d3dmetal";
+import { D3DMETAL_WINE_11_17, D3DMETAL_WINE_CX26_3 } from "./d3dmetal";
 
 export interface WineDistributionAttributes {
   renderBackend: "dxmt" | "d3dmetal";
@@ -69,9 +69,19 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
   },
 
   {
-    id: D3DMETAL_RUNTIME_ID,
+    id: D3DMETAL_WINE_11_17.id,
     displayName: "Wine 11.17 D3DMetal (GPTK 4.0b2, experimental)",
-    remoteUrl: D3DMETAL_RUNTIME_URL,
+    remoteUrl: D3DMETAL_WINE_11_17.remoteUrl,
+    attributes: {
+      renderBackend: "d3dmetal",
+      supportsD3d12: true,
+      winePath: "wine",
+    },
+  },
+  {
+    id: D3DMETAL_WINE_CX26_3.id,
+    displayName: "Wine 11.0 D3DMetal (CX 26.3, GPTK 4.0b2, experimental)",
+    remoteUrl: D3DMETAL_WINE_CX26_3.remoteUrl,
     attributes: {
       renderBackend: "d3dmetal",
       supportsD3d12: true,
@@ -89,6 +99,12 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     },
   },
 ];
+
+// Unpublished manual builds are replaced by their published successor through
+// the normal install flow instead of falling back to the client default.
+const SUPERSEDED_WINE_DISTRO_TAGS: Record<string, string> = {
+  "wine-cx26.3-d3dmetal-gptk4.0b2-1": D3DMETAL_WINE_CX26_3.id,
+};
 
 export async function getWineDistributions(): Promise<WineDistribution[]> {
   return YAAGL_BUILTIN_WINE;
@@ -118,16 +134,26 @@ export async function checkWine(github: Github): Promise<WineStatus> {
     const wineState = await getKey("wine_state");
     if (wineState == "update") {
       const update_wine_tag = await getKey("wine_update_tag");
+      const successor = wine_versions.find(
+        x => x.id == SUPERSEDED_WINE_DISTRO_TAGS[update_wine_tag]
+      );
       return {
         wineReady: false,
         wineDistribution:
-          wine_versions.find(x => x.id == update_wine_tag) ?? defaultDistro,
+          wine_versions.find(x => x.id == update_wine_tag) ??
+          successor ??
+          defaultDistro,
       } as const;
     }
     const currrent_wine_tag = await getKey("wine_tag");
     const wineDistribution = wine_versions.find(x => x.id == currrent_wine_tag);
+    const successor = wine_versions.find(
+      x => x.id == SUPERSEDED_WINE_DISTRO_TAGS[currrent_wine_tag]
+    );
     if (wineDistribution) {
       return { wineReady: true, wineDistribution } as const;
+    } else if (successor) {
+      return { wineReady: false, wineDistribution: successor } as const;
     } else {
       // Force re-install for unknown wine version
       return {

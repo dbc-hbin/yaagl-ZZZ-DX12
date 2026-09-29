@@ -22,7 +22,7 @@ import { WineDistribution } from "./distro";
 import { addCertsToWine } from "./cert";
 import { createD3DMetalLicenseUI } from "./d3dmetal-license";
 import {
-  D3DMETAL_RUNTIME_ID,
+  D3DMETAL_RUNTIMES,
   loadD3DMetalLicense,
   prepareD3DMetalWine,
   verifyD3DMetalArchive,
@@ -39,8 +39,12 @@ export async function createWineInstallProgram({
   wineAbsPrefix: string;
   wineDistro: WineDistribution;
 }) {
+  // Consent and verified staging are keyed on the pinned runtime ID, never on
+  // catalog attributes alone.
+  const d3dmetalRuntime = D3DMETAL_RUNTIMES.find(x => x.id === wineDistro.id);
+
   async function* program(acceptedAppleLicense = false): CommonUpdateProgram {
-    const isOurRuntime = wineDistro.id === D3DMETAL_RUNTIME_ID;
+    const isOurRuntime = d3dmetalRuntime !== undefined;
     if (isOurRuntime && !acceptedAppleLicense) {
       throw new Error(
         "Apple license consent is required before installing D3DMetal"
@@ -77,10 +81,11 @@ export async function createWineInstallProgram({
           `${humanFileSize(Number(progress.downloadSpeed))}`,
         ];
       }
-      if (isOurRuntime) await verifyD3DMetalArchive(wineTarPath);
+      if (d3dmetalRuntime)
+        await verifyD3DMetalArchive(d3dmetalRuntime, wineTarPath);
       yield ["setStateText", "EXTRACT_ENVIRONMENT"];
       yield ["setUndeterminedProgress"];
-      if (isOurRuntime) {
+      if (d3dmetalRuntime) {
         await exec(["mkdir", "-p", stage]);
         await tar_extract_directory(
           wineTarPath,
@@ -88,7 +93,7 @@ export async function createWineInstallProgram({
           wineDistro.attributes.winePath ?? "wine",
           true
         );
-        await prepareD3DMetalWine(stage);
+        await prepareD3DMetalWine(d3dmetalRuntime, stage);
         // Preparation failures leave the active Wine tree and prefix untouched.
         await rmrf_dangerously(wineAbsPrefix);
         await rmrf_dangerously(wineBinaryDir);
@@ -155,7 +160,7 @@ export async function createWineInstallProgram({
     }
   }
 
-  if (wineDistro.id === D3DMETAL_RUNTIME_ID) {
+  if (d3dmetalRuntime) {
     return createD3DMetalLicenseUI({
       locale,
       loadLicense: () => loadD3DMetalLicense(aria2),

@@ -69,6 +69,24 @@ export async function createWine(options: {
     });
   }
 
+  // `wineserver -k` asks the prefix's server to shut down (SIGINT + SIGCONT,
+  // SIGKILL only after its own grace period), then `-w` waits for it to exit.
+  // A silent exit 1 can mean no server or a failed signal; always wait for
+  // the prefix lock to be released rather than assuming the server is gone.
+  async function stopServer() {
+    const cmd = build([join(dirname(loaderBin), "wineserver"), "-k"], {
+      ...getEnvironmentVariables(),
+    });
+    await log(cmd);
+    const ret = await Neutralino.os.execCommand(cmd, {});
+    if (ret.exitCode != 0 && !(ret.exitCode == 1 && ret.stdErr === "")) {
+      throw new Error(
+        `Command return non-zero code (${ret.exitCode}) \n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
+      );
+    }
+    await waitUntilServerOff();
+  }
+
   function toWinePath(absPath: string) {
     return "Z:" + `${absPath}`.replaceAll("/", "\\");
   }
@@ -157,6 +175,7 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
     exec,
     exec2,
     waitUntilServerOff,
+    stopServer,
     cmd,
     toWinePath,
     prefix: options.prefix,

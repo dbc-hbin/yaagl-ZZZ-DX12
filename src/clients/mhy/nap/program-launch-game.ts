@@ -12,6 +12,7 @@ import {
   log,
   exec,
   getKeyOrDefault,
+  addTerminationHook,
 } from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
@@ -59,88 +60,108 @@ cd /d "${wine.toWinePath(gameDir)}"
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
   const yaaglDir = resolve("./");
-  try {
-    yield ["setStateText", "GAME_RUNNING"];
-    const logfile = resolve(`./logs/game_${Date.now()}.log`);
-
-    if (config.blockNet) {
-      const tmpScriptPath = "/tmp/yaagl_network_block_script.sh";
-      const blockUrl =
-        server.id == "nap_global" ? NAP_OS_BLOCK_URL : NAP_CN_BLOCK_URL;
-
-      const commands = [
-        `#!/bin/sh`,
-
-        `HOSTS_FILE="/etc/hosts"`,
-        `ENTRY="0.0.0.0 ${blockUrl}"`,
-        `PAD_START="# Temporarily Added by Yaagl"`,
-        `PAD_END="# End of section"`,
-
-        `if ! grep -qF "$ENTRY" "$HOSTS_FILE"; then`,
-        `sudo bash -c "echo -e '$PAD_START\n$ENTRY\n$PAD_END' >> '/etc/hosts'"`,
-        `fi`,
-        `sleep 20`,
-        `sudo sed -i.bak "/$PAD_START/,/$PAD_END/d" "$HOSTS_FILE"`,
-
-        `rm ${tmpScriptPath}`,
-      ];
-
-      await writeFile(tmpScriptPath, commands.join("\n"));
-      await exec(
-        [
-          "osascript",
-          "-e",
-          `do shell script "source ${tmpScriptPath} > /dev/null 2>&1 &" with administrator privileges`,
-        ],
-        {},
-        false
-      );
-    }
-
-    await wine.exec2(
-      config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
-      config.steamPatch
-        ? [
-            wine.toWinePath(join(gameDir, gameExecutable)),
-            ...(useD3D12 ? ["-use-d3d12"] : []),
-          ]
-        : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `],
-      {
-        MTL_HUD_ENABLED: config.metalHud ? "1" : "0",
-        WINEDLLOVERRIDES: "",
-        WINE_ENABLE_TIMEOUT_FIX: config.timeoutFix ? "1" : "0",
-        ...(wine.attributes.renderBackend == "dxmt"
-          ? {
-              WINEMSYNC: "1",
-              DXMT_LOG_PATH: yaaglDir,
-              DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
-              GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
-            }
-          : {
-              WINEESYNC: "1",
-            }),
-        ...(config.proxyEnabled
-          ? {
-              HTTP_PROXY: config.proxyHost,
-              HTTPS_PROXY: config.proxyHost,
-            }
-          : {}),
-      },
-      logfile
-    );
+  // Closing the launcher while the game (or its cleanup below) runs must stop
+  // this prefix's wineserver while the launcher is still alive, let the
+  // cleanup settle, and wait for any server that cleanup started.
+  const cleanup = Promise.withResolvers<void>();
+  let closing = false;
+  const removeHook = addTerminationHook(async () => {
+    closing = true;
+    await wine.stopServer();
+    await cleanup.promise;
     await wine.waitUntilServerOff();
-    if (config.resolutionCustom) {
-      await revertResolutionRegistry(wine, server);
-    }
-  } catch (e: unknown) {
-    // it seems game crashed?
-    await log(String(e));
-  }
+    return true;
+  });
+  try {
+    try {
+      yield ["setStateText", "GAME_RUNNING"];
+      const logfile = resolve(`./logs/game_${Date.now()}.log`);
 
-  // await removeFile(resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-  await removeFile(resolve("config.bat"));
-  yield ["setStateText", "REVERT_PATCHING"];
-  yield* patchRevertProgram(gameDir, wine, server, config);
+      if (config.blockNet && !closing) {
+        const tmpScriptPath = "/tmp/yaagl_network_block_script.sh";
+        const blockUrl =
+          server.id == "nap_global" ? NAP_OS_BLOCK_URL : NAP_CN_BLOCK_URL;
+
+        const commands = [
+          `#!/bin/sh`,
+
+          `HOSTS_FILE="/etc/hosts"`,
+          `ENTRY="0.0.0.0 ${blockUrl}"`,
+          `PAD_START="# Temporarily Added by Yaagl"`,
+          `PAD_END="# End of section"`,
+
+          `if ! grep -qF "$ENTRY" "$HOSTS_FILE"; then`,
+          `sudo bash -c "echo -e '$PAD_START\n$ENTRY\n$PAD_END' >> '/etc/hosts'"`,
+          `fi`,
+          `sleep 20`,
+          `sudo sed -i.bak "/$PAD_START/,/$PAD_END/d" "$HOSTS_FILE"`,
+
+          `rm ${tmpScriptPath}`,
+        ];
+
+        await writeFile(tmpScriptPath, commands.join("\n"));
+        await exec(
+          [
+            "osascript",
+            "-e",
+            `do shell script "source ${tmpScriptPath} > /dev/null 2>&1 &" with administrator privileges`,
+          ],
+          {},
+          false
+        );
+      }
+
+      if (!closing) {
+        await wine.exec2(
+          config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
+          config.steamPatch
+            ? [
+                wine.toWinePath(join(gameDir, gameExecutable)),
+                ...(useD3D12 ? ["-use-d3d12"] : []),
+              ]
+            : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `],
+          {
+            MTL_HUD_ENABLED: config.metalHud ? "1" : "0",
+            WINEDLLOVERRIDES: "",
+            WINE_ENABLE_TIMEOUT_FIX: config.timeoutFix ? "1" : "0",
+            ...(wine.attributes.renderBackend == "dxmt"
+              ? {
+                  WINEMSYNC: "1",
+                  DXMT_LOG_PATH: yaaglDir,
+                  DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
+                  GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
+                }
+              : {
+                  WINEESYNC: "1",
+                }),
+            ...(config.proxyEnabled
+              ? {
+                  HTTP_PROXY: config.proxyHost,
+                  HTTPS_PROXY: config.proxyHost,
+                }
+              : {}),
+          },
+          logfile
+        );
+      }
+      await wine.waitUntilServerOff();
+      if (config.resolutionCustom) {
+        await revertResolutionRegistry(wine, server);
+      }
+    } catch (e: unknown) {
+      // it seems game crashed?
+      await log(String(e));
+    }
+
+    // await removeFile(resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+    await removeFile(resolve("config.bat"));
+    yield ["setStateText", "REVERT_PATCHING"];
+    yield* patchRevertProgram(gameDir, wine, server, config);
+  } finally {
+    // Settle before unregistering so a pending close hook never waits forever.
+    cleanup.resolve();
+    removeHook();
+  }
 }
 
 async function fixWebview(wine: Wine, server: Server) {

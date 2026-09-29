@@ -358,9 +358,10 @@ export function addTerminationHook(fn: (forced: boolean) => Promise<boolean>) {
   };
 }
 
-// ??
-export async function GLOBAL_onClose(forced: boolean) {
-  for (const hook of hooks.reverse()) {
+async function runTerminationHooks(forced: boolean) {
+  // Iterate a reversed snapshot: hooks may unregister themselves while an
+  // earlier hook is still awaiting, and the stored LIFO order must not change.
+  for (const hook of [...hooks].reverse()) {
     if (!(await hook(forced)) && !forced) {
       return false; // aborted
     }
@@ -368,9 +369,31 @@ export async function GLOBAL_onClose(forced: boolean) {
   return true;
 }
 
+// Close in flight (or completed). Repeated closes share it instead of running
+// hooks again; it is cleared only when the close was aborted or failed.
+let closing: Promise<boolean> | undefined;
+
+export function GLOBAL_onClose(forced: boolean): Promise<boolean> {
+  if (!closing) {
+    const run: Promise<boolean> = runTerminationHooks(forced).then(
+      done => {
+        if (!done && closing === run) closing = undefined;
+        return done;
+      },
+      (e: unknown) => {
+        if (closing === run) closing = undefined;
+        throw e;
+      }
+    );
+    closing = run;
+  }
+  return closing;
+}
+
 export async function shutdown() {
-  for (const hook of hooks.reverse()) {
-    await hook(true);
+  // A pending non-forced close may still be aborted by a hook; force afterwards.
+  if (!(await GLOBAL_onClose(true))) {
+    await GLOBAL_onClose(true);
   }
 }
 

@@ -9,15 +9,44 @@ import {
   resolve,
 } from "@utils";
 
-export const D3DMETAL_RUNTIME_ID = "wine-11.17-d3dmetal-gptk4.0b2-4";
-const D3DMETAL_ARCHIVE_NAME = "wine-11.17-d3dmetal-gptk4.0b2-macos26.tar.xz";
-export const D3DMETAL_RUNTIME_URL = `https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.17-gptk4.0b2-4/${D3DMETAL_ARCHIVE_NAME}`;
-// Pins from the independently published Wine release.
-const D3DMETAL_ARCHIVE_SHA256 =
-  "0db3b1a1e971ad693cfaec734e9516742257c7a7edc50616288db61274e150e6";
-const D3DMETAL_ARCHIVE_SIZE = 237616672;
-const D3DMETAL_HELPER_SHA256 =
-  "4e23a23d796c8a3e5db2c4bd1e7201d42074e5549f1b0bf2194a686f577e1eaf";
+export interface D3DMetalRuntime {
+  id: string;
+  remoteUrl: string;
+  archiveSize: number;
+  archiveSha256: string;
+  helperSha256: string;
+}
+
+const WINE_RELEASES =
+  "https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download";
+
+// Pins from the independently published Wine releases. Every runtime shares
+// the GPTK 4.0b2 license and native cache below.
+export const D3DMETAL_WINE_11_17: D3DMetalRuntime = {
+  id: "wine-11.17-d3dmetal-gptk4.0b2-4",
+  remoteUrl: `${WINE_RELEASES}/wine-11.17-gptk4.0b2-4/wine-11.17-d3dmetal-gptk4.0b2-macos26.tar.xz`,
+  archiveSize: 237616672,
+  archiveSha256:
+    "0db3b1a1e971ad693cfaec734e9516742257c7a7edc50616288db61274e150e6",
+  helperSha256:
+    "4e23a23d796c8a3e5db2c4bd1e7201d42074e5549f1b0bf2194a686f577e1eaf",
+};
+
+export const D3DMETAL_WINE_CX26_3: D3DMetalRuntime = {
+  id: "wine-cx26.3-d3dmetal-gptk4.0b2-2",
+  remoteUrl: `${WINE_RELEASES}/wine-cx26.3-gptk4.0b2-2/wine-cx26.3-d3dmetal-gptk4.0b2-macos26.tar.xz`,
+  archiveSize: 226446836,
+  archiveSha256:
+    "229bc2c9ba4a3542f283e6971502961c3e1ed6959aa9b421d725acbc2d4a5933",
+  helperSha256:
+    "f531e2450a91295d2e27d11a8a9a58f2ec8f8762435b55aefa13964b80359ea5",
+};
+
+export const D3DMETAL_RUNTIMES: D3DMetalRuntime[] = [
+  D3DMETAL_WINE_11_17,
+  D3DMETAL_WINE_CX26_3,
+];
+
 const OFFICIAL_RELEASE =
   "https://github.com/dbc-hbin/d3dmetal-redistributable/releases/download/gptk-4.0b2";
 const LICENSE_SHA256 =
@@ -38,14 +67,17 @@ async function assertFileHash(path: string, expected: string) {
   }
 }
 
-export async function verifyD3DMetalArchive(path: string) {
+export async function verifyD3DMetalArchive(
+  runtime: D3DMetalRuntime,
+  path: string
+) {
   const size = Number(
     (await exec(["/usr/bin/stat", "-f", "%z", path])).stdOut.trim()
   );
-  if (size !== D3DMETAL_ARCHIVE_SIZE) {
+  if (size !== runtime.archiveSize) {
     throw new Error("D3DMetal Wine archive size mismatch");
   }
-  await assertFileHash(path, D3DMETAL_ARCHIVE_SHA256);
+  await assertFileHash(path, runtime.archiveSha256);
 }
 
 export async function loadD3DMetalLicense(aria2: Aria2): Promise<string> {
@@ -82,12 +114,15 @@ export async function loadD3DMetalLicense(aria2: Aria2): Promise<string> {
   return text;
 }
 
-export async function prepareD3DMetalWine(wineRoot: string) {
+export async function prepareD3DMetalWine(
+  runtime: D3DMetalRuntime,
+  wineRoot: string
+) {
   const helper = join(
     wineRoot,
     "libexec/yaagl-d3dmetal/prepare-d3dmetal-runtime"
   );
-  await assertFileHash(helper, D3DMETAL_HELPER_SHA256);
+  await assertFileHash(helper, runtime.helperSha256);
   await exec(["/usr/bin/codesign", "--verify", "--strict", helper]);
   const output = join(wineRoot, "lib/external");
   const prepared = join(wineRoot, ".prepared-d3dmetal");
