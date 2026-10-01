@@ -48,7 +48,7 @@ Use it at your own risk. Or enjoying it with a new f2p account.
 
 ### ZZZ Test build
 
-The Test builds offer the Wine 11.17 D3DMetal runtime in the Wine version setting. It requires Apple Silicon, macOS 26+ and Rosetta 2. Apple GPTK license consent is required before the separate, verified D3DMetal download and patching; Apple's framework is not bundled.
+The Test builds offer the Wine 11.17 D3DMetal runtime in the Wine version setting, pinned to [runtime release 6](https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/tag/wine-11.17-gptk4.0b2-6). It requires Apple Silicon, macOS 26+ and Rosetta 2. Apple GPTK license consent is required before the separate, verified D3DMetal download and patching; Apple's framework is not bundled.
 
 Installing it uses the existing installer and recreates the Wine prefix after preparation succeeds; game files outside the prefix are retained. Closing the launcher during a ZZZ session waits for that Wine session and its cleanup before exiting. This release branch is separate from PR #759 until testing is complete.
 <!--
