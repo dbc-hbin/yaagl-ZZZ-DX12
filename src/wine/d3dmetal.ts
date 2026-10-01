@@ -20,32 +20,19 @@ export interface D3DMetalRuntime {
 const WINE_RELEASES =
   "https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download";
 
-// Pins from the independently published Wine releases. Every runtime shares
+// Pins from the independently published Wine release. Every runtime shares
 // the GPTK 4.0b2 license and native cache below.
 export const D3DMETAL_WINE_11_17: D3DMetalRuntime = {
-  id: "wine-11.17-d3dmetal-gptk4.0b2-4",
-  remoteUrl: `${WINE_RELEASES}/wine-11.17-gptk4.0b2-4/wine-11.17-d3dmetal-gptk4.0b2-macos26.tar.xz`,
-  archiveSize: 237616672,
+  id: "wine-11.17-d3dmetal-gptk4.0b2-5",
+  remoteUrl: `${WINE_RELEASES}/wine-11.17-gptk4.0b2-5/wine-11.17-d3dmetal-gptk4.0b2-macos26.tar.xz`,
+  archiveSize: 237650372,
   archiveSha256:
-    "0db3b1a1e971ad693cfaec734e9516742257c7a7edc50616288db61274e150e6",
+    "56551635d5a82da8c149bcff5389e9686b02f9fc56ca83f79c6bb53f3258f3aa",
   helperSha256:
-    "4e23a23d796c8a3e5db2c4bd1e7201d42074e5549f1b0bf2194a686f577e1eaf",
+    "80eb8ed28f931634f2c28fe239227a96f6efef088a966b86f5aee873554b1dc9",
 };
 
-export const D3DMETAL_WINE_CX26_3: D3DMetalRuntime = {
-  id: "wine-cx26.3-d3dmetal-gptk4.0b2-2",
-  remoteUrl: `${WINE_RELEASES}/wine-cx26.3-gptk4.0b2-2/wine-cx26.3-d3dmetal-gptk4.0b2-macos26.tar.xz`,
-  archiveSize: 226446836,
-  archiveSha256:
-    "229bc2c9ba4a3542f283e6971502961c3e1ed6959aa9b421d725acbc2d4a5933",
-  helperSha256:
-    "f531e2450a91295d2e27d11a8a9a58f2ec8f8762435b55aefa13964b80359ea5",
-};
-
-export const D3DMETAL_RUNTIMES: D3DMetalRuntime[] = [
-  D3DMETAL_WINE_11_17,
-  D3DMETAL_WINE_CX26_3,
-];
+export const D3DMETAL_RUNTIMES: D3DMetalRuntime[] = [D3DMETAL_WINE_11_17];
 
 const OFFICIAL_RELEASE =
   "https://github.com/dbc-hbin/d3dmetal-redistributable/releases/download/gptk-4.0b2";

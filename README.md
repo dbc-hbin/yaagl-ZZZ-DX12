@@ -46,11 +46,11 @@ Use it at your own risk. Or enjoying it with a new f2p account.
 
 - Also make sure your game files aren't stored inside `/Applications`, use something inside your home folder instead, e.g `Games/GI`.
 
-### ZZZ Test: Wine A/B comparison
+### ZZZ Test build
 
-The Test builds offer Wine 11.17 and Wine 11.0 based on CrossOver 26.3 in the Wine version setting. Both D3DMetal runtimes require Apple Silicon, macOS 26+ and Rosetta 2. Apple GPTK license consent is required before the separate, verified D3DMetal download and patching; Apple's framework is not bundled.
+The Test builds offer the Wine 11.17 D3DMetal runtime in the Wine version setting. It requires Apple Silicon, macOS 26+ and Rosetta 2. Apple GPTK license consent is required before the separate, verified D3DMetal download and patching; Apple's framework is not bundled.
 
-Switching uses the existing installer and recreates the Wine prefix after preparation succeeds; game files outside the prefix are retained. Keep game settings equivalent when comparing. Closing the launcher during a ZZZ session now waits for that Wine session and its cleanup before exiting. This release branch is separate from PR #759 until A/B testing is complete.
+Installing it uses the existing installer and recreates the Wine prefix after preparation succeeds; game files outside the prefix are retained. Closing the launcher during a ZZZ session waits for that Wine session and its cleanup before exiting. This release branch is separate from PR #759 until testing is complete.
 <!--
 ## Development (Outdated)
 
