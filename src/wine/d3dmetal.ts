@@ -23,13 +23,13 @@ const WINE_RELEASES =
 // Pins from the independently published Wine release. Every runtime shares
 // the GPTK 4.0b2 license and native cache below.
 export const D3DMETAL_WINE_11_17: D3DMetalRuntime = {
-  id: "wine-11.17-d3dmetal-gptk4.0b2-6",
-  remoteUrl: `${WINE_RELEASES}/wine-11.17-gptk4.0b2-6/wine-11.17-d3dmetal-gptk4.0b2-macos26.tar.xz`,
-  archiveSize: 237660428,
+  id: "wine-11.17-d3dmetal-gptk4.0b2-7",
+  remoteUrl: `${WINE_RELEASES}/wine-11.17-gptk4.0b2-7/wine-11.17-d3dmetal-gptk4.0b2-macos26.tar.xz`,
+  archiveSize: 237617632,
   archiveSha256:
-    "afe6c949a0ce1900723bb41356d30240a071fc9b1518f0b878910f7bb7dec07c",
+    "e07293a0e5db490fecf623054b4275eeae25330200b1da914f0f4f409bbacc0a",
   helperSha256:
-    "dd95f9be1c49ed8eb55f3b0b46a7bb4b4c2c95e57d6b81d30b5b8f776f613114",
+    "f71ba3f8ef578cf7a3dfd0b3722cf45874fe1f1642163703d7469fa226e19877",
 };
 
 export const D3DMETAL_RUNTIMES: D3DMetalRuntime[] = [D3DMETAL_WINE_11_17];
