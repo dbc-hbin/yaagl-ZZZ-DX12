@@ -9,17 +9,15 @@ import {
   resolve,
 } from "@utils";
 
-export const D3DMETAL_RUNTIME_ID = "wine-11.17-d3dmetal-gptk4.0b2-8";
+export const D3DMETAL_RUNTIME_ID = "wine-11.17-d3dmetal-gptk4.0b2-9";
 const D3DMETAL_ARCHIVE_NAME = "wine-11.17-d3dmetal-gptk4.0b2-macos26.tar.xz";
-export const D3DMETAL_RUNTIME_URL = `https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.17-gptk4.0b2-8/${D3DMETAL_ARCHIVE_NAME}`;
-// Pins from the independently published Wine release. The experimental 8
-// archive keeps the shared archive name and its packaged metadata still reads
-// `...-7`, so the runtime id here is the release tag, separate from that label.
+export const D3DMETAL_RUNTIME_URL = `https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.17-gptk4.0b2-9/${D3DMETAL_ARCHIVE_NAME}`;
+// Pins from the independently published Wine release.
 const D3DMETAL_ARCHIVE_SHA256 =
-  "4e1710022ddfa0948231c36121c8af0bd325d7b4dbfb08d5f600ce0640e18afc";
-const D3DMETAL_ARCHIVE_SIZE = 237618208;
+  "1199fa3402a7a145a13c2bfd87ad7a66dfee66bdcadbc9303f32e00416922c47";
+const D3DMETAL_ARCHIVE_SIZE = 237630196;
 const D3DMETAL_HELPER_SHA256 =
-  "e607f5a5c574c143bdb5f5c88944e52a8c25e4346e4c0761572bd918cf545f97";
+  "47991896c33793fb9f832a20988db09bc2c9c52d65cf93eee9396e60e2c73e40";
 const OFFICIAL_RELEASE =
   "https://github.com/dbc-hbin/d3dmetal-redistributable/releases/download/gptk-4.0b2";
 const LICENSE_SHA256 =
