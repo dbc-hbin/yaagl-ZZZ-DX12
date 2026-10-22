@@ -135,7 +135,7 @@ export const de_DE: typeof zh_CN = {
   UPDATE_PROMPT_IGNORE: "Update ignorieren",
   SETTING_CHECK_UPDATE: "Nach YAAGL-Updates suchen",
   ALREADY_LATEST_VERSION: "Sie verwenden bereits die neueste Version.",
-  D3DMETAL_LICENSE_TITLE: "Game Porting Toolkit 4.0 beta 2 Lizenzvereinbarung",
+  D3DMETAL_LICENSE_TITLE: "Game Porting Toolkit 4.0 beta 3 Lizenzvereinbarung",
   D3DMETAL_LICENSE_LOADING: en.D3DMETAL_LICENSE_LOADING,
   D3DMETAL_LICENSE_ERROR: en.D3DMETAL_LICENSE_ERROR,
   D3DMETAL_LICENSE_RETRY: en.D3DMETAL_LICENSE_RETRY,

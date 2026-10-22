@@ -132,7 +132,7 @@ export const th_TH: typeof zh_CN = {
   SETTING_CHECK_UPDATE: "ตรวจสอบการอัปเดต YAAGL",
   ALREADY_LATEST_VERSION: "คุณใช้เวอร์ชันล่าสุดอยู่แล้ว",
   D3DMETAL_LICENSE_TITLE:
-    "ข้อตกลงสิทธิ์การใช้งาน Game Porting Toolkit 4.0 beta 2",
+    "ข้อตกลงสิทธิ์การใช้งาน Game Porting Toolkit 4.0 beta 3",
   D3DMETAL_LICENSE_LOADING: en.D3DMETAL_LICENSE_LOADING,
   D3DMETAL_LICENSE_ERROR: en.D3DMETAL_LICENSE_ERROR,
   D3DMETAL_LICENSE_RETRY: en.D3DMETAL_LICENSE_RETRY,

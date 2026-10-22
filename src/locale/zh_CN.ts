@@ -128,7 +128,7 @@ export const zh_CN = {
   UPDATE_PROMPT_IGNORE: "忽略此更新",
   SETTING_CHECK_UPDATE: "检查 YAAGL 更新",
   ALREADY_LATEST_VERSION: "您已在使用最新版本。",
-  D3DMETAL_LICENSE_TITLE: "Game Porting Toolkit 4.0 beta 2 许可协议",
+  D3DMETAL_LICENSE_TITLE: "Game Porting Toolkit 4.0 beta 3 许可协议",
   D3DMETAL_LICENSE_LOADING: "正在获取并验证许可协议…",
   D3DMETAL_LICENSE_ERROR: "无法获取或验证许可协议。安装尚未开始。",
   D3DMETAL_LICENSE_RETRY: "重试",

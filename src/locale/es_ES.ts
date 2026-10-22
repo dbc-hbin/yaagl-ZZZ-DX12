@@ -134,7 +134,7 @@ export const es_ES: typeof zh_CN = {
   SETTING_CHECK_UPDATE: "Buscar actualizaciones de YAAGL",
   ALREADY_LATEST_VERSION: "Ya estás utilizando la última versión.",
   D3DMETAL_LICENSE_TITLE:
-    "Acuerdo de licencia de Game Porting Toolkit 4.0 beta 2",
+    "Acuerdo de licencia de Game Porting Toolkit 4.0 beta 3",
   D3DMETAL_LICENSE_LOADING: en.D3DMETAL_LICENSE_LOADING,
   D3DMETAL_LICENSE_ERROR: en.D3DMETAL_LICENSE_ERROR,
   D3DMETAL_LICENSE_RETRY: en.D3DMETAL_LICENSE_RETRY,

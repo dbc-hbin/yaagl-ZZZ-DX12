@@ -71,6 +71,22 @@ pnpm run start-hk4eos
 node ./build-app.js
 ``` -->
 
+## Experimental bundled D3DMetal runtime
+
+The Wine menu entry **Wine 11.20 D3Dmetal (GPTK4.0b3, experimental)**
+installs the complete macOS 26 runtime directly from the
+[pinned Wine release](https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/tag/wine-11.20-gptk4.0b3-1).
+It includes the signed D3DMetal framework, stock graphics, native FSR and
+dependencies; no GPTK DMG selection, separate GPTK download or native preparation
+helper is required.
+
+Before installation, the launcher downloads and verifies `License.rtf` from the
+same release and requires explicit acceptance of Apple's license. It checks the
+archive's exact size and SHA-256, extracts its `wine/` root into a staging
+directory, and verifies the bundled framework's code signature before replacing
+the active runtime and prefix. Download, extraction or signature failures leave
+the active runtime and prefix untouched and clean up temporary installation files.
+
 ## Uninstall (completely)
 1. Drag app to the bin
 2. Open Terminal and run:

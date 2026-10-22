@@ -9,17 +9,15 @@ import {
   resolve,
 } from "@utils";
 
-export const D3DMETAL_RUNTIME_ID = "wine-11.17-d3dmetal-gptk4.0b2-10";
-const D3DMETAL_ARCHIVE_NAME = "wine-11.17-d3dmetal-gptk4.0b2-macos26.tar.xz";
-export const D3DMETAL_RUNTIME_URL = `https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.17-gptk4.0b2-10/${D3DMETAL_ARCHIVE_NAME}`;
+export const D3DMETAL_RUNTIME_ID = "wine-11.20-d3dmetal-gptk4.0b3-1";
+const D3DMETAL_RELEASE =
+  "https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.20-gptk4.0b3-1";
+const D3DMETAL_ARCHIVE_NAME = "wine-11.20-d3dmetal-gptk4.0b3-macos26.tar.xz";
+export const D3DMETAL_RUNTIME_URL = `${D3DMETAL_RELEASE}/${D3DMETAL_ARCHIVE_NAME}`;
 // Pins from the independently published Wine release.
 const D3DMETAL_ARCHIVE_SHA256 =
-  "5084a2ca19071f9269193c9b6f003a82eeb96f823b1121382aa317ae2fb50fd4";
-const D3DMETAL_ARCHIVE_SIZE = 239444460;
-const D3DMETAL_HELPER_SHA256 =
-  "a21eb0f6de40d5a7f1c23f989644b0966b99c637a5d8f0d26b7b26a5fbffe00e";
-const OFFICIAL_RELEASE =
-  "https://github.com/dbc-hbin/d3dmetal-redistributable/releases/download/gptk-4.0b2";
+  "a1a6f1dab9bb373091f4b7756505b706e29c9c72e805c011d8107192574920aa";
+const D3DMETAL_ARCHIVE_SIZE = 307352548;
 const LICENSE_SHA256 =
   "5abb2d059be217663b00e8fd37e14411d374e11d17e3b744eebd49b8d17118c8";
 
@@ -63,7 +61,7 @@ export async function loadD3DMetalLicense(aria2: Aria2): Promise<string> {
     );
     try {
       for await (const _ of aria2.doStreamingDownload({
-        uri: `${OFFICIAL_RELEASE}/License.rtf`,
+        uri: `${D3DMETAL_RELEASE}/License.rtf`,
         absDst: downloaded,
       })) {
         /* License is small; UI remains in loading state. */
@@ -83,33 +81,11 @@ export async function loadD3DMetalLicense(aria2: Aria2): Promise<string> {
   return text;
 }
 
-export async function prepareD3DMetalWine(wineRoot: string) {
-  const helper = join(
-    wineRoot,
-    "libexec/yaagl-d3dmetal/prepare-d3dmetal-runtime"
-  );
-  await assertFileHash(helper, D3DMETAL_HELPER_SHA256);
-  await exec(["/usr/bin/codesign", "--verify", "--strict", helper]);
-  const output = join(wineRoot, "lib/external");
-  const prepared = join(wineRoot, ".prepared-d3dmetal");
+export async function verifyD3DMetalWine(wineRoot: string) {
   await exec([
-    helper,
-    "--output",
-    prepared,
-    "--cache",
-    resolve("./d3dmetal-native-cache"),
-    "--accept-apple-license",
+    "/usr/bin/codesign",
+    "--verify",
+    "--strict",
+    join(wineRoot, "lib/external/D3DMetal.framework"),
   ]);
-  // The native helper validates its inputs, signatures and finished output
-  // before publishing the prepared directory.
-  for (const name of [
-    "D3DMetal.framework",
-    "prepared-d3dmetal.json",
-    "License.rtf",
-    "Acknowledgements.rtf",
-    "SHA256SUMS",
-  ]) {
-    await exec(["/bin/mv", join(prepared, name), join(output, name)]);
-  }
-  await exec(["/bin/rmdir", prepared]);
 }
