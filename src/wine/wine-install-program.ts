@@ -27,7 +27,7 @@ import { createD3DMetalLicenseUI } from "./d3dmetal-license";
 import {
   D3DMETAL_RUNTIME_ID,
   loadD3DMetalLicense,
-  prepareD3DMetalWine,
+  verifyD3DMetalWine,
   verifyD3DMetalArchive,
 } from "./d3dmetal";
 
@@ -92,8 +92,8 @@ export async function createWineInstallProgram({
           wineDistro.attributes.winePath ?? "wine",
           true
         );
-        await prepareD3DMetalWine(stage);
-        // Preparation failures leave the active Wine tree and prefix untouched.
+        await verifyD3DMetalWine(stage);
+        // Validation failures leave the active Wine tree and prefix untouched.
         await rmrf_dangerously(wineAbsPrefix);
         await rmrf_dangerously(wineBinaryDir);
         await exec(["/bin/mv", stage, wineBinaryDir]);
@@ -151,7 +151,7 @@ export async function createWineInstallProgram({
         yield* installMediaFoundation(aria2, wine);
       }
 
-      // Keep a pending update selector on interrupted native installs until
+      // Keep a pending update selector on interrupted bundled installs until
       // the installed tag is recorded and the runtime is ready.
       if (isOurRuntime) await setKey("wine_tag", wineDistro.id);
       await setKey("wine_state", "ready");
@@ -182,7 +182,7 @@ export async function createWineInstallProgram({
           (await fileOrDirExists(resolve("./wine"))) &&
           (await fileOrDirExists(wineAbsPrefix)) &&
           !(await fileOrDirExists(
-            resolve("./wine/lib/external/prepared-d3dmetal.json")
+            resolve("./wine/yaagl-d3dmetal-runtime.json")
           ))
         ) {
           await setKey("wine_state", "ready");

@@ -127,7 +127,7 @@ export const en: typeof zh_CN = {
   UPDATE_PROMPT_IGNORE: "Ignore Update",
   SETTING_CHECK_UPDATE: "Check for YAAGL Updates",
   ALREADY_LATEST_VERSION: "You are already using the latest version.",
-  D3DMETAL_LICENSE_TITLE: "Game Porting Toolkit 4.0 beta 2 License agreement",
+  D3DMETAL_LICENSE_TITLE: "Game Porting Toolkit 4.0 beta 3 License agreement",
   D3DMETAL_LICENSE_LOADING: "Downloading and verifying the license…",
   D3DMETAL_LICENSE_ERROR:
     "Could not load or verify the license. Installation has not started.",
