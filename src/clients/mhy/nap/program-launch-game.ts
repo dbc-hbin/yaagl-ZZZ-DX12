@@ -14,6 +14,7 @@ import {
   getKeyOrDefault,
   resolvePreferredMaxFrameRate,
 } from "../../../utils";
+import { preflightGameMode } from "../../../wine/game-mode";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
@@ -36,6 +37,9 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
+  const gameModeSupervisor = config.gameMode
+    ? await preflightGameMode()
+    : undefined;
   await fixWebview(wine, server);
   await wine.setProps(config);
 
@@ -60,6 +64,7 @@ cd /d "${wine.toWinePath(gameDir)}"
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
   const yaaglDir = resolve("./");
+  let launchFailure: unknown;
   try {
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = resolve(`./logs/game_${Date.now()}.log`);
@@ -106,13 +111,16 @@ cd /d "${wine.toWinePath(gameDir)}"
       config.steamPatch
         ? [
             wine.toWinePath(join(gameDir, gameExecutable)),
-            ...(useD3D12 ? ["-use-d3d12"] : []),
+            ...(gameModeSupervisor ? args : useD3D12 ? ["-use-d3d12"] : []),
           ]
         : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "0",
         WINEDLLOVERRIDES: "",
         WINE_ENABLE_TIMEOUT_FIX: config.timeoutFix ? "1" : "0",
+        ...(gameModeSupervisor
+          ? { YAAGL_GAME_MODE_TARGET: join(gameDir, gameExecutable) }
+          : {}),
         ...(wine.attributes.renderBackend == "dxmt"
           ? {
               WINEMSYNC: "1",
@@ -135,12 +143,14 @@ cd /d "${wine.toWinePath(gameDir)}"
             }
           : {}),
       },
-      logfile
+      logfile,
+      gameModeSupervisor
     );
-    await wine.waitUntilServerOff();
+    if (!gameModeSupervisor) await wine.waitUntilServerOff();
   } catch (e: unknown) {
     // it seems game crashed?
     await log(String(e));
+    if (gameModeSupervisor) launchFailure = e;
   }
 
   try {
@@ -155,6 +165,9 @@ cd /d "${wine.toWinePath(gameDir)}"
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine, server, config);
+  if (launchFailure) {
+    throw new Error(`Game Mode launch failed: ${String(launchFailure)}`);
+  }
 }
 
 async function fixWebview(wine: Wine, server: Server) {

@@ -48,12 +48,21 @@ export async function createWine(options: {
     program: string,
     args: string[],
     env?: { [key: string]: string },
-    log_file: string | undefined = undefined
+    log_file: string | undefined = undefined,
+    gameModeSupervisor?: string
   ) {
-    return await unixExec2(
+    const command =
       program == "copy"
         ? [loaderBin, "cmd", "/c", program, ...args]
-        : [loaderBin, program, ...args],
+        : [loaderBin, program, ...args];
+    if (gameModeSupervisor) {
+      command.unshift(
+        gameModeSupervisor,
+        join(dirname(loaderBin), "wineserver")
+      );
+    }
+    return await unixExec2(
+      command,
       {
         ...getEnvironmentVariables(),
         ...(env ?? {}),

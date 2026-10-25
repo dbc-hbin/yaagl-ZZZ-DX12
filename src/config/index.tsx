@@ -43,6 +43,7 @@ import { createLeftCmdConfig } from "./left-cmd";
 import { createWineDistroConfig } from "./wine-distribution";
 import { createD3D12 } from "./d3d12";
 import { createMaxFrameRateConfig } from "./max-framerate";
+import { createGameMode } from "./game-mode";
 import createLocaleConfig from "./ui-locale";
 import createFPSUnlock from "./fps-unlock";
 import { exec2, getKeyOrDefault, resolve, setKey } from "../utils";
@@ -151,6 +152,10 @@ export async function createConfiguration({
   });
   const [D3D12] = await createD3D12({ locale, config, wine });
   const [MFR] = await createMaxFrameRateConfig({ locale, config });
+  const isZZZ = ["napcn", "napos"].includes(
+    String(import.meta.env["YAAGL_CHANNEL_CLIENT"])
+  );
+  const [GameMode] = await createGameMode({ locale, config });
   const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
@@ -494,6 +499,10 @@ export async function createConfiguration({
                           <Show when={supportsD3d12}>
                             <Divider />
                             <D3D12 />
+                          </Show>
+                          <Show when={isZZZ}>
+                            <Divider />
+                            <GameMode />
                           </Show>
                         </VStack>
                       </Box>

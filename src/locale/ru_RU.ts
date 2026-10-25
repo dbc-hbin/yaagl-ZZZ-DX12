@@ -119,6 +119,10 @@ export const ru_RU: typeof zh_CN = {
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix (Исправление тайм-аута)",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_GAME_MODE: en.SETTING_GAME_MODE,
+  SETTING_GAME_MODE_REQUEST: en.SETTING_GAME_MODE_REQUEST,
+  SETTING_GAME_MODE_DESC: en.SETTING_GAME_MODE_DESC,
+  SETTING_GAME_MODE_UNAVAILABLE: en.SETTING_GAME_MODE_UNAVAILABLE,
   SETTING_D3D12_RUN:
     "Запуск с DX12 (рекомендуется macOS 27, не рекомендуется пользователям с 16ГБ ОЗУ или меньше)",
   SETTING_LICENSES: "Лицензии",

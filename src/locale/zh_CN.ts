@@ -113,6 +113,12 @@ export const zh_CN = {
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_GAME_MODE: "macOS 游戏模式",
+  SETTING_GAME_MODE_REQUEST: "在下次启动绝区零时请求游戏模式",
+  SETTING_GAME_MODE_DESC:
+    "下次启动时，仅为指定的绝区零可执行文件使用原生游戏宿主，并通过内置的 Apple 工具为 Wine 会话请求系统级游戏模式。最后一个重叠会话结束后恢复原有策略。不会自动切换全屏，实际运行效果尚未验证。无需安装 Xcode。",
+  SETTING_GAME_MODE_UNAVAILABLE:
+    "需要 Apple 芯片、macOS 26 或更高版本，以及支持绝区零游戏模式的 Wine。",
   SETTING_D3D12_RUN:
     "使用 DX12 运行（建议使用 macOS 27，不建议 RAM 为 16GB 或更少的用户使用）",
   SETTING_LICENSES: "Licenses", // TODO: Translate

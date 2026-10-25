@@ -119,6 +119,12 @@ export const ko_KR: typeof zh_CN = {
   SETTING_BLOCK_NET: "게임실행 문제해결(hosts 수정)",
   SETTING_TIMEOUT_FIX: "타임아웃 문제 해결",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_GAME_MODE: "macOS 게임 모드",
+  SETTING_GAME_MODE_REQUEST: "다음 ZZZ 실행 시 게임 모드 요청",
+  SETTING_GAME_MODE_DESC:
+    "다음 실행 시 지정된 ZZZ 실행 파일에만 네이티브 게임 호스트를 사용하고, 포함된 Apple 도구로 Wine 세션 동안 시스템 전체 게임 모드를 요청합니다. 겹쳐 실행된 마지막 세션이 끝나면 이전 정책을 복원합니다. 전체 화면으로 자동 전환하지 않으며 실제 실행 효과는 검증되지 않았습니다. Xcode 설치는 필요하지 않습니다.",
+  SETTING_GAME_MODE_UNAVAILABLE:
+    "Apple Silicon·macOS 26 이상과 ZZZ 게임 모드 도구가 포함된 Wine이 필요합니다.",
   SETTING_D3D12_RUN:
     "DX12로 실행 (macOS 27 권장, RAM 16GB 이하 사용자에게는 권장하지 않음)",
   SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate

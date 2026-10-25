@@ -118,6 +118,12 @@ export const en: typeof zh_CN = {
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_GAME_MODE: "macOS Game Mode",
+  SETTING_GAME_MODE_REQUEST: "Request Game Mode for ZZZ on the next launch",
+  SETTING_GAME_MODE_DESC:
+    "On the next launch, selects the native game host for the exact ZZZ executable and requests system-wide Game Mode for the Wine session using the bundled Apple tool. Restores the previous policy after the last overlapping session ends. Does not enter fullscreen automatically. Runtime effectiveness is unverified. No Xcode installation is required.",
+  SETTING_GAME_MODE_UNAVAILABLE:
+    "Requires Apple Silicon, macOS 26 or later, and a Wine runtime with the bundled ZZZ Game Mode tools.",
   SETTING_D3D12_RUN:
     "Run with DX12 (macOS 27 recommended, not recommended for 16GB or less RAM users)",
   SETTING_LICENSES: "Licenses",

@@ -119,6 +119,10 @@ export const vi_VN: typeof zh_CN = {
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_GAME_MODE: en.SETTING_GAME_MODE,
+  SETTING_GAME_MODE_REQUEST: en.SETTING_GAME_MODE_REQUEST,
+  SETTING_GAME_MODE_DESC: en.SETTING_GAME_MODE_DESC,
+  SETTING_GAME_MODE_UNAVAILABLE: en.SETTING_GAME_MODE_UNAVAILABLE,
   SETTING_D3D12_RUN:
     "Chạy với DX12 (khuyến nghị macOS 27, không khuyến nghị cho người dùng có RAM 16GB trở xuống)",
   SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
