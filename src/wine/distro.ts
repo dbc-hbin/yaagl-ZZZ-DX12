@@ -77,7 +77,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
 
   {
     id: D3DMETAL_RUNTIME_ID,
-    displayName: "Wine 11.20 D3Dmetal (GPTK4.0b3, experimental)",
+    displayName: "Wine 11.20 D3DMetal Async + Game Mode + Reflex",
     remoteUrl: D3DMETAL_RUNTIME_URL,
     attributes: {
       renderBackend: "d3dmetal",

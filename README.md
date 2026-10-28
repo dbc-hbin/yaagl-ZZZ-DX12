@@ -73,7 +73,7 @@ node ./build-app.js
 
 ## Experimental bundled D3DMetal runtime
 
-The Wine menu entry **Wine 11.20 D3Dmetal (GPTK4.0b3, experimental)**
+The Wine menu entry **Wine 11.20 D3DMetal Async + Game Mode + Reflex**
 installs the complete macOS 26 runtime directly from the
 [pinned Wine release](https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/tag/wine-11.20-gptk4.0b3-2).
 It includes the signed D3DMetal framework, stock graphics, native FSR and
