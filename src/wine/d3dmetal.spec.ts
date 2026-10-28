@@ -39,6 +39,11 @@ vi.mock("@utils", () => ({
   _safeRelaunch: vi.fn(),
 }));
 vi.mock("@common-update-ui", () => ({ createCommonUpdateUI: vi.fn() }));
+vi.mock("@config", () => ({
+  applyRecommendedSettings: vi.fn(),
+  RECOMMENDED_WINE_TAG: "9.9-dxmt",
+}));
+vi.mock("./initial-setup", () => ({ createInitialSetupUI: vi.fn() }));
 vi.mock("./d3dmetal-license", () => ({ createD3DMetalLicenseUI: vi.fn() }));
 vi.mock("./wine", () => ({ createWine: vi.fn() }));
 vi.mock("./cert", () => ({ addCertsToWine: vi.fn() }));
@@ -48,9 +53,9 @@ vi.mock("../clients", () => ({ DEFAULT_WINE_DISTRO_TAG: "9.9-dxmt" }));
 vi.mock("../clients/secret", () => ({ ENSURE_HOSTS: [] }));
 
 const release =
-  "https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.20-gptk4.0b3-1";
+  "https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.20-gptk4.0b3-2";
 const archiveHash =
-  "a1a6f1dab9bb373091f4b7756505b706e29c9c72e805c011d8107192574920aa";
+  "238994c8fdad7f5464f8c0d6451a680bb3dd0396c5b3e18f4fb4775b015a84d9";
 const licenseHash =
   "5abb2d059be217663b00e8fd37e14411d374e11d17e3b744eebd49b8d17118c8";
 const archive = "/test/wine.d3dmetal.unique.tar.xz";
@@ -102,7 +107,7 @@ beforeEach(() => {
         files.add(args[2]);
         break;
       case "/usr/bin/stat":
-        stdOut = failure === "size" ? "1" : "307352548";
+        stdOut = failure === "size" ? "1" : "307840868";
         break;
       case "/usr/bin/shasum": {
         const path = args[3];
@@ -172,6 +177,8 @@ beforeEach(() => {
     exec: wineExec,
     exec2: unexpectedWineOperation,
     waitUntilServerOff: unexpectedWineOperation,
+    killServer: unexpectedWineOperation,
+    wasServerKilled: unexpectedWineOperation,
     cmd: unexpectedWineOperation,
     toWinePath: unexpectedWineOperation,
     prefix,
@@ -192,6 +199,7 @@ async function openInstaller() {
     locale: {} as Locale,
     wineAbsPrefix: prefix,
     wineDistro: distro,
+    wineUpdate: true,
   });
   return vi.mocked(createD3DMetalLicenseUI).mock.calls[0][0];
 }
@@ -215,7 +223,7 @@ describe("bundled D3DMetal installer", () => {
 
   it("validates the bundled framework before replacing the runtime and publishing readiness", async () => {
     await install();
-    expect(D3DMETAL_RUNTIME_ID).toBe("wine-11.20-d3dmetal-gptk4.0b3-1");
+    expect(D3DMETAL_RUNTIME_ID).toBe("wine-11.20-d3dmetal-gptk4.0b3-2");
     expect(D3DMETAL_RUNTIME_URL).toBe(
       `${release}/wine-11.20-d3dmetal-gptk4.0b3-macos26.tar.xz`
     );

@@ -65,6 +65,7 @@ cd /d "${wine.toWinePath(gameDir)}"
   await mkdirp(resolve("./logs"));
   const yaaglDir = resolve("./");
   let launchFailure: unknown;
+  let commandStarted = false;
   try {
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = resolve(`./logs/game_${Date.now()}.log`);
@@ -106,6 +107,7 @@ cd /d "${wine.toWinePath(gameDir)}"
     const preferredMaxFrameRate = config.maxFrameRateCustom
       ? await resolvePreferredMaxFrameRate(config)
       : 0;
+    commandStarted = true;
     await wine.exec2(
       config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
       config.steamPatch
@@ -154,7 +156,8 @@ cd /d "${wine.toWinePath(gameDir)}"
   } catch (e: unknown) {
     // it seems game crashed?
     await log(String(e));
-    if (gameModeSupervisor) launchFailure = e;
+    if (gameModeSupervisor && (!commandStarted || !wine.wasServerKilled()))
+      launchFailure = e;
   }
 
   try {

@@ -51,6 +51,7 @@ export async function createWine(options: {
     log_file: string | undefined = undefined,
     gameModeSupervisor?: string
   ) {
+    serverKillRequested = false;
     const command =
       program == "copy"
         ? [loaderBin, "cmd", "/c", program, ...args]
@@ -78,7 +79,10 @@ export async function createWine(options: {
     });
   }
 
+  // A forced close makes the launched session exit non-zero by design.
+  let serverKillRequested = false;
   async function killServer() {
+    serverKillRequested = true;
     return await unixExec2([join(dirname(loaderBin), "wineserver"), "-k"], {
       ...getEnvironmentVariables(),
     });
@@ -173,6 +177,7 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
     exec2,
     waitUntilServerOff,
     killServer,
+    wasServerKilled: () => serverKillRequested,
     cmd,
     toWinePath,
     prefix: options.prefix,

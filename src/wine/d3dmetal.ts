@@ -9,15 +9,15 @@ import {
   resolve,
 } from "@utils";
 
-export const D3DMETAL_RUNTIME_ID = "wine-11.20-d3dmetal-gptk4.0b3-1";
+export const D3DMETAL_RUNTIME_ID = "wine-11.20-d3dmetal-gptk4.0b3-2";
 const D3DMETAL_RELEASE =
-  "https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.20-gptk4.0b3-1";
+  "https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.20-gptk4.0b3-2";
 const D3DMETAL_ARCHIVE_NAME = "wine-11.20-d3dmetal-gptk4.0b3-macos26.tar.xz";
 export const D3DMETAL_RUNTIME_URL = `${D3DMETAL_RELEASE}/${D3DMETAL_ARCHIVE_NAME}`;
 // Pins from the independently published Wine release.
 const D3DMETAL_ARCHIVE_SHA256 =
-  "a1a6f1dab9bb373091f4b7756505b706e29c9c72e805c011d8107192574920aa";
-const D3DMETAL_ARCHIVE_SIZE = 307352548;
+  "238994c8fdad7f5464f8c0d6451a680bb3dd0396c5b3e18f4fb4775b015a84d9";
+const D3DMETAL_ARCHIVE_SIZE = 307840868;
 const LICENSE_SHA256 =
   "5abb2d059be217663b00e8fd37e14411d374e11d17e3b744eebd49b8d17118c8";
 
