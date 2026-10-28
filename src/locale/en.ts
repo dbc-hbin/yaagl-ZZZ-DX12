@@ -119,9 +119,13 @@ export const en: typeof zh_CN = {
   SETTING_TIMEOUT_FIX: "Timeout Fix",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
   SETTING_GAME_MODE: "macOS Game Mode",
-  SETTING_GAME_MODE_REQUEST: "Request Game Mode for ZZZ on the next launch",
+  SETTING_GAME_MODE_REQUEST: "Use Game Mode",
   SETTING_GAME_MODE_DESC:
-    "On the next launch, selects the native game host for the exact ZZZ executable and requests system-wide Game Mode for the Wine session using the bundled Apple tool. Restores the previous policy after the last overlapping session ends. Does not enter fullscreen automatically. Runtime effectiveness is unverified. No Xcode installation is required.",
+    "Requests macOS Game Mode while the game runs. Restores the previous setting on exit.",
+  SETTING_LOW_LATENCY: "Low Latency Mode",
+  SETTING_LOW_LATENCY_ENABLE: "Reduce input latency",
+  SETTING_LOW_LATENCY_DESC:
+    "Limits queued GPU frames to 2 on the next launch. Requires a supported D3DMetal Wine runtime and may reduce FPS.",
   SETTING_GAME_MODE_UNAVAILABLE:
     "Requires Apple Silicon, macOS 26 or later, and a Wine runtime with the bundled ZZZ Game Mode tools.",
   SETTING_D3D12_RUN:

@@ -121,6 +121,18 @@ game from starting. Launch failures are surfaced after game cleanup. Turning
 the preference off restores ordinary launches without forcing system Game Mode
 off; setup commands and other games retain the ordinary Wine path.
 
+## ZZZ Low Latency Mode (opt-in)
+
+ZZZ's Game settings include a separate **Low Latency Mode** checkbox, off by
+default. On the next launch, a supported D3DMetal Wine runtime limits queued GPU
+frames to 2 without requiring the game to call Reflex Sleep. This may reduce FPS.
+The preference persists independently of macOS Game Mode.
+
+The launcher passes `YAAGL_D3DMETAL_LOW_LATENCY=force` when enabled with D3DMetal,
+and `0` when disabled or using another backend, overriding inherited settings.
+This option does not install or replace Wine; it requires a runtime implementing
+that environment-variable contract.
+
 ## Uninstall (completely)
 1. Drag app to the bin
 2. Open Terminal and run:

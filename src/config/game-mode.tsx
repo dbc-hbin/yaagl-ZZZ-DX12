@@ -55,7 +55,12 @@ export async function createGameMode({
               {locale.get("SETTING_GAME_MODE_REQUEST")}
             </Checkbox>
           </Box>
-          <Text id="game-mode-description" fontSize="$sm" color="$neutral11">
+          <Text
+            id="game-mode-description"
+            fontSize="$sm"
+            color="$neutral11"
+            style={{ "word-break": "keep-all" }}
+          >
             {locale.get("SETTING_GAME_MODE_DESC")}
           </Text>
           <Show when={!available()}>

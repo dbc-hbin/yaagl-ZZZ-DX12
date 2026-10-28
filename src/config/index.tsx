@@ -44,6 +44,7 @@ import { createWineDistroConfig } from "./wine-distribution";
 import { createD3D12 } from "./d3d12";
 import { createMaxFrameRateConfig } from "./max-framerate";
 import { createGameMode } from "./game-mode";
+import { createLowLatency } from "./low-latency";
 import createLocaleConfig from "./ui-locale";
 import createFPSUnlock from "./fps-unlock";
 import { exec2, getKeyOrDefault, resolve, setKey } from "../utils";
@@ -156,6 +157,7 @@ export async function createConfiguration({
     String(import.meta.env["YAAGL_CHANNEL_CLIENT"])
   );
   const [GameMode] = await createGameMode({ locale, config });
+  const [LowLatency] = await createLowLatency({ locale, config, wine });
   const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
@@ -503,6 +505,8 @@ export async function createConfiguration({
                           <Show when={isZZZ}>
                             <Divider />
                             <GameMode />
+                            <Divider />
+                            <LowLatency />
                           </Show>
                         </VStack>
                       </Box>

@@ -118,6 +118,10 @@ cd /d "${wine.toWinePath(gameDir)}"
         MTL_HUD_ENABLED: config.metalHud ? "1" : "0",
         WINEDLLOVERRIDES: "",
         WINE_ENABLE_TIMEOUT_FIX: config.timeoutFix ? "1" : "0",
+        YAAGL_D3DMETAL_LOW_LATENCY:
+          config.lowLatency && wine.attributes.renderBackend === "d3dmetal"
+            ? "force"
+            : "0",
         ...(gameModeSupervisor
           ? { YAAGL_GAME_MODE_TARGET: join(gameDir, gameExecutable) }
           : {}),

@@ -120,9 +120,13 @@ export const ko_KR: typeof zh_CN = {
   SETTING_TIMEOUT_FIX: "타임아웃 문제 해결",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
   SETTING_GAME_MODE: "macOS 게임 모드",
-  SETTING_GAME_MODE_REQUEST: "다음 ZZZ 실행 시 게임 모드 요청",
+  SETTING_GAME_MODE_REQUEST: "게임 모드 사용",
   SETTING_GAME_MODE_DESC:
-    "다음 실행 시 지정된 ZZZ 실행 파일에만 네이티브 게임 호스트를 사용하고, 포함된 Apple 도구로 Wine 세션 동안 시스템 전체 게임 모드를 요청합니다. 겹쳐 실행된 마지막 세션이 끝나면 이전 정책을 복원합니다. 전체 화면으로 자동 전환하지 않으며 실제 실행 효과는 검증되지 않았습니다. Xcode 설치는 필요하지 않습니다.",
+    "게임 실행 중 macOS 게임 모드를 요청합니다. 종료하면 이전 설정으로 복원합니다.",
+  SETTING_LOW_LATENCY: "저지연 모드",
+  SETTING_LOW_LATENCY_ENABLE: "입력 지연 줄이기",
+  SETTING_LOW_LATENCY_DESC:
+    "다음 실행부터 GPU 대기 프레임을 2개로 제한합니다. 지원하는 D3DMetal Wine이 필요하며 FPS가 낮아질 수 있습니다.",
   SETTING_GAME_MODE_UNAVAILABLE:
     "Apple Silicon·macOS 26 이상과 ZZZ 게임 모드 도구가 포함된 Wine이 필요합니다.",
   SETTING_D3D12_RUN:
